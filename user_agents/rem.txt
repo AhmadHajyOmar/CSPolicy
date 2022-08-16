@@ -1,0 +1,198 @@
+		// {
+		// 	"url": "github.com"
+		// },
+		// {
+		// 	"url": "whatsapp.com"
+		// },
+		// {
+		// 	"url": "reddit.com"
+		// },
+		// {
+		// 	"url": "nflxso.net"
+		// },
+		// {
+		// 	"url": "yandex.ru"
+		// },
+		// {
+		// 	"url": "mail.ru"
+		// },
+		// {
+		// 	"url": "microsoftonline.com"
+		// },
+		// {
+		// 	"url": "googlevideo.com"
+		// },
+		// {
+		// 	"url": "domaincontrol.com"
+		// },
+		// {
+		// 	"url": "gandi.net"
+		// },
+		// {
+		// 	"url": "vimeo.com"
+		// },
+		// {
+		// 	"url": "adobe.com"
+		// },
+		// {
+		// 	"url": "zoom.us"
+		// },
+		// {
+		// 	"url": "windowsupdate.com"
+		// },
+		// {
+		// 	"url": "s-msedge.net"
+		// },
+		// {
+		// 	"url": "sharepoint.com"
+		// },
+		// {
+		// 	"url": "wordpress.com"
+		// },
+		// {
+		// 	"url": "aaplimg.com"
+		// },
+		// {
+		// 	"url": "cloudapp.net"
+		// },
+		// {
+		// 	"url": "goo.gl"
+		// },
+		// {
+		// 	"url": "windows.net"
+		// },
+		// {
+		// 	"url": "bit.ly"
+		// },
+		// {
+		// 	"url": "edgekey.net"
+		// },
+		// {
+		// 	"url": "vk.com"
+		// },
+		// {
+		// 	"url": "msn.com"
+		// },
+		// {
+		// 	"url": "office365.com"
+		// },
+		// {
+		// 	"url": "webex.com"
+		// },
+		// {
+		// 	"url": "intuit.com"
+		// },
+		// {
+		// 	"url": "blogspot.com"
+		// },
+		// {
+		// 	"url": "doubleclick.net"
+		// },
+		// {
+		// 	"url": "apple-dns.net"
+		// },
+		// {
+		// 	"url": "zhihu.com"
+		// },
+		// {
+		// 	"url": "mozilla.org"
+		// },
+		// {
+		// 	"url": "t.co"
+		// },
+		// {
+		// 	"url": "tiktok.com"
+		// },
+		// {
+		// 	"url": "taobao.com"
+		// },
+		// {
+		// 	"url": "myfritz.net"
+		// },
+		// {
+		// 	"url": "tumblr.com"
+		// },
+		// {
+		// 	"url": "t-msedge.net"
+		// },
+		// {
+		// 	"url": "macromedia.com"
+		// },
+		// {
+		// 	"url": "xvideos.com"
+		// },
+		// {
+		// 	"url": "skype.com"
+		// },
+		// {
+		// 	"url": "googledomains.com"
+		// },
+		// {
+		// 	"url": "nic.ru"
+		// },
+		// {
+		// 	"url": "paypal.com"
+		// },
+		// {
+		// 	"url": "spotify.com"
+		// },
+		// {
+		// 	"url": "zemanta.com"
+		// },
+		// {
+		// 	"url": "pornhub.com"
+		// },
+		// {
+		// 	"url": "nih.gov"
+		// },
+		// {
+		// 	"url": "opera.com"
+		// },
+		// {
+		// 	"url": "cloudflare.net"
+		// },
+		// {
+		// 	"url": "nytimes.com"
+		// },
+		// {
+		// 	"url": "outlook.com"
+		// },
+		// {
+		// 	"url": "abusix.zone"
+		// },
+		// {
+		// 	"url": "cloudfront.net"
+		// },
+		// {
+		// 	"url": "fandom.com"
+		// },
+		// {
+		// 	"url": "flickr.com"
+		// },
+		// {
+		// 	"url": "dropbox.com"
+		// },
+		// {
+		// 	"url": "wellsfargo.com"
+		// },
+		// {
+		// 	"url": "europa.eu"
+		// },
+		// {
+		// 	"url": "googleusercontent.com"
+		// },
+		// {
+		// 	"url": "weibo.com"
+		// },
+		// {
+		// 	"url": "yahoo.co.jp"
+		// },
+		// {
+		// 	"url": "salesforce.com"
+		// },
+		// {
+		// 	"url": "omtrdc.net"
+		// },
+		// {
+		// 	"url": "fbcdn.net"
+		// }
