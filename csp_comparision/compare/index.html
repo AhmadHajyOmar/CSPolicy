@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="compResult.js"></script>
+    <script>
+        console.log(co)
+        console.log(used_browser)
+        console.log(os)
+        let browser = used_browser[0]
+        if(used_browser[1] != undefined) {
+            browser += "-";
+            browser += used_browser[1]
+            if(used_browser[2] != undefined) {
+                browser += "-";
+                browser += used_browser[2]
+            }
+        }
+
+        window.onload = function () {
+        var chart1 = new CanvasJS.Chart("chartContainer", {
+            exportEnabled: true,
+            animationEnabled: true,
+            theme: "light2", // "light1", "light2", "dark1", "dark2"
+            title:{
+                text: `safe/unsafe csp ${os[0]} devices using ${browser}`,
+            },
+            axisY: {
+                title: "number of different devices",
+            },
+            toolTip: {
+                shared: true
+            },
+            legend: {
+                cursor:"pointer",
+            },
+            data: [{        
+                type: "column", 
+                name: "device use chrome",
+                showInLegend: true, 
+                //legendMarkerColor: "#3feea2",
+                legendText: "chromium",
+                dataPoints: [      
+                    { y: safeDB[0], label: "safe csp" },
+                    { y: unsafeDB[0],  label: "usafe csp" }
+                ]
+            },
+            {        
+                type: "column",
+                name: "device use firefox",
+                showInLegend: true, 
+                //legendMarkerColor: "#e86868",
+                legendText: "firefox",
+                dataPoints: [      
+                    { y: safeDB[2], label: "safe csp" },
+                    { y: unsafeDB[2],  label: "usafe csp" }
+                ]
+            },
+            {        
+                type: "column",
+                name: "device use webkit(safari)",
+                showInLegend: true, 
+                //legendMarkerColor: "#4983d0",
+                legendText: "webkit(safari)",
+                dataPoints: [      
+                    { y: safeDB[1], label: "safe csp" },
+                    { y: unsafeDB[1],  label: "usafe csp" }
+                ]
+            }]
+
+        });
+        let vpSame = vp[0]
+        let vpNSame = vp[1]
+        let total_devices = vpNSame + vpSame;
+        vpSame = vpSame * 100 / total_devices
+        vpNSame = vpNSame * 100 / total_devices
+        var chart2 = new CanvasJS.Chart("chartContainer2", {
+            exportEnabled: true,
+            animationEnabled: true,
+            title:{
+                text: `csp ${os} devices with differents viewports`
+            },
+            legend:{
+                cursor: "pointer",
+            },
+            data: [{
+                type: "pie",
+                showInLegend: true,
+                toolTipContent: "{name}: <strong>{y}%</strong>",
+                indexLabel: "{name} - {y}%",
+                dataPoints: [
+                    { y: vpNSame, name: "not the same safity level" },
+                    { y: vpSame, name: "same saftiy level" },
+                ]
+            }]
+        });
+        chart1.render();
+        chart2.render();
+        }
+        </script> 
+</head>
+<body>
+    <h1 id="h1"></h1>
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <h1 id="h2"></h1>
+    <div id="chartContainer2" style="height: 370px; width: 100%;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script>
+
+        if(os[1] === undefined && used_browser[1] === undefined) {
+            document.getElementById("h1").innerHTML = `csp policy for differents ${os[0]} devices using ${used_browser[0]}`
+            document.getElementById("h2").innerHTML = `csp policy for differents ${os[0]} devices with differents view ports`
+        }
+        if(os[1] != undefined && used_browser[1] === undefined) {
+            document.getElementById("h1").innerHTML = `csp policy for differents ${os[0]} ${os[1]} devices using ${used_browser[0]}`
+            document.getElementById("h2").innerHTML = `csp policy for differents ${os[0]} ${os[1]} devices with differents view ports`
+        }
+        if(os[1] === undefined && used_browser[1] != undefined) {
+            document.getElementById("h1").innerHTML = `csp policy for differents ${os[0]} devices using ${used_browser[0]} ${used_browser[1]}`
+            document.getElementById("h2").innerHTML = `csp policy for differents ${os[0]} devices with differents view ports`
+        }
+      
+    </script>
+</body>
+</html>
