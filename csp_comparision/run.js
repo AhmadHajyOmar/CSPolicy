@@ -38,11 +38,25 @@ for(var fileName of fileNames) {
     if(fileName === 'i' || fileName === 'I') {
         option.push("iOS")
     }
-    if(fileName === 'ai' || fileName === 'aI' || fileName === 'Ai' || fileName === 'AI') {
+    if(fileName === 'd' || fileName === 'D') {
+        option.push("Windows")
+        option.push("Mac OS")
+    }
+    if(fileName === 'ai' || fileName === 'aI' || fileName === 'Ai' || fileName === 'AI' || fileName === 'ia' || fileName === 'Ia' || fileName === 'iA' || fileName === 'IA') {
         option.push("Android")
         option.push("iOS")
     }
-    if(fileName === 'aid' || fileName === 'aiD' || fileName === 'aID' || fileName === 'AID' || fileName === 'AId' || fileName === 'Aid') {
+    if(fileName === 'ad' || fileName === 'aD' || fileName === 'Ad' || fileName === 'AD' || fileName === 'da' || fileName === 'Da' || fileName === 'dA' || fileName === 'DA') {
+        option.push("Android")
+        option.push("Windows")
+        option.push("Mac OS")
+    }
+    if(fileName === 'id' || fileName === 'iD' || fileName === 'Id' || fileName === 'ID' || fileName === 'di' || fileName === 'Di' || fileName === 'dI' || fileName === 'DI') {
+        option.push("iOS")
+        option.push("Windows")
+        option.push("Mac OS")
+    }
+    if(fileName === 'all' || fileName === 'All' || fileName === 'ALL') {
         option.push("Android")
         option.push("iOS")
         option.push("Windows")
@@ -54,7 +68,7 @@ for(var fileName of fileNames) {
     if(fileName === 'w' || fileName === 'W') {
         usedBrowserToTest.push("WebKit")
         usedBrowserToTest.push("Mobile Safari")
-
+        usedBrowserToTest.push("Safari")
     }
     if(fileName === 'f' || fileName === 'F') {
         usedBrowserToTest.push("Firefox")
@@ -63,11 +77,13 @@ for(var fileName of fileNames) {
         usedBrowserToTest.push("Chrome")
         usedBrowserToTest.push("WebKit")
         usedBrowserToTest.push("Mobile Safari")
+        usedBrowserToTest.push("Safari")
     }
     if(fileName === 'fw' || fileName === 'Fw' || fileName === 'FW' || fileName === 'fW') {
         usedBrowserToTest.push("WebKit")
 		usedBrowserToTest.push("Firefox")
         usedBrowserToTest.push("Mobile Safari")
+        usedBrowserToTest.push("Safari")
     }
     if(fileName === 'cf' || fileName === 'Cf' || fileName === 'CF' || fileName === 'cF') {
         usedBrowserToTest.push("Chrome")
@@ -78,6 +94,7 @@ for(var fileName of fileNames) {
         usedBrowserToTest.push("Chrome")
         usedBrowserToTest.push("WebKit")
         usedBrowserToTest.push("Mobile Safari")
+        usedBrowserToTest.push("Safari")
         usedBrowserToTest.push("Firefox")
     }
     

@@ -3,7 +3,6 @@ const path = require("path");
 const info = process.argv.splice(2);
 let path_to_json_files = info[0]
 let pattern = info[1]
-
 if (info.length === 1 && info[0] === "all") {
     var allfiles = new Array();
     const paths = ['./tests', './viewport_comp', './compare']
@@ -18,7 +17,7 @@ if (info.length === 1 && info[0] === "all") {
     for(var af of allfiles) {
         fs.unlinkSync(af);
     }
-} else if(info.length === 1 && info[0].charAt(0) === "." && info[0].charAt(1) === "/") {
+} else if(info.length === 2 && info[0].charAt(0) === "." && info[0].charAt(1) === "/") {
     const files =  fs.readdirSync(path_to_json_files).map(file => path.join(path_to_json_files, file));
     for(var f of files) {
         console.log(f)
