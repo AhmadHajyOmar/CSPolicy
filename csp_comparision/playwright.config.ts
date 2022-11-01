@@ -249,6 +249,13 @@ const config: PlaywrightTestConfig = {
        },
      }
      ,
+     {
+      name: 'Mobile Safari',
+      use: {
+        ...devices['iPhone 13 landscape'],
+      },
+    }
+    ,
     {
        name: 'Mobile Safari',
        use: {

@@ -66,7 +66,8 @@ if(permission) {
                     csp_policies.push(csp)
                 }
             });
-            
+           /*  console.log("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
+            console.log(csp_policies) */
             if(csp_policies.length > 0) {
                 let csp_safe = new Array();
                 for(let i = 0; i < csp_policies.length; i++) {
@@ -78,13 +79,78 @@ if(permission) {
                     //console.log(arr[1])
                     let csp_dir = getDirectives_content_secuirty_policy(arr[1], "content-security-policy")
                     let sts = getDirectives_content_secuirty_policy(arr[1], "strict-transport-security")
-                
-                    //31,556,952
-                
-                /*  console.log("SSSSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTTTTLLLLLLLLLLLLLLLLLLLL")
-                    console.log(sts)
-                    console.log("SSSSSSSSSSSSSSSSSSSSSSTTTTTTTTTTTTTTTTLLLLLLLLLLLLLLLLLLLL") */
-                
+                    let xfo = getDirectives_content_secuirty_policy(arr[1], "x-frame-options")
+                    let set_cookie = getDirectives_content_secuirty_policy(arr[1], "set-cookie")
+                    console.log("XXXXXXXFFFFFFFFFFFFFFFOOOOOOOOOOOOOO")
+                    console.log(set_cookie)
+
+               // ************************************************************************************************************************************************************
+                    // protection-level against stealing the cookies throw XXS attacks
+                    let secure_flage = false;
+                    let httponly_flage = false;
+                    let samesite_flage = false; 
+                    let protection_against_csrf = 0;
+                    let protection_against_csrf_flage = false;
+
+                    for (var v of set_cookie) {
+                        if (v === "Secure") {
+                            secure_flage = true;
+                        }
+                        if(v.includes("HttpOnly")) {
+                            httponly_flage = true;
+                        }
+                        if(v.includes("SameSite")) {
+                            samesite_flage = true;
+                            
+                            if(v.includes("Strict")) {
+                                protection_against_csrf = 2;
+                                protection_against_csrf_flage = true;
+                            }
+                            if(v.includes("Lax")) {
+                                samesite_flage = true;
+                                protection_against_csrf = 1;
+                                protection_against_csrf_flage = true;
+                            }
+                        }
+                    }
+
+                    // ************************************************************************************************************************************************************
+                    // protection-level against hijacking.
+                    let protection_against_hijacking = false;
+                    if(secure_flage && httponly_flage) {
+                        protection_against_hijacking = true;
+                    }
+
+                    // ************************************************************************************************************************************************************
+                    // protection-level against Clickjacking attack
+                    // CSP frame-ancestors is the most important protection mechanism against external framing, and better than X-Frame-Options in multiple ways
+
+                    let protectionClickJacking_value_Class = new Array();
+                    let frame_ancestors = new Array();
+                    let frame_ancestors_flage = false;
+                    let xfo_flage = false;
+                    if (csp_dir.includes("frame-ancestors")) {
+                        frame_ancestors_flage = true;
+                        frame_ancestors = getDirective_Sources(arr[1], "frame-ancestors")
+                        protectionClickJacking_value_Class.push("csp frame-ancestors")
+                        protectionClickJacking_value_Class.push(get_ProtectionLevel_AgainstClickjacking("frame-ancestors", frame_ancestors));
+                    } else {
+                        if(xfo.length === 1) {
+                            xfo_flage = true;
+                            protectionClickJacking_value_Class.push(`x-farm-option ${xfo}`)
+                            protectionClickJacking_value_Class.push(get_ProtectionLevel_AgainstClickjacking(xfo[0], []));
+                        } else {
+                            if(xfo.length === 0) {
+                                protectionClickJacking_value_Class = ["no protection against xlickjacking is provided", 0];
+                            }
+                        }
+                    }
+                   
+
+                    
+                    // *******************************************************************************************************************************************************
+                    // protection-level against ssl stripping attack
+
                     let max_age_sts = false;
                     let insub_sts = false;
                     let preload_sts = false;
@@ -109,6 +175,16 @@ if(permission) {
                             preload_sts = true;
                         }
                     }
+                    
+                    let protection_level_againstSLLStripping = get_ProtectionLevel_AgainstSLLStripping(max_age_YearValue, max_age_sts, insub_sts, preload_sts)
+                    
+                    let hsts_classe = protection_level_againstSLLStripping[0];
+                    let level_of_protection_against_SSL_Stripping = protection_level_againstSLLStripping[1];
+
+
+                    // *******************************************************************************************************************************************************
+                    // check if the csp is safe or unsafe
+
                     console.log(csp_dir)
                     let source = new Array();
                     let directive = "csp dose not contain script-srcc or default-src";
@@ -178,34 +254,7 @@ if(permission) {
                             }
                         }
                     }
-                
-                    let hsts_classe = 0;
-                    
-                    if(max_age_YearValue === 0) {
-                        hsts_classe = 1
-                    }
-                
-                    if(max_age_YearValue < 1) {
-                        hsts_classe = 2
-                    }
-                
-                    if(max_age_YearValue >= 1) {
-                        hsts_classe = 3
-                    }
-                
-                    let level_of_protection_against_SSL_Stripping = 0;
-                
-                    if(max_age_sts && !insub_sts && !preload_sts) {
-                        level_of_protection_against_SSL_Stripping = 1;
-                    }
-                
-                    if(max_age_sts && insub_sts && !preload_sts) {
-                        level_of_protection_against_SSL_Stripping = 2;
-                    }
-                
-                    if(max_age_sts && insub_sts && preload_sts) {
-                        level_of_protection_against_SSL_Stripping = 3;
-                    }
+
                 
                     let safe_flage = false;
                     if(script_flage === true || default_flage === true) {
@@ -215,9 +264,16 @@ if(permission) {
                     }
                 
                     let details = arr[0].split("_");
-                    csp_safe.push([["device model", details[0]],["browser name", details[1]],["browser version", details[2]],["os", details[3]],["viewport-height", details[4]],["viewport-width", details[5]], ["origins", source], ["safe csp", safe_flage], ["directive to check", directive], ["script-src", script_flage], ["default-src", default_flage], ["'unsafe-inline'", inline_flage], ["'unsafe-eval'", eval_flage], ["nonce", nonce_flage], ["hash", hash_flage], ["strict-dynamic", strictD_flage], ["wildcard*", wildcard_flage], ["protocol", protocol_flage], ["data", data_flage], ["sts_max_age", max_age_sts], ["sts_max_age_year_protection", max_age_YearValue] , ["sts_includeSD", insub_sts], ["sts_preload", preload_sts], ["hsts classe", hsts_classe]])
+                    csp_safe.push([["device model", details[0]],["browser name", details[1]],["browser version", details[2]],["os", details[3]],["viewport-height", details[4]],["viewport-width", details[5]], ["origins", source], ["safe csp", safe_flage], ["directive to check", directive], ["script-src", script_flage], ["default-src", default_flage], ["'unsafe-inline'", inline_flage], ["'unsafe-eval'", eval_flage], ["nonce", nonce_flage], ["hash", hash_flage], ["strict-dynamic", strictD_flage], ["wildcard*", wildcard_flage], ["protocol", protocol_flage], ["data", data_flage], ["sts_max_age", max_age_sts], ["sts_max_age_year_protection", max_age_YearValue] , ["sts_includeSD", insub_sts], ["sts_preload", preload_sts], ["hsts classe", hsts_classe], ["protection level against sll stripping", level_of_protection_against_SSL_Stripping], ["protection against clickjacking provided by", protectionClickJacking_value_Class[0]], ["protection-level against clickjacking", protectionClickJacking_value_Class[1]], ["protection against hijacking", protection_against_hijacking], ["protection against csrf", protection_against_csrf_flage], ["protection level against csrf", protection_against_csrf], ["protection against steeling cookies", httponly_flage]])
                 
                 }
+
+                // *******************************************************************************************************************************************************
+                // Viewport-similarity tests
+
+                console.log("t3all")
+                console.log(csp_safe)
+
                 let viewport_arr = new Array();
                 
                 for (let i = 0; i < csp_safe.length; i++) {
@@ -280,7 +336,9 @@ if(permission) {
                 
                         let v_comp = new Array();
                         let dev_mod = arr__1[0][1];
-                        if (same_attributes_values === 17) {
+                        console.log("t4all")
+                        console.log(same_attributes_values)
+                        if (same_attributes_values === 24) {
                 
                             //let dev_mod = arr__1[0][1];
                             v_comp.push(['the model of the two devices is', dev_mod])
@@ -294,6 +352,10 @@ if(permission) {
                             v_comp.push(["the heights and widths of the two devices are", arr_v])
                             let safe_csp = arr__1[7][1]
                             v_comp.push(["both of the two devices get a safe csp", safe_csp])
+
+                            let sllstrpping = arr__1[7][1]
+                            v_comp.push(["both of the two devices get a safe csp", safe_csp])
+
                             if(!os_ViewportArr.includes(operating_system)) {
                                 os_ViewportArr.push(operating_system)
                             }
@@ -357,6 +419,64 @@ if(permission) {
                 let num_dev_not_safe_csp_chrmoium = 0;
                 let num_dev_not_safe_csp_webkit = 0;
                 let num_dev_not_safe_csp_firefox = 0;
+
+                let num_dev_no_cspHeader = 0;
+                let dev_no_cspHeader = new Array();
+                let num_dev_with_cspHeader = 0;
+                let dev_with_cspHeader = new Array();
+
+                let num_dev_provide_no_protection_against_sslStripping_level_0 = 0;
+                let dev_provide_no_protection_against_sslStripping_level_0 = new Array();
+                let num_dev_provide_protection_against_sslStripping_level_1 = 0;
+                let dev_provide_protection_against_sslStripping_level_1 = new Array();
+                let num_dev_provide_protection_against_sslStripping_level_2 = 0;
+                let dev_provide_protection_against_sslStripping_level_2 = new Array();
+                let num_dev_provide_protection_against_sslStripping_level_3 = 0;
+                let dev_provide_protection_against_sslStripping_level_3 = new Array();
+                let num_dev_provide_protection_against_sslStripping_level_4 = 0;
+                let dev_provide_protection_against_sslStripping_level_4 = new Array();
+
+                let num_dev_provide_no_protection_against_clickjacking_level_0 = 0;
+                let dev_provide_no_protection_against_clickjacking_level_0 = new Array();
+
+                let num_dev_provide_protection_against_clickjacking_xfo_level_1 = 0;
+                let dev_provide_protection_against_clickjacking_xfo_level_1 = new Array();
+                let num_dev_provide_protection_against_clickjacking_xfo_level_2 = 0;
+                let dev_provide_protection_against_clickjacking_xfo_level_2 = new Array();
+                let num_dev_provide_protection_against_clickjacking_xfo_level_3 = 0;
+                let dev_provide_protection_against_clickjacking_xfo_level_3 = new Array();
+
+    
+                let num_dev_provide_protection_against_clickjacking_csp_level_1 = 0;
+                let dev_provide_protection_against_clickjacking_csp_level_1 = new Array();
+                let num_dev_provide_protection_against_clickjacking_csp_level_2 = 0;
+                let dev_provide_protection_against_clickjacking_csp_level_2 = new Array();
+                let num_dev_provide_protection_against_clickjacking_csp_level_3 = 0;
+                let dev_provide_protection_against_clickjacking_csp_level_3 = new Array();
+
+                let num_dev_provide_protection_against_hijacking = 0;
+                let num_dev_provide_no_protection_against_hijacking = 0;
+                let dev_provide_protection_against_hijacking = new Array();
+                let dev_provide_no_protection_against_hijacking = new Array();
+
+                let num_dev_provide_no_protection_against_csrf_level_0 = 0;
+                let dev_provide_no_protection_against_csrf_level_0 = new Array();
+                let num_dev_provide_protection_against_csrf_level_1 = 0;
+                let dev_provide_protection_against_csrf_level_1 = new Array();
+                let num_dev_provide_protection_against_csrf_level_2 = 0;
+                let dev_provide_protection_against_csrf_level_2 = new Array();
+
+                let num_dev_provide_protection_against_steeling_cookies = 0;
+                let dev_provide_protection_against_steeling_cookies = new Array();
+                let num_dev_provide_no_protection_against_steeling_cookies = 0;
+                let dev_provide_no_protection_against_steeling_cookies = new Array();
+                console.log("HAHAHAHA")
+                console.log(csp_safe[0][25][1][0])
+                console.log(csp_safe[0][25][1][0] === 'x')
+
+
+
+
                 let used_browser = new Array();
                 var webkit_devices = 0;
                 var chromium_devices = 0;
@@ -405,8 +525,161 @@ if(permission) {
                         break;
                 
                     }
-                
+
+                    switch(csp_safe[i][24][1]) {
+
+                        case 0 : {
+                            num_dev_provide_no_protection_against_sslStripping_level_0++;
+                            dev_provide_no_protection_against_sslStripping_level_0.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        case 1: {
+                            num_dev_provide_protection_against_sslStripping_level_1++;
+                            dev_provide_protection_against_sslStripping_level_1.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        case 2: {
+                            num_dev_provide_protection_against_sslStripping_level_2++;
+                            dev_provide_protection_against_sslStripping_level_2.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        case 3: {
+                            num_dev_provide_protection_against_sslStripping_level_3++;
+                            dev_provide_protection_against_sslStripping_level_3.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        case 4: {
+                            num_dev_provide_protection_against_sslStripping_level_4++;
+                            dev_provide_protection_against_sslStripping_level_4.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        default : console.log('-_-')
+                        break;
+                    }
+
+                    switch(csp_safe[i][26][1]) {
+
+                        case 0 : {
+                            num_dev_provide_no_protection_against_clickjacking_level_0++;
+                            dev_provide_no_protection_against_clickjacking_level_0.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        case 1: {
+                            if (csp_safe[i][25][1][0] === 'x') {
+                                num_dev_provide_protection_against_clickjacking_xfo_level_1++;
+                                dev_provide_protection_against_clickjacking_xfo_level_1.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                            }
+                            if (csp_safe[i][25][1][0] === 'c') {
+                                num_dev_provide_protection_against_clickjacking_csp_level_1++;
+                                dev_provide_protection_against_clickjacking_csp_level_1.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                            }
+                        
+                        }
+                        break;
+
+                        case 2: {
+                            if (csp_safe[i][25][1][0] === 'x') {
+                                num_dev_provide_protection_against_clickjacking_xfo_level_2++;
+                                dev_provide_protection_against_clickjacking_xfo_level_2.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                            }
+                            if (csp_safe[i][25][1][0] === 'c') {
+                                num_dev_provide_protection_against_clickjacking_csp_level_2++;
+                                dev_provide_protection_against_clickjacking_csp_level_2.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                            }
+                        }
+                        break;
+
+                        case 3: {
+                            if (csp_safe[i][25][1][0] === 'x') {
+                                num_dev_provide_protection_against_clickjacking_xfo_level_3++;
+                                dev_provide_protection_against_clickjacking_xfo_level_3.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                            }
+                            if (csp_safe[i][25][1][0] === 'c') {
+                                num_dev_provide_protection_against_clickjacking_csp_level_3++;
+                                dev_provide_protection_against_clickjacking_csp_level_3.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                            }
+                        }
+                        break;
+            
+                        default: console.log('-_-');
+                        break;
+
+                    }
+
+                    switch(csp_safe[i][27][1]) {
+                        
+                        case true: {
+                            num_dev_provide_protection_against_hijacking++;
+                            dev_provide_protection_against_hijacking.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        case false: {
+                            num_dev_provide_no_protection_against_hijacking++;
+                            dev_provide_no_protection_against_hijacking.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        default: console.log('-_-')
+                        break;
+
+                    }
+
+                    switch(csp_safe[i][30][1]) {
+                        
+                        case true: {
+                            num_dev_provide_protection_against_steeling_cookies++;
+                            dev_provide_protection_against_steeling_cookies.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        case false: {
+                            num_dev_provide_no_protection_against_steeling_cookies++;
+                            dev_provide_no_protection_against_steeling_cookies.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        default: console.log('-_-')
+                        break;
+
+                    }
+
+                    switch(csp_safe[i][29][1]) {
+
+                        case 0: {
+                            num_dev_provide_no_protection_against_csrf_level_0++;
+                            dev_provide_no_protection_against_csrf_level_0.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        case 1: {
+                            num_dev_provide_protection_against_csrf_level_1++;
+                            dev_provide_protection_against_csrf_level_1.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+
+                        case 2: {
+                            num_dev_provide_protection_against_csrf_level_2++;
+                            dev_provide_protection_against_csrf_level_2.push([csp_safe[i][0][1], `height: ${csp_safe[i][4][1]}`, `width: ${csp_safe[i][5][1]}`])
+                        }
+                        break;
+                    }
+
                     if(csp_safe[i][7][1] === false) {
+                        if(csp_safe[i][8][1] === 'csp dose not contain script-srcc or default-src') {
+                            num_dev_no_cspHeader ++;
+                            dev_no_cspHeader.push([csp_safe[i][0][1], `viewport:{height: ${csp_safe[i][4][1]} , width: ${csp_safe[i][5][1]}}`])
+                        } else {
+                            num_dev_with_cspHeader ++;
+                            dev_with_cspHeader.push([csp_safe[i][0][1], `viewport:{height: ${csp_safe[i][4][1]} , width: ${csp_safe[i][5][1]}}`])
+                        }
+
                         if(csp_safe[i][1][1] === "chromium") {
                             num_dev_not_safe_csp_chrmoium++;
                         }
@@ -464,6 +737,58 @@ if(permission) {
                 json_comp["number of devices that offer zero max age for hsts"] = num_dev_sts_max_age_protection_equal_zero
                 json_comp["number of devices that offer max age < 1 for hsts"] = num_dev_sts_max_age_protection_less_than_one_year
                 json_comp["number of devices that offer max age >= 1 for hsts"] = num_dev_sts_max_age_protection_more_than_one_year
+                // csp header exisit ?
+                json_comp["number of devices without csp header"] = num_dev_no_cspHeader
+                json_comp["devices without csp header"] = dev_no_cspHeader
+                json_comp["number of devices with csp header"] = num_dev_with_cspHeader
+                json_comp["devices with csp header"] = dev_with_cspHeader
+                // level of protection against ssl stripping
+                json_comp["number of devices that dose not offer protection against sll stripping"] = num_dev_provide_no_protection_against_sslStripping_level_0
+                json_comp["devices that dose not offer protection against sll stripping"] = dev_provide_no_protection_against_sslStripping_level_0
+                json_comp["number of devices that offer protection_level_1 against sll stripping"] = num_dev_provide_protection_against_sslStripping_level_1
+                json_comp["devices that offer protection_level_1 against sll stripping"] = dev_provide_protection_against_sslStripping_level_1
+                json_comp["number of devices that offer protection_level_2 against sll stripping"] = num_dev_provide_protection_against_sslStripping_level_2
+                json_comp["devices that offer protection_level_2 against sll stripping"] = dev_provide_protection_against_sslStripping_level_2
+                json_comp["number of devices that offer protection_level_3 against sll stripping"] = num_dev_provide_protection_against_sslStripping_level_3
+                json_comp["devices that offer protection_level_3 against sll stripping"] = dev_provide_protection_against_sslStripping_level_3
+                json_comp["number of devices that offer protection_level_4 against sll stripping"] = num_dev_provide_protection_against_sslStripping_level_4
+                json_comp["devices that offer protection_level_4 against sll stripping"] = dev_provide_protection_against_sslStripping_level_4
+                // level of protection against clickjacking(x-fram-option)
+                json_comp["number of devices that dose not offer protection against clickjacking"] = num_dev_provide_no_protection_against_clickjacking_level_0
+                json_comp["devices that dose not offer protection against clickjacking"] = dev_provide_no_protection_against_clickjacking_level_0
+
+                json_comp["number of devices that offer protection_level_1 against clickjacking (csp frame-ancestors)"] = num_dev_provide_protection_against_clickjacking_csp_level_1
+                json_comp["devices that offer protection_level_1 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_1
+                json_comp["number of devices that offer protection_level_2 against clickjacking (csp frame-ancestors)"] = num_dev_provide_protection_against_clickjacking_csp_level_2
+                json_comp["devices that offer protection_level_2 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_2
+                json_comp["number of devices that offer protection_level_3 against clickjacking (csp frame-ancestors)"] = num_dev_provide_protection_against_clickjacking_csp_level_3
+                json_comp["devices that offer protection_level_3 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_3
+
+                json_comp["number of devices that offer protection_level_1 against clickjacking (xfo)"] = num_dev_provide_protection_against_clickjacking_xfo_level_1
+                json_comp["devices that offer protection_level_1 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_1
+                json_comp["number of devices that offer protection_level_2 against clickjacking (xfo)"] = num_dev_provide_protection_against_clickjacking_xfo_level_2
+                json_comp["devices that offer protection_level_2 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_2
+                json_comp["number of devices that offer protection_level_3 against clickjacking (xfo)"] = num_dev_provide_protection_against_clickjacking_xfo_level_3
+                json_comp["devices that offer protection_level_3 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_3
+                // protection against hijacking
+                json_comp["number of devices that dose not offer protection against hijacking"] = num_dev_provide_no_protection_against_hijacking
+                json_comp["devices that dose not offer protection against hijacking"] = dev_provide_no_protection_against_hijacking
+                json_comp["number of devices that offer protection against hijacking"] = num_dev_provide_protection_against_hijacking
+                json_comp["devices that offer protection against hijacking"] = dev_provide_protection_against_hijacking
+                // level of protection against csrf
+                json_comp["number of devices that dose not offer protection against csrf"] = num_dev_provide_no_protection_against_csrf_level_0
+                json_comp["devices that dose not offer protection against csrf"] = dev_provide_no_protection_against_csrf_level_0
+                json_comp["number of devices that offer protection_level_1 against csrf"] = num_dev_provide_protection_against_csrf_level_1
+                json_comp["devices that offer protection_level_1 against csrf"] = dev_provide_protection_against_csrf_level_1
+                json_comp["number of devices that offer protection_level_2 against csrf"] = num_dev_provide_protection_against_csrf_level_2
+                json_comp["devices that offer protection_level_2 against csrf"] = dev_provide_protection_against_csrf_level_2
+                // protection against steeling the cookies (XXS)
+                json_comp["number of devices that dose not offer protection against steeling the cookies"] = num_dev_provide_no_protection_against_steeling_cookies
+                json_comp["devices that dose not offer protection against steeling the cookies"] = dev_provide_no_protection_against_steeling_cookies
+                json_comp["number of devices that offer protection against steeling the cookies"] = num_dev_provide_protection_against_steeling_cookies
+                json_comp["devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies
+
+
                 json_comp["number of devices that used chromium"] = chromium_devices
                 json_comp["number of devices that used webkit"] = webkit_devices
                 json_comp["number of devices that used firefox"] = firefox_devices
@@ -497,15 +822,6 @@ if(permission) {
 }
 
 
-
-
-
-/* if(check) {
-
-
-}else {
-  
-} */
 function browsershortcut(arr) {
     let out = new String();
     for(var v of arr) {
@@ -521,97 +837,75 @@ function arraysEquals(arr_1, arr_2) {
     }
    }
     return true;
-  }
+  }                      
 
+function get_ProtectionLevel_AgainstSLLStripping(max_age_YearValue, max_age_sts, insub_sts, preload_sts) {
 
-function isSamePolicy(arr) {
-    let same_flage = false;
-    var csp_same = new Array();
-    for (let i = 0; i < arr.length; i++) {
-        let arr_ = arr[i][1];
-        for(let j = 0; j < arr.length; j++) {
-            let arr_2 = arr[j][1];
-            for(let u = 0; u < arr_.length; u++) {
-                same_flage = false;
-                let header1 = arr_[u];
-                let dir_arr_header1 = getDirectives(header1);
-                for(let n = 0; n < arr_2.length; n++) {
-                    let header2 = arr_2[n];
-                    let dir_arr_header2 = getDirectives(header2);
-                    if(header1[0] === header2[0]) {
-                        /* console.log("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§")
-                        console.log(header1[0])
-                        console.log(dir_arr_header1)
-                        console.log(dir_arr_header2) */
-                        if (dir_arr_header1.length === dir_arr_header2.length) {
-                            return dir_arr_header1.every((element, index) => {
-                              if (element === dir_arr_header2[index]) {
-                                same_flage = true;
-                              }
-                            });
-                          }
-                    }
-                }
-            }
-            if(same_flage) {
-              csp_same.push(arr[i][0], arr[j][0])      
-            }
+    let hsts_classe = 0;
+    let level_of_protection_against_SSL_Stripping = 0;
+                    
+    if(max_age_YearValue === 0) {
+        hsts_classe = 1
+    }
+
+    if(max_age_YearValue < 1) {
+        hsts_classe = 2
+    }
+
+    if(max_age_YearValue >= 1) {
+        hsts_classe = 3
+    }
+
+    if(max_age_sts && !insub_sts && !preload_sts) {
+        level_of_protection_against_SSL_Stripping = 1;
+    }
+
+    if(max_age_sts && insub_sts && !preload_sts) {
+        level_of_protection_against_SSL_Stripping = 2;
+    }
+
+    if(max_age_sts && !insub_sts && preload_sts) {
+        level_of_protection_against_SSL_Stripping = 3;
+    }
+
+    if(max_age_sts && insub_sts && preload_sts) {
+        level_of_protection_against_SSL_Stripping = 4;
+    }
+    return [hsts_classe, level_of_protection_against_SSL_Stripping]
+}
+
+function get_ProtectionLevel_AgainstClickjacking(xfo, arr) {
+    // no protection level (default)
+    let level = 0;
+    // if csp contains the directive "frame-ancestors"
+    if(xfo === "frame-ancestors") {
+        if (arr.length === 1 && arr[0] === "'none'") {
+            level = 3;
+        }
+        if (arr.length === 1 && arr[0] === "'self'") {
+            level = 2;
+        }
+        if (arr.length > 1) {
+            level = 1;
+        }
+    } 
+        // if csp dose not contains the directive "frame-ancestors" and the header x-frame-option exisit
+    else {
+     // level in case xfo value is ALLOW-FROM uri
+        level = 1;
+        switch(xfo) {
+            case 'DENY' : { level = 3; }
+                break;
+            case 'SAMEORIGIN' : { level = 2; }
+                break;
+            default : console.log("xfo value is ALLOW-FROM or something that is not defined")
+                break;
         }
     }
-    console.log(csp_same)
-    return csp_same;
+   
+
+    return level;
 }
-
-function getDirectives(csp) {
-	var arr = new Array()
-	let directives_arr = csp[1].split(";");
-	//console.log(directives_arr)
-	var flage = false;
-	if(csp[0] != 'date' && csp[0] != 'expires' && csp[0] != 'last-modified' && csp[0] != 'priority') {
-		for(var d of directives_arr) {
-			if(d != '') {
-				let directive = d.split(" ")
-				let directive_arr = new Array();
-				flage = true;
-				for(var g of directive) {
-					if(g != '') {
-						if(csp[0] === 'content-security-policy-report-only' || csp[0] === 'content-security-policy' ) {
-							if(flage) {
-								g = delete_StrSy(g);
-								directive_arr.push(g)
-								flage = false;
-							}
-						} else if (csp[0] === 'report-to') {
-							g = g.split(/\:/)[0];
-							g = g.replace(/[^a-zA-Z]_/, '');
-							
-							directive_arr.push(g)
-						}else {
-							let dir = delete_StrSy(g);
-							if(g.includes("=")) {
-								let arr_ex = dir.split("=");
-								dir = arr_ex[0]
-							}
-							directive_arr.push(dir)
-						}
-					}
-				}
-				let directive_name = delete_StrSy(directive_arr)
-				for (var v of directive_name) {
-                    arr.push(v);
-
-                }
-			}
-		}
-	} else {
-		let g = delete_StrSy(csp[1])
-		arr.push(g)
-	}
-	
-	return arr;
-
-}
-
 
 
 function getDirectives_content_secuirty_policy(arr, header) {
@@ -673,3 +967,89 @@ console.log(arr) */
 
 
 
+
+/* function isSamePolicy(arr) {
+    let same_flage = false;
+    var csp_same = new Array();
+    for (let i = 0; i < arr.length; i++) {
+        let arr_ = arr[i][1];
+        for(let j = 0; j < arr.length; j++) {
+            let arr_2 = arr[j][1];
+            for(let u = 0; u < arr_.length; u++) {
+                same_flage = false;
+                let header1 = arr_[u];
+                let dir_arr_header1 = getDirectives(header1);
+                for(let n = 0; n < arr_2.length; n++) {
+                    let header2 = arr_2[n];
+                    let dir_arr_header2 = getDirectives(header2);
+                    if(header1[0] === header2[0]) {
+                       
+                        if (dir_arr_header1.length === dir_arr_header2.length) {
+                            return dir_arr_header1.every((element, index) => {
+                              if (element === dir_arr_header2[index]) {
+                                same_flage = true;
+                              }
+                            });
+                          }
+                    }
+                }
+            }
+            if(same_flage) {
+              csp_same.push(arr[i][0], arr[j][0])      
+            }
+        }
+    }
+    console.log(csp_same)
+    return csp_same;
+} */
+
+
+/* function getDirectives(csp) {
+	var arr = new Array()
+	let directives_arr = csp[1].split(";");
+	//console.log(directives_arr)
+	var flage = false;
+	if(csp[0] != 'date' && csp[0] != 'expires' && csp[0] != 'last-modified' && csp[0] != 'priority') {
+		for(var d of directives_arr) {
+			if(d != '') {
+				let directive = d.split(" ")
+				let directive_arr = new Array();
+				flage = true;
+				for(var g of directive) {
+					if(g != '') {
+						if(csp[0] === 'content-security-policy-report-only' || csp[0] === 'content-security-policy' ) {
+							if(flage) {
+								g = delete_StrSy(g);
+								directive_arr.push(g)
+								flage = false;
+							}
+						} else if (csp[0] === 'report-to') {
+							g = g.split(/\:/)[0];
+							g = g.replace(/[^a-zA-Z]_/, '');
+							
+							directive_arr.push(g)
+						}else {
+							let dir = delete_StrSy(g);
+							if(g.includes("=")) {
+								let arr_ex = dir.split("=");
+								dir = arr_ex[0]
+							}
+							directive_arr.push(dir)
+						}
+					}
+				}
+				let directive_name = delete_StrSy(directive_arr)
+				for (var v of directive_name) {
+                    arr.push(v);
+
+                }
+			}
+		}
+	} else {
+		let g = delete_StrSy(csp[1])
+		arr.push(g)
+	}
+	
+	return arr;
+
+} */
