@@ -1,5 +1,6 @@
 
 const fs = require('fs');
+const playwright = require('@playwright/test')
 let input_arr = new Array();
 var usedBrowserToTest = new Array();;
 
@@ -28,6 +29,7 @@ for(var fileName of fileNames) {
                 }
             }
     }
+
     if(fileName.endsWith(".com") || fileName.endsWith(".de") ) {
         input_arr.push(fileName)
     }
@@ -73,24 +75,24 @@ for(var fileName of fileNames) {
     if(fileName === 'f' || fileName === 'F') {
         usedBrowserToTest.push("Firefox")
     }
-    if(fileName === 'cw' || fileName === 'Cw' || fileName === 'CW' || fileName === 'cW') {
+    if(fileName === 'cw' || fileName === 'Cw' || fileName === 'CW' || fileName === 'cW' || fileName === 'wc' || fileName === ' wC' || fileName === 'WC' || fileName === 'Wc') {
         usedBrowserToTest.push("Chrome")
         usedBrowserToTest.push("WebKit")
         usedBrowserToTest.push("Mobile Safari")
         usedBrowserToTest.push("Safari")
     }
-    if(fileName === 'fw' || fileName === 'Fw' || fileName === 'FW' || fileName === 'fW') {
+    if(fileName === 'fw' || fileName === 'Fw' || fileName === 'FW' || fileName === 'fW' || fileName === 'wf' || fileName === 'wF' || fileName === 'WF' || fileName === 'Wf') {
         usedBrowserToTest.push("WebKit")
 		usedBrowserToTest.push("Firefox")
         usedBrowserToTest.push("Mobile Safari")
         usedBrowserToTest.push("Safari")
     }
-    if(fileName === 'cf' || fileName === 'Cf' || fileName === 'CF' || fileName === 'cF') {
+    if(fileName === 'cf' || fileName === 'Cf' || fileName === 'CF' || fileName === 'cF' || fileName === 'fc' || fileName === 'fC' || fileName === 'FC' || fileName === 'Fc') {
         usedBrowserToTest.push("Chrome")
         usedBrowserToTest.push("Firefox")
 
     }
-    if(fileName === 'cwf' || fileName === 'Cwf' || fileName === 'CWf' || fileName === 'CWF' || fileName === 'cWF' || fileName === 'cwF') {
+    if(fileName === 'all' || fileName === 'All' || fileName === 'ALL') {
         usedBrowserToTest.push("Chrome")
         usedBrowserToTest.push("WebKit")
         usedBrowserToTest.push("Mobile Safari")
@@ -99,6 +101,23 @@ for(var fileName of fileNames) {
     }
     
     //ToDo the rest
+}
+var links = new Array()
+console.log(input_arr.length)
+for(var lk of input_arr) {
+    (async () => {
+        const browser = await playwright.chromium.launch()
+        const page = await browser.newPage()
+    
+        await page.goto(`https:/${lk}`)
+        const links = await page.evaluate(() => {
+            return Array.from(document.links).map(item => item.href);
+        });
+        browser.close()
+    
+    })()
+    console.log(links)
+
 }
 
 
