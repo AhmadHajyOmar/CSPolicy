@@ -300,7 +300,14 @@ const config: PlaywrightTestConfig = {
         use: {
           ...devices['Desktop Firefox'],
         },
+      },
+      {
+        name: 'firefox',
+        use: {
+          ...devices['JioPhone 2'],
+        },
       }
+
     
 
 

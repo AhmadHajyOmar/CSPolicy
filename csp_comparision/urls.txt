@@ -1,2 +1,3 @@
-otto.de
-htw.de
+facebook.com
+instagram.com
+google.com

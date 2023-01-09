@@ -1,6 +1,7 @@
 
 const fs = require('fs');
 const playwright = require('@playwright/test')
+writeFiles("./tests/urls", [""])
 let input_arr = new Array();
 var usedBrowserToTest = new Array();;
 
@@ -92,7 +93,7 @@ for(var fileName of fileNames) {
         usedBrowserToTest.push("Firefox")
 
     }
-    if(fileName === 'all' || fileName === 'All' || fileName === 'ALL') {
+    if(fileName === 'b' || fileName === 'B') {
         usedBrowserToTest.push("Chrome")
         usedBrowserToTest.push("WebKit")
         usedBrowserToTest.push("Mobile Safari")
@@ -102,33 +103,50 @@ for(var fileName of fileNames) {
     
     //ToDo the rest
 }
-var links = new Array()
+console.log(input_arr)
+var urls = new Array();
 console.log(input_arr.length)
-for(var lk of input_arr) {
+for(let i = 0; i < input_arr.length; i++) {
+    let lk = input_arr[i]
+    if(i>=2) {
+        const input = fs.readFileSync("./tests/urls", 'utf-8')
+        urls = input.split(/\r?\n/);
+    }
     (async () => {
         const browser = await playwright.chromium.launch()
         const page = await browser.newPage()
     
-        await page.goto(`https:/${lk}`)
+        await page.goto(`https://${lk}`)
         const links = await page.evaluate(() => {
             return Array.from(document.links).map(item => item.href);
         });
+        urls.push(lk)
+        let counter = 0;
+        while (counter < 5) {
+            index = Math.floor(Math.random() * links.length);
+            if(!urls.includes(links[index])) {
+                console.log("fffffffffffffffffffff")
+                urls.push(links[index])
+                counter++
+            }
+        }
         browser.close()
-    
+        console.log(urls)
+        writeFiles("./tests/urls", urls)
+
+
     })()
-    console.log(links)
 
 }
 
-
 writeFiles("./tests/browserToTest", usedBrowserToTest)
-writeFiles("./tests/urls", input_arr)
 writeFiles("./tests/option", option)
 
 
 function writeFiles(path, array) {
     let content = new String()
     for(var inp of array) {
+        console.log(inp)
         if (array.length > 1) {
             if(inp === array[array.length-1]) {
                 content += inp;
@@ -138,6 +156,7 @@ function writeFiles(path, array) {
         } else {
             content = inp;
         }
+     
     
     }
     
