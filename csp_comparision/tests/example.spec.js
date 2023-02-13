@@ -71,8 +71,37 @@ fs.writeFileSync(`./tests/webkit_dev.json`, JSON.stringify(json_webkit))
 fs.writeFileSync(`./tests/firefox_dev.json`, JSON.stringify(json_firefox))
 
 const input = fs.readFileSync("./tests/urls", 'utf-8')
-const urls = input.split(/\r?\n/);
+const urls_input = input.split(/\r?\n/);
+urls_input.shift()
+const urls = new Array();
+const indexs = new Array();
+const index_2 = new Array();
 
+for(let i = 0; i < urls_input.length; i++) {
+	indexs[i] = i;
+}
+
+const includeAllElements = (arr1, arr2) => arr2.every(arr2Item => arr1.includes(arr2Item))
+const sameElements = (arr1, arr2) => includeAllElements(arr1, arr2) && includeAllElements(arr2, arr1);
+var sameUrls = false;
+var sameIndex = false;
+var i = 0;
+while(true) {
+	var j = Math.floor(Math.random() * urls_input.length);
+	if (!index_2.includes(j)) {
+		index_2.push(j)
+		urls[i] =urls_input[j]
+		i++
+	}
+	sameUrls = sameElements(urls_input, urls)
+	sameIndex = sameElements(indexs, index_2)
+	if(sameUrls && sameIndex) {
+		break;
+	}
+}
+console.log(urls_input)
+console.log(urls)
+console.log("dfffffffffffffffffffffff")
 const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
 const usedBrowserToTest = fs.readFileSync("./tests/browserToTest", 'utf-8').split(/\r?\n/);
 
@@ -82,7 +111,12 @@ console.log(usedBrowserToTest)
 
 for(var u of urls) {
 	let page_name = u.split(".")[0]
-	let url = `https://${u}`;
+	let url;
+	if(!u.includes("https://")){
+		url = `https://${u}`;
+	} else {
+		url = u;
+	}
 	console.log(url)
 	playwright.test(`csp_${u}`, async ({
 		page, browserName, viewport, isMobile
