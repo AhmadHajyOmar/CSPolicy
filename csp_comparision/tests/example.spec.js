@@ -108,9 +108,22 @@ const usedBrowserToTest = fs.readFileSync("./tests/browserToTest", 'utf-8').spli
 
 console.log(usedBrowserToTest)
 
-
+var page_name_var = 1;
+var page_names = new Array()
 for(var u of urls) {
-	let page_name = u.split(".")[0]
+	let page_name;
+	if(u.includes("https://") || u.includes("http://")) {
+		page_name = u.split(".")[1]
+		page_name = page_name.split(".")[0]
+	} else {
+		page_name = u.split(".")[0]
+	}
+	if(page_names.includes(page_name)) {
+		page_name = `${page_name}_${page_name_var}`
+		page_name_var++
+	} else {
+		page_names.push(page_name)
+	}
 	let url;
 	if(!u.includes("https://")){
 		url = `https://${u}`;
