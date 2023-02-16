@@ -1,6 +1,23 @@
 
 const fs = require('fs');
 const playwright = require('@playwright/test')
+const readline = require("readline");
+
+const csvStreamer = fs.createReadStream("./uris.csv");
+const csvReader = readline.createInterface({ input: csvStreamer });
+let urisDB = [];
+
+csvReader.on("line", row => {
+  // This will split a row string into an array
+  // And then push into the data array
+  urisDB.push(row.split(","));
+});
+
+csvReader.on("close", () => {
+  //  Reached the end of file
+  console.log(urisDB);
+});
+
 writeFiles("./tests/urls", [""])
 let input_arr = new Array();
 var usedBrowserToTest = new Array();;
@@ -103,6 +120,11 @@ for(var fileName of fileNames) {
     
     //ToDo the rest
 }
+
+var index = 0
+var index_ = 0
+var urlIsThere = false
+var index_url = 0
 console.log(input_arr)
 var urls = new Array();
 console.log(input_arr.length)
@@ -112,27 +134,66 @@ for(let i = 0; i < input_arr.length; i++) {
         const input = fs.readFileSync("./tests/urls", 'utf-8')
         urls = input.split(/\r?\n/);
     }
+  
+
     (async () => {
-        const browser = await playwright.chromium.launch()
-        const page = await browser.newPage()
-    
-        await page.goto(`https://${lk}`)
-        const links = await page.evaluate(() => {
-            return Array.from(document.links).map(item => item.href);
+        
+      
+        csvReader.on("close", async () => {
+            console.log("BBBBBBBBBBUUUUUUUUUUUGGGGGGGGGGG")
+                console.log(urisDB.length)
+                for(let i = 0; i < urisDB.length; i++) {
+                    console.log("CONDIFTION")
+                    console.log(lk)
+                    console.log(urisDB[i][0] )
+                    console.log(urisDB[i][0] === lk)
+                    if(urisDB[i][0] === lk) {
+                        urlIsThere = true
+                        index_url = i
+                    }
+                }
+                   
+                if(urlIsThere) {
+                    console.log("Url already exists in the DB!")
+                    console.log(urlIsThere)
+                    console.log(index_url)
+                    console.log(urisDB[index_url])
+                    for(let j = 0;  j< urisDB[index_url].length; j++) {
+                        urls.push(urisDB[index_url][j])
+
+                    }
+                } else {
+                    console.log("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
+                    const browser = await playwright.chromium.launch()
+                    const page = await browser.newPage()
+                
+                    await page.goto(`https://${lk}`)
+                    const links = await page.evaluate(() => {
+                        return Array.from(document.links).map(item => item.href);
+                    });
+                    urls.push(lk)
+                    let counter = 0;
+                    while (counter < 5) {
+                        index = Math.floor(Math.random() * links.length);
+                        if(!urls.includes(links[index])) {
+                            urls.push(links[index])
+                            counter++
+                        }
+                    }
+                    browser.close()
+                    console.log(urls)
+                    const csv = `${urls[index_]}, ${urls[index_+1]}, ${urls[index_+2]}, ${urls[index_+3]}, ${urls[index_+4]}, ${urls[index_+5]}\n`;
+                    index_ = index_ + 6
+                    fs.appendFileSync("./uris.csv", csv);
+                    console.log(urls)
+                }
+                      
+                     
+                
+                console.log("MMMMMMMMMMMMMMMMMMMM")
+                writeFiles("./tests/urls", urls)
+            
         });
-        urls.push(lk)
-        let counter = 0;
-        while (counter < 5) {
-            index = Math.floor(Math.random() * links.length);
-            if(!urls.includes(links[index])) {
-                console.log("fffffffffffffffffffff")
-                urls.push(links[index])
-                counter++
-            }
-        }
-        browser.close()
-        console.log(urls)
-        writeFiles("./tests/urls", urls)
 
 
     })()
