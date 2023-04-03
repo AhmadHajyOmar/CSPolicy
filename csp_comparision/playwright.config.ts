@@ -41,11 +41,12 @@ const config: PlaywrightTestConfig = {
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+    headless: false,
   },
 
   /* Configure projects for major browsers */
   projects: [
-    {
+    /*{
       name: 'Mobile Safari',
       use: {
         ...devices['Blackberry PlayBook'],
@@ -92,7 +93,7 @@ const config: PlaywrightTestConfig = {
       use: {
         ...devices['Pixel 5'],
       },
-    },
+    },*/
     {
       name: 'Mobile Chrome',
       use: {
@@ -105,7 +106,7 @@ const config: PlaywrightTestConfig = {
         ...devices['Galaxy S8 landscape'],
       },
     },
-    {
+    /*{
       name: 'Mobile Chrome',
       use: {
         ...devices['Galaxy S9+'],
@@ -166,7 +167,7 @@ const config: PlaywrightTestConfig = {
         ...devices['Microsoft Lumia 950 landscape'],
       },
     }, */
-    {
+    /*{
       name: 'Mobile Chrome',
       use: {
         ...devices['Nexus 10'],
