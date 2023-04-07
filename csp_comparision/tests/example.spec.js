@@ -223,7 +223,7 @@ function run(urls, searchSubPages) {
               console.log(homePageDB[o][0])
               console.log(u)
               console.log(homePageDB[o][1])
-              page_name = `${page_name}_${homePageDB[o][1]}`
+              page_name = `${page_name}§${homePageDB[o][1]}`
               homePageDB[o][1] = homePageDB[o][1] + 1
               console.log(page_name)
               console.log(homePageDB[o][1])
@@ -371,7 +371,7 @@ function run(urls, searchSubPages) {
                       let value = csp[i][1][0];
                       json[key] = value;
                     } 
-  
+                    json['url'] = url
                     //console.log(json)
                     fs.writeFileSync(`./tests/${fileName}`, JSON.stringify(json))
                   }               

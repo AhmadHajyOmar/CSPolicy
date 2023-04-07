@@ -42,27 +42,37 @@ if (compare_option.length === 0 || compare_option.length > 1 || (compare_option.
     uri.push(page)
     console.log(uri)
 }
-
-
+let files = new Array();
+jsonsInDir.forEach(filename => {
+    if(filename.includes("csp")){
+        files.push(filename)
+    }
+});
 if(permission) {
     for (var osystem of op) {
         let allDeveices = new Array();
         let allBrowsers = new Array();
         let SB = new Array();
         let NSB = new Array();
-        for(var u of uri) {
-            let page_name = u.split(".")[0]
-            //console.log(page_name)
+        for(var u of files) {
+            console.log("IIIIIIIIIIIII")
+            console.log(u)
+            let page_name;
+            page_name = u.split(".json")[0].split("_")
+            page_name = page_name[page_name.length-1]
             var csp = new Array();
             var csp_policies = new Array();
             let viewport_res = new Array();
             jsonsInDir.forEach(filename => {
+                console.log("RRRRRRRRRRRRRRRRRR")
                 console.log(filename)
-                if(filename.includes(osystem) && filename.includes(page_name)) {
+                if(filename.includes(osystem) && filename.includes(u)) {
                     csp = new Array();
-                    const fileData = fs.readFileSync(path.join("./tests", filename));
-                    const json_arr = JSON.parse(fileData.toString());
-                    //console.log(filename)
+                    const fileData = fs.readFileSync(path.join("./tests", filename));                    const json_arr = JSON.parse(fileData.toString());
+                    console.log("OOOOOOOOOOOOOOOOOO")
+                    console.log(filename)
+                    console.log("MMMMMMMMMMMMMMMMMMM")
+                    console.log(page_name)
                     let json_str = JSON.stringify(json_arr);
                     json_after_split = json_str.substring(1, json_str.length - 1);
                     json_after_split = json_after_split.split(/,"/)
@@ -88,6 +98,19 @@ if(permission) {
                 for(let i = 0; i < csp_policies.length; i++) {
                     let arr = csp_policies[i];
                     //console.log(arr)
+                    for(let hdr of arr[1]){
+                        if(hdr[0] === "content-security-policy"){
+                            //console.log("JJJJJJJJJJJJJJJ")
+                            //console.log(arr[0])
+                            //console.log(hdr[1])
+                            hdr[1] = hdr[1].replace("nscript-src", ";script-src")
+                            hdr[1] = hdr[1].replace("ndefault-src", ";default-src")
+                            hdr[1] = hdr[1].replace("nscript-src-elem", ";script-src-elem")
+
+                            //console.log(hdr[1])
+
+                        }
+                    }
                     let csp_dir = getDirectives_content_secuirty_policy(arr[1], "content-security-policy")
                     let sts = getDirectives_content_secuirty_policy(arr[1], "strict-transport-security")
                     let xfo = getDirectives_content_secuirty_policy(arr[1], "x-frame-options")
@@ -253,12 +276,15 @@ if(permission) {
                                 let vHeight = options[4]
                                 let vWidth = options[5]
                                 let operSysVersion = options[6]
-                                let uriPageName = options[7]
+                                let uriPageName = arr[1][arr[1].length-1][1]
                                 let nonceValue = v.replace("\"","")
                                 nonceValue = nonceValue.replace("\'","")
                                 nonceValue = nonceValue.replace("nonce-", "")
                                 nonceValue = nonceValue.substring(0, nonceValue.length-1)
                                 //console.log(nonceValue)
+                                console.log("ZZZZZZZZZZZZZZZZZZZ")
+                                console.log(arr[0])
+                                console.log(uriPageName)
                                 check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName)
 
                             }
@@ -1173,7 +1199,7 @@ function check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, 
            
             });          
                    
-            await page.goto(`https://www.${uriPageName}.com`, { waitUntil: "load", timeout: 600000 });
+            await page.goto(uriPageName, { waitUntil: "load", timeout: 600000 });
             await context.close();
             await browser.close();
        
