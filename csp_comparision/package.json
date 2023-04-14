@@ -8,9 +8,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.31.2"
+    "@playwright/test": "^1.32.3"
   },
   "dependencies": {
+    "playwright": "^1.32.3",
+    "playwright-extra": "^4.3.6",
     "puppeteer": "^19.7.5",
     "ua-parser-js": "^1.0.34"
   }

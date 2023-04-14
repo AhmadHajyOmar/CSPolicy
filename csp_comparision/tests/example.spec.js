@@ -1,5 +1,5 @@
-const { firefox, devices, chromium, webkit, expect } = require('@playwright/test');
-const playwright = require('@playwright/test');
+const { firefox, devices, chromium, webkit, expect } = require('playwright-extra');
+const playwright = require('playwright-extra');
 const parser = require('./csp_parsing')
 const uaParser = require('ua-parser-js');
 const fs = require('fs')
@@ -22,6 +22,9 @@ let devNamesFirfox = new Array();
 let devNamesWebkit = new Array();
 let devNames = new Array();
 let subpagesWithMark = new Array();
+console.log("CCCCCCCCCCCCCCCCCCCCCCCCCC")
+console.log(JSON.stringify(playwright.chromium))
+
 getUA(devNames);
 //console.log(devNames)
 //devNames = devNames.slice(32,36);
@@ -91,7 +94,7 @@ if(usedBrowserToTest.includes("Firefox")){
   choosedBrowsers.push(3)
 }
 //console.log(devNames)
-devNames = devNames.slice(2, 3)
+devNames = devNames.slice(2, 4)
 console.log(devNames);
 
 const run_option = process.argv.splice(2);

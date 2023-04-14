@@ -55,8 +55,6 @@ if(permission) {
         let SB = new Array();
         let NSB = new Array();
         for(var u of files) {
-            console.log("IIIIIIIIIIIII")
-            console.log(u)
             let page_name;
             page_name = u.split(".json")[0].split("_")
             page_name = page_name[page_name.length-1]
@@ -64,15 +62,9 @@ if(permission) {
             var csp_policies = new Array();
             let viewport_res = new Array();
             jsonsInDir.forEach(filename => {
-                console.log("RRRRRRRRRRRRRRRRRR")
-                console.log(filename)
                 if(filename.includes(osystem) && filename.includes(u)) {
                     csp = new Array();
                     const fileData = fs.readFileSync(path.join("./tests", filename));                    const json_arr = JSON.parse(fileData.toString());
-                    console.log("OOOOOOOOOOOOOOOOOO")
-                    console.log(filename)
-                    console.log("MMMMMMMMMMMMMMMMMMM")
-                    console.log(page_name)
                     let json_str = JSON.stringify(json_arr);
                     json_after_split = json_str.substring(1, json_str.length - 1);
                     json_after_split = json_after_split.split(/,"/)
@@ -93,10 +85,13 @@ if(permission) {
                 }
             });
             //console.log(csp_policies.length)
+            let uriPageName;
+
             if(csp_policies.length > 0) {
                 let csp_safe = new Array();
                 for(let i = 0; i < csp_policies.length; i++) {
                     let arr = csp_policies[i];
+                    uriPageName = arr[1][arr[1].length-1][1]
                     //console.log(arr)
                     for(let hdr of arr[1]){
                         if(hdr[0] === "content-security-policy"){
@@ -276,7 +271,6 @@ if(permission) {
                                 let vHeight = options[4]
                                 let vWidth = options[5]
                                 let operSysVersion = options[6]
-                                let uriPageName = arr[1][arr[1].length-1][1]
                                 let nonceValue = v.replace("\"","")
                                 nonceValue = nonceValue.replace("\'","")
                                 nonceValue = nonceValue.replace("nonce-", "")
@@ -352,14 +346,14 @@ if(permission) {
                     } 
                     
                     fs.writeFileSync(`./compare/${fileName}`, JSON.stringify(json))
-                    viewport_arr.push(`${arr_comp[0][1]}`)
+                    viewport_arr.push(`${arr_comp[0][1]}: {height${arr_comp[4][1]}, width:${arr_comp[5][1]}}`)
                     //[`${arr_comp[0][1]}`, `${arr_comp[4][1]}`, `${arr_comp[5][1]}`]
                     let dev = `${arr_comp[0][1]}: {height${arr_comp[4][1]}, width:${arr_comp[5][1]}}`
                     if(!allDeveices.includes(dev)) {
                         allDeveices.push(dev)
                     }
                 }
-
+                console.log("PPPPPPPPPPPPPP")
                 console.log(viewport_arr)
                 let viewport_arr_ND = new Array();
                 let viewport_arr_VD = new Array();
@@ -819,14 +813,16 @@ if(permission) {
                 }        
                 
                 if(arr_dev_safe_csp.length > 0) {
-                    if(!SB.includes(page_name)) {
-                        SB.push(page_name)
+                    console.log(uriPageName)
+                    if(!SB.includes(uriPageName)) {
+                        SB.push(uriPageName)
                     }
                 }
 
                 if(arr_dev_not_safe_csp.length > 0) {
-                    if(!NSB.includes(page_name)) {
-                        NSB.push(page_name)
+                    console.log(uriPageName)
+                    if(!NSB.includes(uriPageName)) {
+                        NSB.push(uriPageName)
                     }
                 }
 
