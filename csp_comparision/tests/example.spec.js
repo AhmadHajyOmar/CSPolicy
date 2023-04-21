@@ -61,6 +61,8 @@ for(let pun of pagesUN){
 const input = fs.readFileSync("./tests/urls", 'utf-8')
 const urls = input.split(/\r?\n/);
 const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
+var acceptLanguage = op[op.length-1]
+op.pop();
 const usedBrowserToTest = fs.readFileSync("./tests/browserToTest", 'utf-8').split(/\r?\n/);
 var page_names = new Array()
 var subPagesToTest = new Array()
@@ -94,7 +96,7 @@ if(usedBrowserToTest.includes("Firefox")){
   choosedBrowsers.push(3)
 }
 //console.log(devNames)
-devNames = devNames.slice(2, 4)
+//devNames = devNames.slice(2, 4)
 console.log(devNames);
 
 const run_option = process.argv.splice(2);
@@ -306,7 +308,7 @@ function run(urls, searchSubPages) {
               ...dev,
               premissions: ['geolocation'],
               geolocation: {latitude: 19.432608, longitude: -99.133209},
-              locale: 'de-DE',
+              locale: `${acceptLanguage}`,
               ignoreHTTPSErrors: true
             });
       
@@ -325,15 +327,19 @@ function run(urls, searchSubPages) {
               browserversion = version.product.split("/")[1]
             }*/
             //console.log(page_name)
+            let requestHeadersArray = new Array();
             await page.on("response", async (response) => {
               try {
                 const os = userAgentInfo.os.name
                 const os_version = userAgentInfo.os.version;
               
                 if(op.includes(os) && (usedBrowserToTest.includes(userAgentInfo.browser.name) || (userAgentInfo.browser.name === "Android Browser" && usedBrowserToTest.includes(userAgentInfo.engine.name)))) {
-                
                   if(response.request().resourceType() == 'document'){
                     console.log(`${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url}`)
+                    let requestAllHeaders = response.request().headers();
+                    console.log(requestAllHeaders)
+                    requestHeadersArray = parser.requestHeaders(JSON.stringify(requestAllHeaders), requestHeadersArray);
+
                     /*let allHeaders = await response.headers();
                     console.log(`${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url}`)
                     //console.log(dev.viewport.height)
@@ -377,6 +383,14 @@ function run(urls, searchSubPages) {
                     json['url'] = url
                     //console.log(json)
                     fs.writeFileSync(`./tests/${fileName}`, JSON.stringify(json))
+
+                    let json_2 = {};
+                    for(let i = 0; i < requestHeadersArray.length; i++){
+                      json_2[requestHeadersArray[i][0]] = requestHeadersArray[i][1]
+                    }
+                    let fileName_UA = `UserAgent ${fileName}`;
+                    fs.writeFileSync(`./tests/${fileName_UA}`, JSON.stringify(json_2))
+
                   }               
                 }
               } catch (error) {

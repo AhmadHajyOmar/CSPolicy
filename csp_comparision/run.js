@@ -7,7 +7,7 @@ const path = require('path');
 writeFiles("./tests/urls", [""])
 let input_arr = new Array();
 var usedBrowserToTest = new Array();;
-
+var acceptLanguage = "";
 const fileNames = process.argv.splice(2);
 console.log(fileNames)
 let option = new Array();
@@ -34,7 +34,7 @@ for(var fileName of fileNames) {
             }
     }
 
-    if(fileName.endsWith(".com") || fileName.endsWith(".de") ) {
+   if(!fileName.endsWith(".net")) {
         input_arr.push(fileName)
     }
 
@@ -103,9 +103,22 @@ for(var fileName of fileNames) {
         usedBrowserToTest.push("Safari")
         usedBrowserToTest.push("Firefox")
     }
+
+    if(fileName === 'fr-CH' || fileName === 'en-US' || fileName === 'de-DE' || fileName === 'ru-RU' || fileName === 'en-GB' || fileName === 'fr-FR'){
+        acceptLanguage = fileName
+        if (acceptLanguage.length === 0){
+            option.push("de-DE")
+        }else {
+            option.push(acceptLanguage)
+        }
+        
+    }
     
+   
+
     //ToDo the rest
 }
+
 
 var index = 0
 var index_ = 0

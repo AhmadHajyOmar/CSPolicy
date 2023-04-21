@@ -63,8 +63,8 @@ function cspParserGetAllResponseHeaders(finalheaders, allCSP, csp){
 						}
 					}
 				}
-				console.log(allCSP[j][n][m])
-				console.log(getDirective_Sources())
+				//console.log(allCSP[j][n][m])
+				//console.log(getDirective_Sources())
 				
 			}
 		}
@@ -207,9 +207,9 @@ function delete_character(str, s) {
 
 
 function getCSP_Policy(csp, headers, headers_arr) {
-	console.log(csp)
-	console.log(headers)
-	console.log(headers_arr)
+	//console.log(csp)
+	//console.log(headers)
+	//console.log(headers_arr)
 	let check_flage = false;
 	//let Set-Cookie
 		if(csp.length > 0) {
@@ -229,12 +229,12 @@ function getCSP_Policy(csp, headers, headers_arr) {
 					if(!headers_arr[j][0].includes("Set_Cookie") && !headers_arr[j][0].includes("Strict-Transport-Security") ) {
 
 						if(headers_arr[j][0].includes("x-frame-options")){
-							console.log("TTTTTTTTTTTTTTTTTTTT")
-							console.log(csp[index])
-							console.log(headers_arr[j])
+							//console.log("TTTTTTTTTTTTTTTTTTTT")
+							//console.log(csp[index])
+							//console.log(headers_arr[j])
 							let x_FrameOptions = ""
-							console.log("JJJJJJJJJJJJJ")
-							console.log(x_FrameOptions)
+							//console.log("JJJJJJJJJJJJJ")
+							//console.log(x_FrameOptions)
 							for(let u = 0; u < headers_arr[j][1].length; u++){
 								if(!csp[index][1].includes(headers_arr[j][1][u])){
 									x_FrameOptions += headers_arr[j][1][u].substring(1, headers_arr[j][1][u].length)
@@ -246,8 +246,8 @@ function getCSP_Policy(csp, headers, headers_arr) {
 								x_FrameOptions = " " + x_FrameOptions;
 								csp[index][1][0] = csp[index][1][0] + x_FrameOptions
 							}
-							console.log(x_FrameOptions)
-							console.log(csp[index])
+							//console.log(x_FrameOptions)
+							//console.log(csp[index])
 
 						}
 						let mulcsp = "";
@@ -351,7 +351,47 @@ function getCSP_Policy(csp, headers, headers_arr) {
 		return csp;
 }
 
+function requestHeaders(headers, savedHeaders){
+	headers = headers.substring(1, headers.length-1)
+	let arr = headers.split(",");
+	let arr_ = new Array();
+	for(let n = 0; n < arr.length; n++){
+		if(!arr[n].includes(":")){
+			//console.log(arr[n])
+			arr_[arr_.length-1][1] = arr_[arr_.length-1][1] + "," + arr[n].replace("\"", "");
+		}else{
+			let headerAndValue = arr[n].split(":");
+			let header = headerAndValue[0].replaceAll("\"", "");
+			let value;
+			value = headerAndValue[1].replace("\"", "");
+			if(header === "referer"){
+				value = value + ":" + headerAndValue[2].replace("\"", "");
+			}
+			value = value.replaceAll("\"", "")
+			arr_.push([header, value])
+		}
+		
+	}
+	if(savedHeaders.length == 0){
+		return arr_;
+	}
+	let isThere = false;
+	for(let j = 0; j < arr_.length; j++){
+		for(let i = 0; i < savedHeaders.length; i++){
+			if(savedHeaders[i][0] === arr_[j]){
+				isThere = true
+				break;
+			}
+		}
+		if(!isThere){
+			savedHeaders.push([arr_[j][0], arr_[j][1]])
+		}
+	}
+	return savedHeaders;
+}
+
 module.exports = {
+	requestHeaders,
 	cspParser,
 	getHeader,
 	cspParser_GetAllHeaders,
