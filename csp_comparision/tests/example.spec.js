@@ -70,6 +70,7 @@ var subPagesDB = new Array();
 var homePageDB = new Array();
 var homePageDB_PIndex = new Array();
 let line ="";
+let notReachableLinks = "";
 let choosedBrowsers = new Array();
 let allcspolicy;
 let fn;
@@ -96,7 +97,7 @@ if(usedBrowserToTest.includes("Firefox")){
   choosedBrowsers.push(3)
 }
 //console.log(devNames)
-//devNames = devNames.slice(2, 4)
+devNames = devNames.slice(2, 4)
 console.log(devNames);
 
 const run_option = process.argv.splice(2);
@@ -288,7 +289,7 @@ function run(urls, searchSubPages) {
               broserName = "WebKit"
             }
             if(chBro === 2){
-              browser = await playwright.chromium.launch({ headless: true,
+              browser = await playwright.chromium.launch({ headless: false,
                 //slowMo:  0,
                 timeout: 30 * 100000});
               broserName = "Chrome"  
@@ -328,6 +329,9 @@ function run(urls, searchSubPages) {
             }*/
             //console.log(page_name)
             let requestHeadersArray = new Array();
+            let failed = false;
+          
+
             await page.on("response", async (response) => {
               try {
                 const os = userAgentInfo.os.name
@@ -401,7 +405,30 @@ function run(urls, searchSubPages) {
             
             //console.log("RRRRRRRRRRRRRRRRRRRRR")
             //console.log(allcspolicy)
-            await page.goto(url, { waitUntil: "load", timeout: 600000 });
+            let loadStatus ;
+            loadStatus += failed + "\n"
+            loadStatus += searchSubPages
+
+            fs.writeFileSync(`./tests/ss.json`, "true\nfalses")
+            await page.on("requestfailed", async (response) => {
+              console.log("requestfailed");
+              failed = true;
+              searchSubPages = false;
+              loadStatus = new String()
+              loadStatus += failed + "\n"
+              loadStatus += searchSubPages  
+              fs.writeFileSync(`./tests/${page_name}`, loadStatus)
+            });
+            const loadStatusOptions = fs.readFileSync(`./tests/${page_name}`, 'utf-8').split(/\r?\n/);
+            failed = loadStatusOptions[0]
+            searchSubPages = loadStatusOptions[1]
+            const file =  fs.readdirSync('./tests');
+
+            if(!failed){
+              await page.goto(url, { waitUntil: "load", timeout: 600000 });
+            }else{
+              notReachableLinks += page_name + "\n"
+            }
             await waitingTime(2000)
             var index = 0
             var index_ = 0
@@ -545,7 +572,9 @@ function run(urls, searchSubPages) {
                   }
       
                   fs.writeFileSync(`./tests/subpages.txt`, line)
-      
+                }
+                if(failed){
+                  fs.writeFileSync("./tests/notReachableLinks", notReachableLinks)
                 }
               }	
       

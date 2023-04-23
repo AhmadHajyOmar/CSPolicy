@@ -34,7 +34,7 @@ for(var fileName of fileNames) {
             }
     }
 
-   if(!fileName.endsWith(".net")) {
+   if(!fileName.endsWith(".net") && (fileName.includes(".")) && (!fileName.endsWith(".txt"))) {
         input_arr.push(fileName)
     }
 
@@ -125,7 +125,7 @@ var index_ = 0
 var urlIsThere = false
 var index_url = 0
 var paths = new Array();
-
+console.log("IIIIIIIIIIIII")
 console.log(input_arr)
 var urls = new Array();
 console.log(input_arr.length)
