@@ -70,7 +70,20 @@ var subPagesDB = new Array();
 var homePageDB = new Array();
 var homePageDB_PIndex = new Array();
 let line ="";
+let  notReachableLinksArray = new Array();
 let notReachableLinks = "";
+if (fs.existsSync("./tests/notReachableLinks")){
+  notReachableLinksArray = fs.readFileSync(`./tests/notReachableLinks`, 'utf-8').split(/\r?\n/);
+  for(let i = 0; i < notReachableLinksArray.length; i++){
+    console.log(notReachableLinksArray[i])
+    if(i == notReachableLinksArray.length -1 ){
+      notReachableLinks += notReachableLinksArray[i]
+    }else{
+      notReachableLinks += notReachableLinksArray[i] + "\n"
+    }
+  }
+}
+
 let choosedBrowsers = new Array();
 let allcspolicy;
 let fn;
@@ -98,7 +111,7 @@ if(usedBrowserToTest.includes("Firefox")){
 }
 //console.log(devNames)
 devNames = devNames.slice(2, 4)
-console.log(devNames);
+//console.log(devNames);
 
 const run_option = process.argv.splice(2);
 console.log(run_option.length);
@@ -108,10 +121,18 @@ console.log(subPages);
 
 switch(run_option.length) {
   case 1:
-    if(run_option[0] === 'h'){
-      run(urls, true);
+    if(run_option[0] === 'rf'){
+      console.log("check not reachable websites")
+      run(urls, false, true);
     }
+
+    if(run_option[0] === 'h'){
+      console.log("visit homepages")
+      run(urls, true, false);
+    }
+
     if(run_option[0] === 's'){
+      console.log("visit subpages")
       if(subPages.length === 0) {
         console.log("There is no subpages stored in the data base")
         console.log("Please use the following command :  node ./tests/example.spec.js h")
@@ -171,7 +192,7 @@ switch(run_option.length) {
         }*/
         console.log(homePageDB)
         console.log(subpages_Shuffel)
-        run(subpages_Shuffel, false);
+        run(subpages_Shuffel, false, false);
       }
     }
   break;
@@ -186,11 +207,11 @@ switch(run_option.length) {
 
 
 
-function run(urls, searchSubPages) {
+function run(urls, searchSubPages, requestedFailed) {
   //console.log(urls)
 
   (async() => {
-
+    let notReachableWebsites = "";
     
     
     //console.log(urls)
@@ -260,7 +281,7 @@ function run(urls, searchSubPages) {
         url = u;
       }
       for(let dev of devNames) {
-  
+        let reachable = true;
         for(let i = 0; i < choosedBrowsers.length; i++){
           let chBro = choosedBrowsers[i]
           //await waitingTime(5000)
@@ -289,7 +310,7 @@ function run(urls, searchSubPages) {
               broserName = "WebKit"
             }
             if(chBro === 2){
-              browser = await playwright.chromium.launch({ headless: false,
+              browser = await playwright.chromium.launch({ headless: true,
                 //slowMo:  0,
                 timeout: 30 * 100000});
               broserName = "Chrome"  
@@ -329,276 +350,317 @@ function run(urls, searchSubPages) {
             }*/
             //console.log(page_name)
             let requestHeadersArray = new Array();
-            let failed = false;
+            let failed = "false";
           
-
-            await page.on("response", async (response) => {
-              try {
-                const os = userAgentInfo.os.name
-                const os_version = userAgentInfo.os.version;
-              
-                if(op.includes(os) && (usedBrowserToTest.includes(userAgentInfo.browser.name) || (userAgentInfo.browser.name === "Android Browser" && usedBrowserToTest.includes(userAgentInfo.engine.name)))) {
-                  if(response.request().resourceType() == 'document'){
-                    console.log(`${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url}`)
-                    let requestAllHeaders = response.request().headers();
-                    console.log(requestAllHeaders)
-                    requestHeadersArray = parser.requestHeaders(JSON.stringify(requestAllHeaders), requestHeadersArray);
-
-                    /*let allHeaders = await response.headers();
-                    console.log(`${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url}`)
-                    //console.log(dev.viewport.height)
-                    //console.log(dev.viewport.width)
-                    //console.log(url)
-                    //console.log(allHeaders)
-                    let headers_arr = parser.cspParser(allHeaders);
-                    headers = parser.cspParser_GetAllHeaders(headers_arr, headers)
-                    allCSP.push(headers_arr)
-                    //let finalheadersCompare = finalheaders;
-                    finalheaders = parser.cspParserGetFinalHeaders(headers, finalheaders)
-                    //console.log(allCSP)
-                    //console.log(headers)
-                    //console.log(finalheaders)
-                    //csp = parser.getCSP_Policy(csp, headers, headers_arr);
-                    csp = parser.cspParserGetAllResponseHeaders(finalheaders, allCSP, csp)*/
-                    let allHeaders = await response.headers();
-                    console.log(allHeaders)
-                    let headers_arr = parser.cspParser(allHeaders);
-                    let headers = parser.cspParser_GetAllHeaders(headers_arr)
-                    allCSP.push(headers_arr)
-                    allcspolicy += headers_arr + ","
-                    csp = parser.getCSP_Policy(csp, headers, headers_arr);
-      
-                    if(model_name.endsWith("landscape")) {
-                      model_name = model_name.substring(0,model_name.indexOf(" landscape"))
-                    }
-  
-                    if(os === "Mac OS" || os === "Windows") {
-                      model_name = `Desktop${os[0]}`
-                    }
-  
-                    let fileName = `csp_${model_name}_${broserName}_${browserversion}_${os}_${dev.viewport.height}_${dev.viewport.width}_${os_version}_${page_name}.json`
-                    fn = fileName;
-                    let json = {};
-                    for(let i = 0; i < csp.length; i++) {
-                      let key = csp[i][0]
-                      let value = csp[i][1][0];
-                      json[key] = value;
-                    } 
-                    json['url'] = url
-                    //console.log(json)
-                    fs.writeFileSync(`./tests/${fileName}`, JSON.stringify(json))
-
-                    let json_2 = {};
-                    for(let i = 0; i < requestHeadersArray.length; i++){
-                      json_2[requestHeadersArray[i][0]] = requestHeadersArray[i][1]
-                    }
-                    let fileName_UA = `UserAgent ${fileName}`;
-                    fs.writeFileSync(`./tests/${fileName_UA}`, JSON.stringify(json_2))
-
-                  }               
+            if(requestedFailed){
+              await page.on("requestfailed", async (response) => {
+                console.log(model_name)
+                console.log(page_name)
+                console.log("requestfailed");
+                console.log(page_name)
+                notReachableWebsites += `${model_name}_${broserName}_${browserversion}_${userAgentInfo.os.name}_${dev.viewport.height}_${dev.viewport.width}_${userAgentInfo.os.version}_${page_name}`+"\n"
+                });
+                try{
+                  await page.goto(url);
+                }catch (e) {
+                  console.log(e);
                 }
-              } catch (error) {
-                console.error(error);
-              }
-             
-            });          
-            
-            //console.log("RRRRRRRRRRRRRRRRRRRRR")
-            //console.log(allcspolicy)
-            let loadStatus ;
-            loadStatus += failed + "\n"
-            loadStatus += searchSubPages
-
-            fs.writeFileSync(`./tests/ss.json`, "true\nfalses")
-            await page.on("requestfailed", async (response) => {
-              console.log("requestfailed");
-              failed = true;
-              searchSubPages = false;
-              loadStatus = new String()
-              loadStatus += failed + "\n"
-              loadStatus += searchSubPages  
-              fs.writeFileSync(`./tests/${page_name}`, loadStatus)
-            });
-            const loadStatusOptions = fs.readFileSync(`./tests/${page_name}`, 'utf-8').split(/\r?\n/);
-            failed = loadStatusOptions[0]
-            searchSubPages = loadStatusOptions[1]
-            const file =  fs.readdirSync('./tests');
-
-            if(!failed){
-              await page.goto(url, { waitUntil: "load", timeout: 600000 });
+     
             }else{
-              notReachableLinks += page_name + "\n"
-            }
-            await waitingTime(2000)
-            var index = 0
-            var index_ = 0
-            var urlIsThere = false
-            var index_url = 0
-            var paths = new Array();
-            //console.log(subPages)
-            if(searchSubPages) {
-              for(let i = 0; i < subPages.length; i++) {
-                if(subPages[i][0] === url) {
-                  urlIsThere = true
-                  index_url = i
-                }
-              }
-              //console.log(urlIsThere)
-              if(urlIsThere){
-                //console.log("Is there !!!")
-                //console.log(url)
-              }
-  
-              if(urlIsThere){
+              await page.on("response", async (response) => {
+                try {
+                  const os = userAgentInfo.os.name
+                  const os_version = userAgentInfo.os.version;
                 
-                if(flage_homePage){
-                  flage_homePage = false;
-                  line += url + " "
-                }
+                  if(op.includes(os) && (usedBrowserToTest.includes(userAgentInfo.browser.name) || (userAgentInfo.browser.name === "Android Browser" && usedBrowserToTest.includes(userAgentInfo.engine.name)))) {
+                    if(response.request().resourceType() == 'document'){
+                      console.log(`${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url}`)
+                      let requestAllHeaders = response.request().headers();
+                      console.log(requestAllHeaders)
+                      requestHeadersArray = parser.requestHeaders(JSON.stringify(requestAllHeaders), requestHeadersArray);
   
-                for(let spe of subPages) {
-                  for(let i = 1; i < spe.length; i++){
-                    if(!subPagesToTest.includes(spe[i])){
-                      subPagesToTest.push(spe[i])
-                      if(i != spe.length - 1){
-                        line += `${spe[i]}Ahmad${page_name}` + " "
-                      }else {
-                        line += `${spe[i]}Ahmad${page_name}`
+                      /*let allHeaders = await response.headers();
+                      console.log(`${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url}`)
+                      //console.log(dev.viewport.height)
+                      //console.log(dev.viewport.width)
+                      //console.log(url)
+                      //console.log(allHeaders)
+                      let headers_arr = parser.cspParser(allHeaders);
+                      headers = parser.cspParser_GetAllHeaders(headers_arr, headers)
+                      allCSP.push(headers_arr)
+                      //let finalheadersCompare = finalheaders;
+                      finalheaders = parser.cspParserGetFinalHeaders(headers, finalheaders)
+                      //console.log(allCSP)
+                      //console.log(headers)
+                      //console.log(finalheaders)
+                      //csp = parser.getCSP_Policy(csp, headers, headers_arr);
+                      csp = parser.cspParserGetAllResponseHeaders(finalheaders, allCSP, csp)*/
+                      let allHeaders = await response.headers();
+                      console.log(allHeaders)
+                      let headers_arr = parser.cspParser(allHeaders);
+                      let headers = parser.cspParser_GetAllHeaders(headers_arr)
+                      allCSP.push(headers_arr)
+                      allcspolicy += headers_arr + ","
+                      csp = parser.getCSP_Policy(csp, headers, headers_arr);
+        
+                      if(model_name.endsWith("landscape")) {
+                        model_name = model_name.substring(0,model_name.indexOf(" landscape"))
                       }
-                    }
+    
+                      if(os === "Mac OS" || os === "Windows") {
+                        model_name = `Desktop${os[0]}`
+                      }
+    
+                      let fileName = `csp_${model_name}_${broserName}_${browserversion}_${os}_${dev.viewport.height}_${dev.viewport.width}_${os_version}_${page_name}.json`
+                      fn = fileName;
+                      let json = {};
+                      for(let i = 0; i < csp.length; i++) {
+                        let key = csp[i][0]
+                        let value = csp[i][1][0];
+                        json[key] = value;
+                      } 
+                      json['url'] = url
+                      //console.log(json)
+                      fs.writeFileSync(`./tests/${fileName}`, JSON.stringify(json))
+  
+                      let json_2 = {};
+                      for(let i = 0; i < requestHeadersArray.length; i++){
+                        json_2[requestHeadersArray[i][0]] = requestHeadersArray[i][1]
+                      }
+                      let fileName_UA = `UserAgent ${fileName}`;
+                      fs.writeFileSync(`./tests/${fileName_UA}`, JSON.stringify(json_2))
+  
+                    }               
+                  }
+                } catch (error) {
+                  console.error(error);
+                }
+               
+              });          
+              
+              //console.log("RRRRRRRRRRRRRRRRRRRRR")
+              //console.log(allcspolicy)
+              /*let loadStatus = "";
+              loadStatus += failed + "\n"
+              loadStatus += searchSubPages
+              fs.writeFileSync(`./tests/${page_name}_${model_name}`, loadStatus)
+              console.log(failed)
+              await page.on("requestfailed", async (response) => {
+                console.log(dev)
+                console.log("requestfailed");
+                failed = true;
+                searchSubPages = false;
+                loadStatus = new String()
+                loadStatus += failed + "\n"
+                loadStatus += searchSubPages
+                fs.writeFileSync(`./tests/${page_name}_${model_name}`, loadStatus)
+                
+              });
+              const loadStatusOptions = fs.readFileSync(`./tests/${page_name}_${model_name}`, 'utf-8').split(/\r?\n/);
+              console.log(loadStatusOptions)
+              failed = loadStatusOptions[1]
+              searchSubPages = loadStatusOptions[0]
+              console.log(failed)
+              console.log(failed === "false")
+              if(failed === "false"){
+                await page.goto(url, { waitUntil: "load", timeout: 600000 });
+              }else{
+                let notReachableLinksVar = page_name +`(${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url})` + ", "
+                let found = false
+                for(let e of notReachableLinksArray){
+                  //console.log(e)
+                  //console.log(notReachableLinksVar)
+                  if(e === notReachableLinksVar){
+                    found = true
                   }
                 }
-                
-                line += "\n"
-      
-                //console.log(subPagesToTest)
-              } else {
-                if(flage_subpages){
-                  flage_subpages = false;
-                  //console.log("Is Not there !!!")
-                  /*const browser = await playwright.chromium.launch()
-                  const page = await browser.newPage()
-                  */
         
-                  //await page.goto(url, { timeout: 80000 })
+                if(!found){
+                  notReachableLinks += notReachableLinksVar + "\n"
+                }
+              }*/
+              try{
+                await page.goto(url, { waitUntil: "load", timeout: 600000 });
+              }catch (e) {
+                console.log(e);
+                reachable = false
+              }
+              await waitingTime(2000)
+              var index = 0
+              var index_ = 0
+              var urlIsThere = false
+              var index_url = 0
+              var paths = new Array();
+              //console.log(subPages)
+              if(searchSubPages && reachable) {
+                for(let i = 0; i < subPages.length; i++) {
+                  if(subPages[i][0] === url) {
+                    urlIsThere = true
+                    index_url = i
+                  }
+                }
+                //console.log(urlIsThere)
+                if(urlIsThere){
+                  //console.log("Is there !!!")
+                  //console.log(url)
+                }
+    
+                if(urlIsThere){
+                  
                   if(flage_homePage){
                     flage_homePage = false;
-                    line += `${url}Ahmad${page_name}` + " "
+                    line += url + " "
                   }
-                  const links = await page.evaluate(() => {
-                    return Array.from(document.links).map(item => item.href);
-                  });
-                  //console.log("GGGGGGGGGGGGGGGGGGGGGGGGGGGG")
-                  //console.log(links)
-                  //urls.push(lk)
-                  for(var u of links) {
-                    if(u.includes("://")){
-                      const url = new URL(u);
-                      if( !paths.includes(url.pathname) ) {
-                        paths.push(url.pathname);
+    
+                  for(let spe of subPages) {
+                    for(let i = 1; i < spe.length; i++){
+                      if(!subPagesToTest.includes(spe[i])){
+                        subPagesToTest.push(spe[i])
+                        if(i != spe.length - 1){
+                          line += `${spe[i]}Ahmad${page_name}` + " "
+                        }else {
+                          line += `${spe[i]}Ahmad${page_name}`
+                        }
                       }
                     }
-                    
-                    //console.log(u)
-                    //console.log(url.pathname)
                   }
                   
-                  if(paths.length <= 4) {
-                    let counter = 0;
-  
-                    for(let i = 0; i < paths.length ; i++) {
-                      for(let j = 0; j < links.length; j++) {
-                        if(links[j].includes(paths[i])){
-                          if(!subPagesToTest.includes(links[j])){
-                            subPagesToTest.push(links[j])
-                            if (i == paths.length - 1){
-                              line += `${links[j]}Ahmad${page_name}`
-                            }else{
-                              line += `${links[j]}Ahmad${page_name}` + " "
-                            }
-                            break;
-                          }
-                        } 
-                      }
+                  line += "\n"
+        
+                  //console.log(subPagesToTest)
+                } else {
+                  if(flage_subpages){
+                    flage_subpages = false;
+                    //console.log("Is Not there !!!")
+                    /*const browser = await playwright.chromium.launch()
+                    const page = await browser.newPage()
+                    */
+          
+                    //await page.goto(url, { timeout: 80000 })
+                    if(flage_homePage){
+                      flage_homePage = false;
+                      line += `${url}Ahmad${page_name}` + " "
                     }
-                    line += "\n"
-  
-                  }else {
-                    //console.log("HIER HIER!!!!")
-                    //console.log(url)
-                    //console.log(paths)
-                    let used_paths = new Array()
-                    for(let i = 0; i < 5 ; i++) {
-                      for(let j = 0; j < links.length; j++) {
-                        /*
-                        if(links[j].includes(paths[i])){
-                          if(links[j].includes(url.substring(12,links[j].length-1).split(".")[0])){
-                            if(!subPagesToTest.includes(links[j])){
-      
-                            }
-                          }
-                        }*/
-                        if(links[j].includes(paths[i])){
-                          if(!subPagesToTest.includes(links[j])){
-                            console.log(url)
-                            subPagesToTest.push(links[j])
-                            if (i == 4){
-                              line += `${links[j]}Ahmad${page_name}` 
-                            }else{
-                              line += `${links[j]}Ahmad${page_name}` + " "
-                            }
-                            break;
-                          }
-                      
+                    const links = await page.evaluate(() => {
+                      return Array.from(document.links).map(item => item.href);
+                    });
+                    //console.log("GGGGGGGGGGGGGGGGGGGGGGGGGGGG")
+                    //console.log(links)
+                    //urls.push(lk)
+                    for(var u of links) {
+                      if(u.includes("://")){
+                        const url = new URL(u);
+                        if( !paths.includes(url.pathname) ) {
+                          paths.push(url.pathname);
                         }
-                        /*console.log(links[j])
-                        console.log(paths[i])
-                        const resultStrComp = paths[i].localeCompare(new URL(links[j]).pathname, undefined, { sensitivity: 'base' });
-                        if(resultStrComp == 0 && !subPagesToTest.includes(links[j])){
-                          if(links[j].includes(url.substring(12,links[j].length-1).split(".")[0])){
-                            subPagesToTest.push(links[j])
-                            if (i == 3){
-                              line += links[j] 
-                            }else{
-                              line += links[j] + " "
-                            }
-                          }
-                          break;
-                        } */
-                        
                       }
+                      
+                      //console.log(u)
+                      //console.log(url.pathname)
                     }
-                    line += "\n"
+                    
+                    if(paths.length <= 4) {
+                      let counter = 0;
+    
+                      for(let i = 0; i < paths.length ; i++) {
+                        for(let j = 0; j < links.length; j++) {
+                          if(links[j].includes(paths[i])){
+                            if(!subPagesToTest.includes(links[j])){
+                              subPagesToTest.push(links[j])
+                              if (i == paths.length - 1){
+                                line += `${links[j]}Ahmad${page_name}`
+                              }else{
+                                line += `${links[j]}Ahmad${page_name}` + " "
+                              }
+                              break;
+                            }
+                          } 
+                        }
+                      }
+                      line += "\n"
+    
+                    }else {
+                      //console.log("HIER HIER!!!!")
+                      //console.log(url)
+                      //console.log(paths)
+                      let used_paths = new Array()
+                      for(let i = 0; i < 5 ; i++) {
+                        for(let j = 0; j < links.length; j++) {
+                          /*
+                          if(links[j].includes(paths[i])){
+                            if(links[j].includes(url.substring(12,links[j].length-1).split(".")[0])){
+                              if(!subPagesToTest.includes(links[j])){
+        
+                              }
+                            }
+                          }*/
+                          if(links[j].includes(paths[i])){
+                            if(!subPagesToTest.includes(links[j])){
+                              console.log(url)
+                              subPagesToTest.push(links[j])
+                              if (i == 4){
+                                line += `${links[j]}Ahmad${page_name}` 
+                              }else{
+                                line += `${links[j]}Ahmad${page_name}` + " "
+                              }
+                              break;
+                            }
+                        
+                          }
+                          /*console.log(links[j])
+                          console.log(paths[i])
+                          const resultStrComp = paths[i].localeCompare(new URL(links[j]).pathname, undefined, { sensitivity: 'base' });
+                          if(resultStrComp == 0 && !subPagesToTest.includes(links[j])){
+                            if(links[j].includes(url.substring(12,links[j].length-1).split(".")[0])){
+                              subPagesToTest.push(links[j])
+                              if (i == 3){
+                                line += links[j] 
+                              }else{
+                                line += links[j] + " "
+                              }
+                            }
+                            break;
+                          } */
+                          
+                        }
+                      }
+                      line += "\n"
+                    }
+        
+                    fs.writeFileSync(`./tests/subpages.txt`, line)
                   }
-      
-                  fs.writeFileSync(`./tests/subpages.txt`, line)
-                }
-                if(failed){
-                  fs.writeFileSync("./tests/notReachableLinks", notReachableLinks)
-                }
-              }	
-      
+                  
+                }	
+        
+              }
+              /*if(failed){
+                fs.unlinkSync(`./tests/${page_name}_${model_name}`);
+                
+                fs.writeFileSync("./tests/notReachableLinks.txt", notReachableLinks)
+              }*/
+              /*const metaDescription = page.locator('meta[name="description"]');
+              console.log(metaDescription)
+              const gh = locator.getAttribute("http-equiv");
+              console.log(gh)
+              //await expect(metaDescription).toHaveAttribute('content', 'something')
+              
+              /*
+              const descriptionTag = await page.$('meta[name="description"]');
+              const description = await descriptionTag?.getAttribute('content');
+        
+              console.log(description)*/
+              await context.close();
+              await browser.close();
             }
-      
-            /*const metaDescription = page.locator('meta[name="description"]');
-            console.log(metaDescription)
-            const gh = locator.getAttribute("http-equiv");
-            console.log(gh)
-            //await expect(metaDescription).toHaveAttribute('content', 'something')
+
             
-            /*
-            const descriptionTag = await page.$('meta[name="description"]');
-            const description = await descriptionTag?.getAttribute('content');
-      
-            console.log(description)*/
-            await context.close();
-            await browser.close();
+           
           }
         
       }
     
     }
-  
+    
   })();
   
 }
