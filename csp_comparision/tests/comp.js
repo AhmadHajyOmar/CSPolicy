@@ -281,7 +281,7 @@ if(permission) {
                                 console.log("ZZZZZZZZZZZZZZZZZZZ")
                                 console.log(arr[0])
                                 console.log(uriPageName)
-                                check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName)
+                                check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName, page_name)
 
                             }
                 
@@ -536,414 +536,6 @@ if(permission) {
                     
                 }
                 
-                /*
-                //console.log(csp_safe)
-                let arr_dev_safe_csp = new Array();
-                let arr_dev_not_safe_csp = new Array();
-                let arr_dev_sts_max_age_protection_classe1 = new Array();
-                let arr_dev_sts_max_age_protection_classe2 = new Array();
-                let arr_dev_sts_max_age_protection_classe3 = new Array();
-                let num_dev_safe_csp = 0;
-                let num_dev_not_safe_csp = 0;
-                let num_dev_sts_max_age_protection_equal_zero = 0;
-                let num_dev_sts_max_age_protection_less_than_one_year = 0;
-                let num_dev_sts_max_age_protection_more_than_one_year = 0;
-                let dev_safe_csp_chromium = new Array();
-                let dev_safe_csp_webkit = new Array();
-                let dev_safe_csp_firefox = new Array();
-                let dev_not_safe_csp_chrmoium = new Array();
-                let dev_not_safe_csp_webkit = new Array();
-                let dev_not_safe_csp_firefox = new Array();
-
-                let dev_no_cspHeader = new Array();
-                let dev_with_cspHeader = new Array();
-
-                let num_dev_provide_no_protection_against_sslStripping_level_0 = 0;
-                let dev_provide_no_protection_against_sslStripping_level_0 = new Array();
-                let num_dev_provide_protection_against_sslStripping_level_1 = 0;
-                let dev_provide_protection_against_sslStripping_level_1 = new Array();
-                let num_dev_provide_protection_against_sslStripping_level_2 = 0;
-                let dev_provide_protection_against_sslStripping_level_2 = new Array();
-                let num_dev_provide_protection_against_sslStripping_level_3 = 0;
-                let dev_provide_protection_against_sslStripping_level_3 = new Array();
-                let num_dev_provide_protection_against_sslStripping_level_4 = 0;
-                let dev_provide_protection_against_sslStripping_level_4 = new Array();
-
-                let num_dev_provide_no_protection_against_clickjacking_level_0 = 0;
-                let dev_provide_no_protection_against_clickjacking_level_0 = new Array();
-
-                let num_dev_provide_protection_against_clickjacking_xfo_level_1 = 0;
-                let dev_provide_protection_against_clickjacking_xfo_level_1 = new Array();
-                let num_dev_provide_protection_against_clickjacking_xfo_level_2 = 0;
-                let dev_provide_protection_against_clickjacking_xfo_level_2 = new Array();
-                let num_dev_provide_protection_against_clickjacking_xfo_level_3 = 0;
-                let dev_provide_protection_against_clickjacking_xfo_level_3 = new Array();
-
-    
-                let num_dev_provide_protection_against_clickjacking_csp_level_1 = 0;
-                let dev_provide_protection_against_clickjacking_csp_level_1 = new Array();
-                let num_dev_provide_protection_against_clickjacking_csp_level_2 = 0;
-                let dev_provide_protection_against_clickjacking_csp_level_2 = new Array();
-                let num_dev_provide_protection_against_clickjacking_csp_level_3 = 0;
-                let dev_provide_protection_against_clickjacking_csp_level_3 = new Array();
-
-                let num_dev_provide_protection_against_hijacking = 0;
-                let num_dev_provide_no_protection_against_hijacking = 0;
-                let dev_provide_protection_against_hijacking = new Array();
-                let dev_provide_no_protection_against_hijacking = new Array();
-
-                let num_dev_provide_no_protection_against_csrf_level_0 = 0;
-                let dev_provide_no_protection_against_csrf_level_0 = new Array();
-                let num_dev_provide_protection_against_csrf_level_1 = 0;
-                let dev_provide_protection_against_csrf_level_1 = new Array();
-                let num_dev_provide_protection_against_csrf_level_2 = 0;
-                let dev_provide_protection_against_csrf_level_2 = new Array();
-
-                let num_dev_provide_protection_against_steeling_cookies = 0;
-                let dev_provide_protection_against_steeling_cookies = new Array();
-                let num_dev_provide_no_protection_against_steeling_cookies = 0;
-                let dev_provide_no_protection_against_steeling_cookies = new Array();
-                //console.log("HAHAHAHA")
-                //console.log(csp_safe[0][25][1][0])
-                //console.log(csp_safe[0][25][1][0] === 'x')
-
-
-
-             
-
-                let used_browser = new Array();
-                var webkit_devices = 0;
-                var chromium_devices = 0;
-                var firefox_devices = 0;
-                for(let i = 0; i<csp_safe.length; i++) {
-                    let ub = csp_safe[i][1][1]
-                    if(ub === "chromium") {
-                        chromium_devices++;
-                    }
-                    if(ub === "firefox") {
-                        firefox_devices++;
-                    }
-                    if(ub === "webkit") {
-                        webkit_devices++;
-                    }
-                    if(!used_browser.includes(ub[0])) {
-                        used_browser.push(ub[0])
-                    }
-                    if(!allBrowsers.includes(ub)) {
-                        allBrowsers.push(ub)
-                    }
-                }
-                //console.log(used_browser)
-                //console.log(allBrowsers)
-                
-                used_browser = delete_StrSy(used_browser, "\"")
-                for (let i = 0; i < csp_safe.length; i++) {
-                
-                    switch(csp_safe[i][23][1]) {   
-                        case 1: {
-                            arr_dev_sts_max_age_protection_classe1.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-                        case 2: {
-                            arr_dev_sts_max_age_protection_classe2.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)                      
-                        }
-                        break;
-                        case 3: {
-                            arr_dev_sts_max_age_protection_classe3.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)                      
-                        }
-                        break;
-                        default: {
-                            console.log("-_-")
-                        }
-                        break;
-                
-                    }
-                    
-                    switch(csp_safe[i][24][1]) {
-                        case 0 : {
-                            dev_provide_no_protection_against_sslStripping_level_0.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        case 1: {
-                            dev_provide_protection_against_sslStripping_level_1.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        case 2: {
-                            dev_provide_protection_against_sslStripping_level_2.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        case 3: {
-                            dev_provide_protection_against_sslStripping_level_3.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        case 4: {
-                            dev_provide_protection_against_sslStripping_level_4.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        default : console.log('-_-')
-                        break;
-                    }
-
-                    switch(csp_safe[i][26][1]) {
-                        case 0 : {
-                            dev_provide_no_protection_against_clickjacking_level_0.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        case 1: {
-                            if (csp_safe[i][25][1][0] === 'x') {
-                                dev_provide_protection_against_clickjacking_xfo_level_1.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                            }
-                            if (csp_safe[i][25][1][0] === 'c') {
-                                dev_provide_protection_against_clickjacking_csp_level_1.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                            }
-                        
-                        }
-                        break;
-
-                        case 2: {
-                            if (csp_safe[i][25][1][0] === 'x') {
-                                dev_provide_protection_against_clickjacking_xfo_level_2.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                            }
-                            if (csp_safe[i][25][1][0] === 'c') {
-                                dev_provide_protection_against_clickjacking_csp_level_2.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                            }
-                        }
-                        break;
-
-                        case 3: {
-                            if (csp_safe[i][25][1][0] === 'x') {
-                                dev_provide_protection_against_clickjacking_xfo_level_3.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                            }
-                            if (csp_safe[i][25][1][0] === 'c') {
-                                dev_provide_protection_against_clickjacking_csp_level_3.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                            }
-                        }
-                        break;
-            
-                        default: console.log('-_-');
-                        break;
-
-                    }
-
-                    switch(csp_safe[i][27][1]) {    
-                        case true: {
-                            dev_provide_protection_against_hijacking.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        case false: {
-                            dev_provide_no_protection_against_hijacking.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        default: console.log('-_-')
-                        break;
-
-                    }
-
-                    switch(csp_safe[i][30][1]) {
-                        
-                        case true: {
-                            dev_provide_protection_against_steeling_cookies.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        case false: {
-                            dev_provide_no_protection_against_steeling_cookies.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        default: console.log('-_-')
-                        break;
-
-                    }
-
-                    switch(csp_safe[i][29][1]) {
-                        case 0: {
-                            dev_provide_no_protection_against_csrf_level_0.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        case 1: {
-                            dev_provide_protection_against_csrf_level_1.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-
-                        case 2: {
-                            dev_provide_protection_against_csrf_level_2.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        break;
-                    }
-                    ##############################################################################################
-
-                    if(csp_safe[i][7][1] === false) {
-                        if(csp_safe[i][8][1] === 'csp dose not contain script-srcc or default-src') {
-                            dev_no_cspHeader.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                            
-                        } else {
-                            dev_with_cspHeader.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-
-                        if(csp_safe[i][1][1] === "Chrome") {
-                            dev_not_safe_csp_chrmoium.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        if(csp_safe[i][1][1] === "WebKit") {
-                            dev_not_safe_csp_webkit.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)                          
-                        }
-                        if(csp_safe[i][1][1] === "Firefox") {
-                            dev_not_safe_csp_firefox.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-
-                        }
-                        arr_dev_not_safe_csp.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        devices_offerd_unsafe_csp.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                    }
-
-                    if(csp_safe[i][7][1] === true) {
-                        if(csp_safe[i][1][1] === "Chrome") {
-                            dev_safe_csp_chromium.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        if(csp_safe[i][1][1] === "WebKit") {
-                            dev_safe_csp_webkit.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        if(csp_safe[i][1][1] === "Firefox") {
-                            dev_safe_csp_firefox.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        }
-                        arr_dev_safe_csp.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                        devices_offerd_safe_csp.push(`${csp_safe[i][0][1]},height: ${csp_safe[i][4][1]},width: ${csp_safe[i][5][1]}`)
-                    }  
-                }        
-                
-                if(arr_dev_safe_csp.length > 0) {
-                    console.log(uriPageName)
-                    if(!SB.includes(uriPageName)) {
-                        SB.push(uriPageName)
-                    }
-                }
-
-                if(arr_dev_not_safe_csp.length > 0) {
-                    console.log(uriPageName)
-                    if(!NSB.includes(uriPageName)) {
-                        NSB.push(uriPageName)
-                    }
-                }
-
-                arr_dev_safe_csp = removeDuplikate(arr_dev_safe_csp)
-                arr_dev_not_safe_csp = removeDuplikate(arr_dev_not_safe_csp)
-                dev_safe_csp_chromium = removeDuplikate(dev_safe_csp_chromium)
-                dev_safe_csp_webkit = removeDuplikate(dev_safe_csp_webkit)
-                dev_safe_csp_firefox = removeDuplikate(dev_safe_csp_firefox)
-                dev_not_safe_csp_chrmoium = removeDuplikate(dev_not_safe_csp_chrmoium)
-                dev_not_safe_csp_webkit = removeDuplikate(dev_not_safe_csp_webkit)
-                dev_not_safe_csp_firefox = removeDuplikate(dev_not_safe_csp_firefox)
-                arr_dev_sts_max_age_protection_classe1 = removeDuplikate(arr_dev_sts_max_age_protection_classe1)
-                arr_dev_sts_max_age_protection_classe2 = removeDuplikate(arr_dev_sts_max_age_protection_classe2)
-                arr_dev_sts_max_age_protection_classe3 = removeDuplikate(arr_dev_sts_max_age_protection_classe3)
-                dev_no_cspHeader = removeDuplikate(dev_no_cspHeader)
-                dev_with_cspHeader = removeDuplikate(dev_with_cspHeader)
-                dev_provide_no_protection_against_sslStripping_level_0 = removeDuplikate(dev_provide_no_protection_against_sslStripping_level_0)
-                dev_provide_protection_against_sslStripping_level_1 = removeDuplikate(dev_provide_protection_against_sslStripping_level_1)
-                dev_provide_protection_against_sslStripping_level_2 = removeDuplikate(dev_provide_protection_against_sslStripping_level_2)
-                dev_provide_protection_against_sslStripping_level_3 = removeDuplikate(dev_provide_protection_against_sslStripping_level_3)
-                dev_provide_protection_against_sslStripping_level_4 = removeDuplikate(dev_provide_protection_against_sslStripping_level_4)
-                dev_provide_no_protection_against_clickjacking_level_0 = removeDuplikate(dev_provide_no_protection_against_clickjacking_level_0)
-                dev_provide_protection_against_clickjacking_csp_level_1 = removeDuplikate(dev_provide_protection_against_clickjacking_csp_level_1)
-                dev_provide_protection_against_clickjacking_csp_level_2 = removeDuplikate(dev_provide_protection_against_clickjacking_csp_level_2)
-                dev_provide_protection_against_clickjacking_csp_level_3 = removeDuplikate(dev_provide_protection_against_clickjacking_csp_level_3)
-                dev_provide_protection_against_clickjacking_xfo_level_1 = removeDuplikate(dev_provide_protection_against_clickjacking_xfo_level_1)
-                dev_provide_protection_against_clickjacking_xfo_level_2 = removeDuplikate(dev_provide_protection_against_clickjacking_xfo_level_2)
-                dev_provide_protection_against_clickjacking_xfo_level_3 = removeDuplikate(dev_provide_protection_against_clickjacking_xfo_level_3)
-                dev_provide_no_protection_against_hijacking = removeDuplikate(dev_provide_no_protection_against_hijacking)
-                dev_provide_protection_against_hijacking = removeDuplikate(dev_provide_protection_against_hijacking)
-                dev_provide_no_protection_against_csrf_level_0 = removeDuplikate(dev_provide_no_protection_against_csrf_level_0)
-                dev_provide_protection_against_csrf_level_1 = removeDuplikate(dev_provide_protection_against_csrf_level_1)
-                dev_provide_protection_against_csrf_level_2 = removeDuplikate(dev_provide_protection_against_csrf_level_2)
-                dev_provide_no_protection_against_steeling_cookies = removeDuplikate(dev_provide_no_protection_against_steeling_cookies)
-                dev_provide_protection_against_steeling_cookies = removeDuplikate(dev_provide_protection_against_steeling_cookies)
-
-                let json_comp = {};      
-                json_comp["number of devices that offer safe csp"] = arr_dev_safe_csp.length
-                json_comp["devices that offer safe csp"] = arr_dev_safe_csp
-                json_comp["number of devices that offer unsafe csp"] = arr_dev_not_safe_csp.length
-                json_comp["devices that offer unsafe csp"] = arr_dev_not_safe_csp
-                json_comp["number of devices that offer safe csp and used chromium"] = dev_safe_csp_chromium.length
-                json_comp["devices that offer safe csp and used chromium"] = dev_safe_csp_chromium
-                json_comp["number of devices that offer safe csp and used webkit"] = dev_safe_csp_webkit.length
-                json_comp["devices that offer safe csp and used webkit"] = dev_safe_csp_webkit.length
-                json_comp["number of devices that offer safe csp and used firefox"] = dev_safe_csp_firefox.length
-                json_comp["devices that offer safe csp and used firefox"] = dev_safe_csp_firefox
-                json_comp["number of devices that offer unsafe csp and used chromium"] = dev_not_safe_csp_chrmoium.length
-                json_comp["devices that offer unsafe csp and used chromium"] = dev_not_safe_csp_chrmoium
-                json_comp["number of devices that offer unsafe csp and used webkit"] = dev_not_safe_csp_webkit.length
-                json_comp["devices that offer unsafe csp and used webkit"] = dev_not_safe_csp_webkit
-                json_comp["number of devices that offer unsafe csp and used firefox"] = dev_not_safe_csp_firefox.length
-                json_comp["devices that offer unsafe csp and used firefox"] = dev_not_safe_csp_firefox
-                json_comp["number of devices that offer zero max age for hsts"] = arr_dev_sts_max_age_protection_classe1.length
-                json_comp["devices that offer zero max age for hsts"] = arr_dev_sts_max_age_protection_classe1
-                json_comp["number of devices that offer max age < 1 for hsts"] = arr_dev_sts_max_age_protection_classe2.length
-                json_comp["devices that offer max age < 1 for hsts"] = arr_dev_sts_max_age_protection_classe2
-                json_comp["number of devices that offer max age >= 1 for hsts"] = arr_dev_sts_max_age_protection_classe3.length
-                json_comp["devices that offer max age >= 1 for hsts"] = arr_dev_sts_max_age_protection_classe3
-                // csp header exisit ?
-                json_comp["number of devices without csp header"] = dev_no_cspHeader.length
-                json_comp["devices without csp header"] = dev_no_cspHeader
-                json_comp["number of devices with csp header"] = dev_with_cspHeader.length
-                json_comp["devices with csp header"] = dev_with_cspHeader
-                // level of protection against ssl stripping
-                json_comp["number of devices that dose not offer protection against sll stripping"] = dev_provide_no_protection_against_sslStripping_level_0.length
-                json_comp["devices that dose not offer protection against sll stripping"] = dev_provide_no_protection_against_sslStripping_level_0
-                json_comp["number of devices that offer protection_level_1 against sll stripping"] = dev_provide_protection_against_sslStripping_level_1.length
-                json_comp["devices that offer protection_level_1 against sll stripping"] = dev_provide_protection_against_sslStripping_level_1
-                json_comp["number of devices that offer protection_level_2 against sll stripping"] = dev_provide_protection_against_sslStripping_level_2.length
-                json_comp["devices that offer protection_level_2 against sll stripping"] = dev_provide_protection_against_sslStripping_level_2
-                json_comp["number of devices that offer protection_level_3 against sll stripping"] = dev_provide_protection_against_sslStripping_level_3.length
-                json_comp["devices that offer protection_level_3 against sll stripping"] = dev_provide_protection_against_sslStripping_level_3
-                json_comp["number of devices that offer protection_level_4 against sll stripping"] = dev_provide_protection_against_sslStripping_level_4.length
-                json_comp["devices that offer protection_level_4 against sll stripping"] = dev_provide_protection_against_sslStripping_level_4
-                // level of protection against clickjacking(x-fram-option)
-                json_comp["number of devices that dose not offer protection against clickjacking"] = dev_provide_no_protection_against_clickjacking_level_0.length
-                json_comp["devices that dose not offer protection against clickjacking"] = dev_provide_no_protection_against_clickjacking_level_0
-
-                json_comp["number of devices that offer protection_level_1 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_1.length
-                json_comp["devices that offer protection_level_1 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_1
-                json_comp["number of devices that offer protection_level_2 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_2.length
-                json_comp["devices that offer protection_level_2 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_2
-                json_comp["number of devices that offer protection_level_3 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_3.length
-                json_comp["devices that offer protection_level_3 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_3
-
-                json_comp["number of devices that offer protection_level_1 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_1.length
-                json_comp["devices that offer protection_level_1 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_1
-                json_comp["number of devices that offer protection_level_2 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_2.length
-                json_comp["devices that offer protection_level_2 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_2
-                json_comp["number of devices that offer protection_level_3 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_3.length
-                json_comp["devices that offer protection_level_3 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_3
-                // protection against hijacking
-                json_comp["number of devices that dose not offer protection against hijacking"] = dev_provide_no_protection_against_hijacking.length
-                json_comp["devices that dose not offer protection against hijacking"] = dev_provide_no_protection_against_hijacking
-                json_comp["number of devices that offer protection against hijacking"] = dev_provide_protection_against_hijacking.length
-                json_comp["devices that offer protection against hijacking"] = dev_provide_protection_against_hijacking
-                // level of protection against csrf
-                json_comp["number of devices that dose not offer protection against csrf"] = dev_provide_no_protection_against_csrf_level_0.length
-                json_comp["devices that dose not offer protection against csrf"] = dev_provide_no_protection_against_csrf_level_0
-                json_comp["number of devices that offer protection_level_1 against csrf"] = dev_provide_protection_against_csrf_level_1.length
-                json_comp["devices that offer protection_level_1 against csrf"] = dev_provide_protection_against_csrf_level_1
-                json_comp["number of devices that offer protection_level_2 against csrf"] = dev_provide_protection_against_csrf_level_2.length
-                json_comp["devices that offer protection_level_2 against csrf"] = dev_provide_protection_against_csrf_level_2
-                // protection against steeling the cookies (XXS)
-                json_comp["number of devices that dose not offer protection against steeling the cookies"] = dev_provide_no_protection_against_steeling_cookies.length
-                json_comp["devices that dose not offer protection against steeling the cookies"] = dev_provide_no_protection_against_steeling_cookies
-                json_comp["number of devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies.length
-                json_comp["devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies
-
-                json_comp["used browser"] = browsershortcut(used_browser)
-                        
-                fs.writeFileSync(`./compare/compResult_${osystem}_${page_name}.json`, JSON.stringify(json_comp))
-              */  
             }
               
         }
@@ -976,24 +568,138 @@ if(permission) {
     console.log(uri)
     console.log(websites)
     for(let u of websites){
-        compareWebsite(u)
+        compareWebsite(u, "./compare", "comparePagesWithDevices")
     }
-
-
-    
+    for(let u of uri){
+        u = u.split(".")[0]
+        compareHomeWithSunpages(u, "./comparePagesWithDevices", "compareHomeWithSubpages")
+    }
+   
      
 }
+function compareHomeWithSunpages(pageName, comparePath, resultPath){
+    //console.log(pageName)
+    const  jsonsFiles =  fs.readdirSync(comparePath).filter((filename) => path.extname(filename) === '.json');
 
-function compareWebsite(pageName){
-    console.log(pageName)
-    const jsonsFiles =  fs.readdirSync("./compare").filter((filename) => path.extname(filename) === '.json');
+    //console.log(jsonsFiles)
+    let csp_policies = new Array();
+    jsonsFiles.forEach(filename => {
+        let csp = new Array()
+        if(filename.includes(`${pageName}`)) {
+            //console.log(filename)
+            const fileData = fs.readFileSync(path.join(comparePath, filename));                    
+            const json_arr = JSON.parse(fileData.toString());
+            let json_str = JSON.stringify(json_arr);
+            json_after_split = json_str.substring(1, json_str.length - 1);
+            json_after_split = json_after_split.split(/,"/)
+            csp.push(filename.split(".json")[0].substring(4))
+            filename_debuger = filename
+            let arr_2 = new Array();
+            //console.log(json_after_split)
+            for (var elem of json_after_split) {
+                let header;
+                let arr_;
+                let header_value;
+              
+                if((elem.includes("\":") && !elem.includes("http")) || elem.includes("visited link")){
+                    arr_ = elem.split(/":/);
+                    //console.log(arr_)
+                    header = arr_[0]
+                    header_value = arr_[1]
+                    header = delete_StrSy(arr_[0], "\"");
+                    header_value = delete_StrSy(arr_[1], "\"")
+                    //header_value = delete_StrSy(header_value, "\\")
+                    arr_2.push([header, header_value])
+                }else{
+                    elem = elem.replaceAll("\"", "")
+                    if(elem.endsWith(" ")){
+                        arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] +","+ elem
+                    }else{
+                        arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + ", " + elem
+                    }
+                    //console.log("Watchccccccccccccccccccccccccccccccccc")
+                    //console.log( arr_2[arr_2.length-1][1])
+                }
+            }
+             
+            csp.push(arr_2)
+           
+            csp_policies.push(csp)
+            //console.log(csp)
+        }
+
+    });
+    //console.log(csp_policies)
+    //console.log(csp_policies.length)
+    let devices = new Array();
+    let homePage_Security = false;
+    let homePage_CSPHeaderisThere = false;
+    let homePage_Check = parseInt(csp_policies[0][1][2][1]) 
+    let homePage_cspHeader = parseInt(csp_policies[0][1][14][1]) 
+    if(homePage_Check > 0){
+        homePage_Security = true;
+    }
+    if(homePage_cspHeader > 0){
+        homePage_CSPHeaderisThere = true;
+    }
+    let subPages_Security = 0;
+    let subPages_cspHeader = 0;
+
+    for(let i = 0; i < csp_policies.length; i++){
+        //console.log(csp_policies[i])
+        let dev = csp_policies[i][1][1][1];
+        let dev_ = dev.replace("[", "")
+        dev_ = dev_.replace("]", "")
+        let dev_arr = dev_.split(", ")
+        for(var d of dev_arr){
+            if(!devices.includes(d)){
+                devices.push(d)
+            }
+        }
+        //console.log(csp_policies[i][1][2][1])
+        if(parseInt(csp_policies[i][1][2][1]) > 0 && (i > 0)){
+            subPages_Security++;
+        }
+        if(parseInt(csp_policies[i][1][14][1]) > 0 && (i > 0)){
+            subPages_cspHeader++;
+        }
+
+
+
+
+    }
+    let subPages_SecurityNotSafe = 5 - subPages_Security;
+    let subPages_withoutcspHeader = 5 - subPages_cspHeader;
+    let json_comp = {};
+    json_comp["Homepage with safe csp"] = homePage_Security
+    json_comp["Subpages with safe csp"] = `${subPages_Security} are with safe csp`
+    json_comp["Subpages with not safe csp"] = `${subPages_SecurityNotSafe} are with not safe csp`
+    json_comp["Homepage with csp header"] = homePage_CSPHeaderisThere
+    json_comp["Subpages with csp header"] = subPages_cspHeader
+    json_comp["Subpages without csp header"] = subPages_withoutcspHeader
+    fs.writeFileSync(`./${resultPath}/compResult_${osystem}_${pageName}.json`, JSON.stringify(json_comp))
+
+
+
+
+
+    //console.log(homePage_Security)
+    //console.log(subPages_Security)
+    
+
+}
+
+function compareWebsite(pageName, comparePath, resultPath){
+    //console.log(pageName)
+    const  jsonsFiles =  fs.readdirSync(comparePath).filter((filename) => path.extname(filename) === '.json');
+
     //console.log(jsonsFiles)
     let csp_policies = new Array();
     jsonsFiles.forEach(filename => {
         let csp = new Array()
         if(filename.includes(`${pageName}.json`)) {
-            console.log(filename)
-            const fileData = fs.readFileSync(path.join("./compare", filename));                    
+            //console.log(filename)
+            const fileData = fs.readFileSync(path.join(comparePath, filename));                    
             const json_arr = JSON.parse(fileData.toString());
             let json_str = JSON.stringify(json_arr);
             json_after_split = json_str.substring(1, json_str.length - 1);
@@ -1008,9 +714,8 @@ function compareWebsite(pageName){
               
                 if((elem.includes(":") && !elem.includes("http")) || elem.includes("visited_Webpage")){
                     arr_ = elem.split(/":/);
-                    console.log(arr_)
+                    //console.log(arr_)
                     header = delete_StrSy(arr_[0], "\"");
-                    console.log(header_value)
                     header_value = delete_StrSy(arr_[1], "\"")
                     header_value = delete_StrSy(header_value, "\\")
                     arr_2.push([header, header_value])
@@ -1027,12 +732,12 @@ function compareWebsite(pageName){
             csp.push(arr_2)
            
             csp_policies.push(csp)
-            console.log(csp)
+            //console.log(csp)
         }
 
     });
     //console.log("JJJJJJJJJJJJJJJJJJJJJ")
-    console.log(csp_policies)
+    //console.log(csp_policies)
     let json_comp = {};
     
     let devices = new Array();
@@ -1064,16 +769,17 @@ function compareWebsite(pageName){
     let dev_with_cspHeader = new Array()
 
     for(let i = 0; i < csp_policies.length; i++){
+        console.log(csp_policies[i])
         let device = `${csp_policies[i][1][0][1]} height:${csp_policies[i][1][4][1]} width:${csp_policies[i][1][5][1]} operatingSystem:${csp_policies[i][1][3][1]} browser:${csp_policies[i][1][1][1]} browser_version:${csp_policies[i][1][2][1]}`
         devices.push(device)
         if(csp_policies[i][1][7][1] === 'true'){
             devices_safe_csp.push(device)
+            dev_with_cspHeader.push(device)
         }
         if(csp_policies[i][1][7][1] === 'false'){
             devices_notSafe_csp.push(device)
             if(csp_policies[i][1][8][1] === 'csp dose not contain script-src-elem, script-src or default-src') {
                 dev_no_cspHeader.push(device)
-                
             } else {
                 dev_with_cspHeader.push(device)
             }
@@ -1296,9 +1002,9 @@ function compareWebsite(pageName){
     json_comp["devices that dose not offer protection against steeling the cookies"] = dev_provide_no_protection_against_steeling_cookies
     json_comp["number of devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies.length
     json_comp["devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies
-
+    json_comp["visited link"] = csp_policies[1][1][csp_policies[1][1].length-1][1]
             
-    fs.writeFileSync(`./compare/compResult_${osystem}_${pageName}.json`, JSON.stringify(json_comp))
+    fs.writeFileSync(`./${resultPath}/compResult_${osystem}_${pageName}.json`, JSON.stringify(json_comp))
 
 
 }
@@ -1454,7 +1160,7 @@ function delete_StrSy(str, character) {
 
 
 
-function check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName){
+function check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName, page_name){
     (async () => {
         let browser;
         let dev = devices[devName];
@@ -1506,21 +1212,34 @@ function check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, 
                         //console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
                         //console.log(nonceStr)
                         nonceStr = nonceStr.replace("nonce-", "")
+                        let fileName = `csp_${devName}_${browserName}_${browserVersion}_${operSys}_${vHeight}_${vWidth}_${operSysVersion}_${page_name}`
+                        let json = {};
+
                         if(nonceStr === nonceValue){
-                            let fileName = `csp_${devName}_${broserName}_${browserVersion}_${operSys}_${vHeight}_${vWidth}_${operSysVersion}_${uriPageName}_NonceValue.json`
-                            let json = {};
                             json['device name'] = devName
                             json['device viewport-height'] = vHeight
                             json['device viewport-width'] = vWidth
-                            json['browser name'] = broserName
-                            json['browser version'] = broserName
+                            json['browser name'] = browserName
+                            json['browser version'] = browserVersion
                             json['operating system'] = operSys
                             json['operating system version'] = operSysVersion
                             json['page name'] = uriPageName
                             json['duplicate nonce value'] = nonceStr
 
-                            fs.writeFileSync(`./nonce/${fileName}`, JSON.stringify(json))
+                            fs.writeFileSync(`./nonceDuplicate/${fileName}_nonceDuplicated.json`, JSON.stringify(json))
                       
+                        }else{
+                            json['device name'] = devName
+                            json['device viewport-height'] = vHeight
+                            json['device viewport-width'] = vWidth
+                            json['browser name'] = browserName
+                            json['browser version'] = browserVersion
+                            json['operating system'] = operSys
+                            json['operating system version'] = operSysVersion
+                            json['page name'] = uriPageName
+                            json['nonce value'] = nonceStr
+                            fs.writeFileSync(`./nonceValue/${fileName}_nonceValue.json`, JSON.stringify(json))
+
                         }
                     }
                     
