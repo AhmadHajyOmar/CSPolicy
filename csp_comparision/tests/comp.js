@@ -278,10 +278,27 @@ if(permission) {
                                 nonceValue = nonceValue.replace("nonce-", "")
                                 nonceValue = nonceValue.substring(0, nonceValue.length-1)
                                 //console.log(nonceValue)
-                                console.log("ZZZZZZZZZZZZZZZZZZZ")
-                                console.log(arr[0])
-                                console.log(uriPageName)
-                                check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName, page_name)
+                               //console.log("ZZZZZZZZZZZZZZZZZZZ")
+                                //console.log(arr[0])
+                                //console.log(uriPageName)
+                                //console.log(nonceValue);
+                                let json_nonce = {}
+                                json_nonce["Nonce Value"] = nonceValue
+                                json_nonce["device Name"] = devName
+                                json_nonce["browser Name"] = browserName
+                                json_nonce["browser version"] = browserVersion
+                                json_nonce["operating system"] = operSys
+                                json_nonce["operatiny system version"] = operSysVersion
+                                json_nonce["viewport hight"] = vHeight
+                                json_nonce["viewport width"] = vWidth
+                                json_nonce["visited link"] = uriPageName
+                                json_nonce["page Name"] = page_name
+                                let fileName = `${page_name}_Nonce_${devName}_${browserName}_${browserVersion}_${operSys}_${vHeight}_${vWidth}_${operSysVersion}`
+
+                                fs.writeFileSync(`./nonceValue/${fileName}.json`, JSON.stringify(json_nonce))
+
+                      
+                                //check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName, page_name)
 
                             }
                 
@@ -359,8 +376,8 @@ if(permission) {
                     }
                 }
 
-                console.log("PPPPPPPPPPPPPP")
-                console.log(viewport_arr)
+                //console.log("PPPPPPPPPPPPPP")
+                //console.log(viewport_arr)
                 let viewport_arr_ND = new Array();
                 let viewport_arr_VD = new Array();
                 num_dev_viewport = viewport_arr.length;
@@ -376,8 +393,8 @@ if(permission) {
                 } else {
                     viewport_arr.pop();
                 }
-                console.log("LLLLLLLLLLLLLLLLLLLLLLLL")
-                console.log(viewport_arr_ND)
+                //console.log("LLLLLLLLLLLLLLLLLLLLLLLL")
+                //console.log(viewport_arr_ND)
                 let browsers = new Array();
                 for(let i = 0; i < csp_safe.length; i++) {
                     let browser_Name = csp_safe[i][1][1];
@@ -396,7 +413,7 @@ if(permission) {
                     }
                 }
 
-                console.log(viewport_arr_VD)
+                //console.log(viewport_arr_VD)
 
                 let viewport_arr_ = new Array();
                 
@@ -412,7 +429,7 @@ if(permission) {
                         }
                         
                        //console.log("------------------------------------------------------------")
-                       console.log(viewport_comp)
+                       //console.log(viewport_comp)
                
                         let index_vc = 0;
                         while(index_vc < viewport_comp.length){
@@ -497,7 +514,7 @@ if(permission) {
                             }
                     
                             let fileName_viewport = `${dev_mod}_${browser_name}_${browser_version}_${page_name}.json` 
-                            console.log(fileName_viewport)
+                            //console.log(fileName_viewport)
                                 let json_viewport = {};
                                 for (let v = 0; v < v_comp.length; v++) {
                                     let key = v_comp[v][0];
@@ -563,15 +580,18 @@ if(permission) {
         }*/
         
     }
-
-    console.log(files)
-    console.log(uri)
-    console.log(websites)
+    
+    //console.log(files)
+    //console.log(uri)
+    //console.log(websites)
     for(let u of websites){
+        //console.log(u)
         compareWebsite(u, "./compare", "comparePagesWithDevices")
+        //console.log("ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ")
     }
     for(let u of uri){
         u = u.split(".")[0]
+        //console.log(u)
         compareHomeWithSunpages(u, "./comparePagesWithDevices", "compareHomeWithSubpages")
     }
    
@@ -629,22 +649,28 @@ function compareHomeWithSunpages(pageName, comparePath, resultPath){
         }
 
     });
+    //console.log(pageName)
+    //console.log("PPPPPPPPPPPPPPPPPPPPPPPPPP")
     //console.log(csp_policies)
     //console.log(csp_policies.length)
     let devices = new Array();
     let homePage_Security = false;
+    let homePage_Security_arr = new Array()
+    let homePage_Security_arr_NotSafe = new Array();
     let homePage_CSPHeaderisThere = false;
-    let homePage_Check = parseInt(csp_policies[0][1][2][1]) 
-    let homePage_cspHeader = parseInt(csp_policies[0][1][14][1]) 
-    if(homePage_Check > 0){
-        homePage_Security = true;
-    }
-    if(homePage_cspHeader > 0){
-        homePage_CSPHeaderisThere = true;
-    }
+    let homePage_CSPHeaderisThere_arr = new Array()
+    let homePage_CSPHeaderisThere_arr_NoCSPHeader = new Array()
+    
     let subPages_Security = 0;
+    let subPages_Security_arr = new Array();
+    let subPages_Security_arr_NotSafe = new Array();
     let subPages_cspHeader = 0;
+    let subPages_cspHeader_arr = new Array();
+    let subPages_cspHeader_arr_NoCSPHeader = new Array();
 
+    console.log("JJJJJJJJJJJJJJJJJJJ")
+    console.log(pageName)
+  
     for(let i = 0; i < csp_policies.length; i++){
         //console.log(csp_policies[i])
         let dev = csp_policies[i][1][1][1];
@@ -656,29 +682,132 @@ function compareHomeWithSunpages(pageName, comparePath, resultPath){
                 devices.push(d)
             }
         }
+        if(i === 0){
+            let homePage_Check = parseInt(csp_policies[0][1][2][1]) 
+            let homePage_cspHeader = parseInt(csp_policies[0][1][14][1]) 
+            if(homePage_Check > 0){
+                homePage_Security = true;
+                let dev = csp_policies[i][1][3][1];
+                //console.log(dev)
+                let dev_ = dev.replace("[", "")
+                dev_ = dev_.replace("]", "")
+                let dev_arr = dev_.split(", ")
+                for(var d of dev_arr){
+                    if(!homePage_Security_arr.includes(d)){
+                        homePage_Security_arr.push(d)
+                    }
+                }
+                for(var d of devices){
+                    if(!homePage_Security_arr.includes(d)){
+                        if(!homePage_Security_arr_NotSafe.includes(d)){
+                            homePage_Security_arr_NotSafe.push(d)
+                        }
+                    }
+                }
+                
+            }else{
+                homePage_Security_arr_NotSafe = devices;
+            }
+            if(homePage_cspHeader > 0){
+                homePage_CSPHeaderisThere = true;
+                let dev = csp_policies[i][1][15][1];
+                let dev_ = dev.replace("[", "")
+                dev_ = dev_.replace("]", "")
+                let dev_arr = dev_.split(", ")
+                for(var d of dev_arr){
+                    if(!homePage_CSPHeaderisThere_arr.includes(d)){
+                        homePage_CSPHeaderisThere_arr.push(d)
+                    }
+                }
+                for(var d of devices){
+                    if(!homePage_CSPHeaderisThere_arr.includes(d)){
+                        if(!homePage_CSPHeaderisThere_arr_NoCSPHeader.includes(d)){
+                            homePage_CSPHeaderisThere_arr_NoCSPHeader.push(d)
+                        }
+                    }
+                }
+            }else{
+                homePage_CSPHeaderisThere_arr_NoCSPHeader = devices
+            }
+        }
+        console.log("KKKKKKKKKKKKKKKKKKKKKKKKKK")
+        console.log(i)
+        //console.log(csp_policies[i])
+       
         //console.log(csp_policies[i][1][2][1])
         if(parseInt(csp_policies[i][1][2][1]) > 0 && (i > 0)){
+            console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
             subPages_Security++;
+            let dev = csp_policies[i][1][3][1];
+            let dev_ = dev.replace("[", "")
+            dev_ = dev_.replace("]", "")
+            let dev_arr = dev_.split(", ")
+            for(var d of dev_arr){
+                if(!subPages_Security_arr.includes(d)){
+                    subPages_Security_arr.push(d)
+                }
+            }
+            console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
+            console.log(devices)
+            console.log(subPages_Security_arr)
+            for(var d of devices){
+                if(!subPages_Security_arr.includes(d)){
+                    if(!subPages_Security_arr_NotSafe.includes(d)){
+                        subPages_Security_arr_NotSafe.push(d)
+                    }
+                }
+            }
+        }else{
+            subPages_Security_arr_NotSafe = devices;
         }
+
         if(parseInt(csp_policies[i][1][14][1]) > 0 && (i > 0)){
             subPages_cspHeader++;
+            
+            let dev = csp_policies[i][1][15][1];
+            let dev_ = dev.replace("[", "")
+            dev_ = dev_.replace("]", "")
+            let dev_arr = dev_.split(", ")
+            for(var d of dev_arr){
+                if(!subPages_cspHeader_arr.includes(d)){
+                    subPages_cspHeader_arr.push(d)
+                }
+            }
+            for(var d of devices){
+                if(!subPages_cspHeader_arr.includes(d)){
+                    if(!subPages_cspHeader_arr_NoCSPHeader.includes(d)){
+                        subPages_cspHeader_arr_NoCSPHeader.push(d)
+                    }
+                }
+            }
+        }else{
+            subPages_cspHeader_arr_NoCSPHeader = devices
         }
 
 
-
+        console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
 
     }
     let subPages_SecurityNotSafe = 5 - subPages_Security;
     let subPages_withoutcspHeader = 5 - subPages_cspHeader;
     let json_comp = {};
+    json_comp["Total devices"] = devices
     json_comp["Homepage with safe csp"] = homePage_Security
+    json_comp["Homepage with safe csp using following devices"] = homePage_Security_arr
+    json_comp["Homepage with not safe csp using following devices"] = homePage_Security_arr_NotSafe
     json_comp["Subpages with safe csp"] = `${subPages_Security} are with safe csp`
     json_comp["Subpages with not safe csp"] = `${subPages_SecurityNotSafe} are with not safe csp`
+    json_comp["Subpages with safe csp using following devices"] = subPages_Security_arr
+    json_comp["Subpages with not safe csp using following devices"] = subPages_Security_arr_NotSafe
     json_comp["Homepage with csp header"] = homePage_CSPHeaderisThere
+    json_comp["Homepage with csp header using following devices"] = homePage_CSPHeaderisThere_arr
+    json_comp["Homepage without csp header using following devices"] = homePage_CSPHeaderisThere_arr_NoCSPHeader
     json_comp["Subpages with csp header"] = subPages_cspHeader
     json_comp["Subpages without csp header"] = subPages_withoutcspHeader
+    json_comp["Subpages with csp header using following devices"] = subPages_cspHeader_arr
+    json_comp["Subpages without csp header using following devices"] = subPages_cspHeader_arr_NoCSPHeader
     fs.writeFileSync(`./${resultPath}/compResult_${osystem}_${pageName}.json`, JSON.stringify(json_comp))
-
+    //console.log("Endddddddddddddddddddddddddddddddddddd")
 
 
 
@@ -707,15 +836,20 @@ function compareWebsite(pageName, comparePath, resultPath){
             csp.push(filename.split(".json")[0].substring(4))
             filename_debuger = filename
             let arr_2 = new Array();
+            //console.log("OOOOOOOOOOOOOOOOOOOO")
+            //console.log(json_after_split)
             for (var elem of json_after_split) {
                 let header;
                 let arr_;
                 let header_value;
-              
-                if((elem.includes(":") && !elem.includes("http")) || elem.includes("visited_Webpage")){
+                
+                if((elem.includes(":") && !elem.includes("http") && !elem.includes("data")&& !elem.includes("mediastream")&& !elem.includes("blob")&& !elem.includes("filesystem")&& !elem.includes("resource")&& !elem.includes(":*")) || elem.includes("visited_Webpage")){
                     arr_ = elem.split(/":/);
                     //console.log(arr_)
                     header = delete_StrSy(arr_[0], "\"");
+                    //console.log("UUUUUUUUUUUUUUUUUUUUU")
+                    //console.log(arr_)
+                    //console.log(arr_[1])
                     header_value = delete_StrSy(arr_[1], "\"")
                     header_value = delete_StrSy(header_value, "\\")
                     arr_2.push([header, header_value])
@@ -767,10 +901,14 @@ function compareWebsite(pageName, comparePath, resultPath){
     let dev_provide_protection_against_csrf_level_2 = new Array()
     let dev_no_cspHeader = new Array()
     let dev_with_cspHeader = new Array()
-
+    //console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
+    //console.log(csp_policies)
+    let filename;
+    let device;
     for(let i = 0; i < csp_policies.length; i++){
-        console.log(csp_policies[i])
-        let device = `${csp_policies[i][1][0][1]} height:${csp_policies[i][1][4][1]} width:${csp_policies[i][1][5][1]} operatingSystem:${csp_policies[i][1][3][1]} browser:${csp_policies[i][1][1][1]} browser_version:${csp_policies[i][1][2][1]}`
+        //console.log(csp_policies[i])
+        filename = `${csp_policies[i][1][0][1]}_${csp_policies[i][1][4][1]}_${csp_policies[i][1][5][1]}_${csp_policies[i][1][3][1]}_${csp_policies[i][1][1][1]}_${csp_policies[i][1][2][1]}`
+        device = `${csp_policies[i][1][0][1]} height:${csp_policies[i][1][4][1]} width:${csp_policies[i][1][5][1]} operatingSystem:${csp_policies[i][1][3][1]} browser:${csp_policies[i][1][1][1]} browser_version:${csp_policies[i][1][2][1]}`
         devices.push(device)
         if(csp_policies[i][1][7][1] === 'true'){
             devices_safe_csp.push(device)
@@ -786,8 +924,7 @@ function compareWebsite(pageName, comparePath, resultPath){
             
         }   
         
-        
-        switch(csp_policies[i][1][24][1]) {
+        switch(csp_policies[i][1][23][1]) {
             case '0' : {
                 dev_provide_no_protection_against_sslStripping_level_0.push(device)
             }
@@ -817,7 +954,7 @@ function compareWebsite(pageName, comparePath, resultPath){
             break;
         }
 
-        switch(csp_policies[i][1][23][1]) {   
+        switch(csp_policies[i][1][22][1]) {   
             case '1': {
                 arr_dev_sts_max_age_protection_classe1.push(device)
             }
@@ -831,7 +968,8 @@ function compareWebsite(pageName, comparePath, resultPath){
             }
             break;
             default: {
-                console.log("-_-")
+                console.log("sts_max_age")
+                console.log(csp_policies[i])
             }
             break;
     
@@ -839,6 +977,10 @@ function compareWebsite(pageName, comparePath, resultPath){
 
         switch(csp_policies[i][1][26][1]) {
             case '0' : {
+                dev_provide_no_protection_against_clickjacking_level_0.push(device)
+            }
+            break;
+            case 'false' :{
                 dev_provide_no_protection_against_clickjacking_level_0.push(device)
             }
             break;
@@ -873,8 +1015,9 @@ function compareWebsite(pageName, comparePath, resultPath){
                 }
             }
             break;
-
             default: console.log('-clickjacking-');
+            console.log(csp_policies[i][1][26])
+
             break;
 
         }
@@ -895,7 +1038,7 @@ function compareWebsite(pageName, comparePath, resultPath){
 
         }
 
-        switch(csp_policies[i][1][30][1]) {
+        switch(csp_policies[i][1][29][1]) {
                         
             case 'true': {
                 dev_provide_protection_against_steeling_cookies.push(device)
@@ -929,6 +1072,7 @@ function compareWebsite(pageName, comparePath, resultPath){
             break;
         }
     }
+    //console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
     //console.log(devices)
     //console.log(devices_safe_csp)
     //console.log(devices_notSafe_csp)
@@ -1003,9 +1147,17 @@ function compareWebsite(pageName, comparePath, resultPath){
     json_comp["number of devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies.length
     json_comp["devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies
     json_comp["visited link"] = csp_policies[1][1][csp_policies[1][1].length-1][1]
-            
+    //console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+    //console.log(pageName)
+    //console.log(JSON.stringify(json_comp))
+    //console.log(resultPath)
+    //console.log(osystem)
+    //console.log(websites)
+    for(var e of websites){
+        //console.log(e)
+    }
     fs.writeFileSync(`./${resultPath}/compResult_${osystem}_${pageName}.json`, JSON.stringify(json_comp))
-
+    //console.log("dfdfdfdfdfdf")
 
 }
 
@@ -1096,7 +1248,7 @@ function get_ProtectionLevel_AgainstClickjacking(xfo, arr) {
                 break;
             case 'SAMEORIGIN' : { level = 2; }
                 break;
-            default : console.log("xfo value is ALLOW-FROM or something that is not defined")
+            default : console.log("xfo value is ALLOW-FROM or something that is not defined/Supported")
                 break;
         }
     }
@@ -1160,102 +1312,10 @@ function delete_StrSy(str, character) {
 
 
 
-function check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName, page_name){
-    (async () => {
-        let browser;
-        let dev = devices[devName];
-        
-        switch(browserName) {
-            case "Chrome":
-                browser = await playwright.chromium.launch({ headless: true,
-                    //slowMo:  0,
-                    timeout: 30 * 100000}) 
-            break;
-            case "WebKit":
-                browser = await playwright.webkit.launch({headless: true,
-                    //slowMo:  0,
-                    timeout: 30 * 100000}); 
-            break;
-            case "Firefox":
-                browser = await playwright.firefox.launch({ headless: true,
-                    //slowMo:  0,
-                    timeout: 30 * 100000}); 
-                    let devStr = JSON.stringify(dev);
-                devStr = devStr.replace("\"isMobile\":true,", "")
-                devStr = devStr.replace("\"isMobile\":false,", "")
-                dev = JSON.parse(devStr);
-            break;
-            default:
-              console.log("-_-")
-        }
 
-            let context = await browser.newContext({
-                ...dev,
-                premissions: ['geolocation'],
-                geolocation: {latitude: 19.432608, longitude: -99.133209},
-                locale: 'de-DE',
-                ignoreHTTPSErrors: true
-            });
-    
-            let page = await context.newPage();
-            await page.on("response", async (response) => {
-                if(response.request().resourceType() == 'document'){
-                    let allHeaders = await response.headers();
-                    let allHeadersStr = JSON.stringify(allHeaders)
-                    if(allHeadersStr.includes("\"content-security-policy\":")){
-                        //console.log(allHeadersStr)
-                        let index = allHeadersStr.indexOf("'nonce")
-                        let nonceStr = allHeadersStr.substring(index+1, allHeadersStr.length-1)
-                        //console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
-                        //console.log(nonceStr)
-                        nonceStr = nonceStr.substring(0, nonceStr.indexOf("'"))
-                        //console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
-                        //console.log(nonceStr)
-                        nonceStr = nonceStr.replace("nonce-", "")
-                        let fileName = `csp_${devName}_${browserName}_${browserVersion}_${operSys}_${vHeight}_${vWidth}_${operSysVersion}_${page_name}`
-                        let json = {};
 
-                        if(nonceStr === nonceValue){
-                            json['device name'] = devName
-                            json['device viewport-height'] = vHeight
-                            json['device viewport-width'] = vWidth
-                            json['browser name'] = browserName
-                            json['browser version'] = browserVersion
-                            json['operating system'] = operSys
-                            json['operating system version'] = operSysVersion
-                            json['page name'] = uriPageName
-                            json['duplicate nonce value'] = nonceStr
-
-                            fs.writeFileSync(`./nonceDuplicate/${fileName}_nonceDuplicated.json`, JSON.stringify(json))
-                      
-                        }else{
-                            json['device name'] = devName
-                            json['device viewport-height'] = vHeight
-                            json['device viewport-width'] = vWidth
-                            json['browser name'] = browserName
-                            json['browser version'] = browserVersion
-                            json['operating system'] = operSys
-                            json['operating system version'] = operSysVersion
-                            json['page name'] = uriPageName
-                            json['nonce value'] = nonceStr
-                            fs.writeFileSync(`./nonceValue/${fileName}_nonceValue.json`, JSON.stringify(json))
-
-                        }
-                    }
-                    
-                }
-            
-    
-                               
-              
-           
-           
-            });          
-                   
-            await page.goto(uriPageName, { waitUntil: "load", timeout: 600000 });
-            await context.close();
-            await browser.close();
-       
-
-    })();
-}
+function waitingTime(ms) {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, ms)
+    })
+  }

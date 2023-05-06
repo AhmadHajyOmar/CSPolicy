@@ -110,7 +110,7 @@ if(usedBrowserToTest.includes("Firefox")){
   choosedBrowsers.push(3)
 }
 //console.log(devNames)
-devNames = devNames.slice(2, 4)
+//devNames = devNames.slice(2, 4)
 //console.log(devNames);
 
 const run_option = process.argv.splice(2);
@@ -407,9 +407,9 @@ function run(urls, searchSubPages, requestedFailed) {
                         model_name = model_name.substring(0,model_name.indexOf(" landscape"))
                       }
     
-                      if(os === "Mac OS" || os === "Windows") {
+                      /*if(os === "Mac OS" || os === "Windows") {
                         model_name = `Desktop${os[0]}`
-                      }
+                      }*/
     
                       let fileName = `csp_${model_name}_${broserName}_${browserversion}_${os}_${dev.viewport.height}_${dev.viewport.width}_${os_version}_${page_name}.json`
                       fn = fileName;
@@ -485,7 +485,7 @@ function run(urls, searchSubPages, requestedFailed) {
                 console.log(e);
                 reachable = false
               }
-              await waitingTime(2000)
+              //await waitingTime(2000)
               var index = 0
               var index_ = 0
               var urlIsThere = false
@@ -713,17 +713,83 @@ function getUA(devNames) {
     if(dev_ua_option[dev_ua_option.length-1].includes("chromium")) {
       json_chromium[dev_name]=dev_ua_json
       dev_name = dev_name.substring(1, dev_name.length-1)
-      devNamesChrome.push(dev_name)
+      devNamesChrome = ['Galaxy S5',
+      'Galaxy S5 landscape',
+      'Galaxy S8',
+      'Galaxy S8 landscape',
+      'Galaxy S9+',
+      'Galaxy S9+ landscape',
+      'Galaxy Tab S4',
+      'Galaxy Tab S4 landscape','Desktop Chrome HiDPI',
+      'Desktop Edge HiDPI',
+      'Desktop Chrome',
+      'Desktop Edge'];
+      //console.log(devNamesChrome)
     } else if(dev_ua_option[dev_ua_option.length-1].includes("webkit")) {
       json_webkit[dev_name]=dev_ua_json
       dev_name = dev_name.substring(1, dev_name.length-1)
-      devNamesWebkit.push(dev_name)
+      devNamesWebkit = ['Galaxy Note 3',
+      'Galaxy Note 3 landscape',
+      'Galaxy Note II',
+      'Galaxy Note II landscape',
+      'Galaxy S III',
+      'Galaxy S III landscape',
+      'iPad (gen 6)',
+      'iPad (gen 6) landscape',
+      'iPad (gen 7)',
+      'iPad (gen 7) landscape',
+      'iPad Mini',
+      'iPad Mini landscape',
+      'iPad Pro 11',
+      'iPad Pro 11 landscape',
+      'iPhone 6',
+      'iPhone 6 landscape',
+      'iPhone 6 Plus',
+      'iPhone 6 Plus landscape',
+      'iPhone 7',
+      'iPhone 7 landscape',
+      'iPhone 7 Plus',
+      'iPhone 7 Plus landscape',
+      'iPhone 8',
+      'iPhone 8 landscape',
+      'iPhone 8 Plus',
+      'iPhone 8 Plus landscape',
+      'iPhone SE',
+      'iPhone SE landscape',
+      'iPhone X',
+      'iPhone X landscape',
+      'iPhone XR',
+      'iPhone XR landscape',
+      'iPhone 11',
+      'iPhone 11 landscape',
+      'iPhone 11 Pro',
+      'iPhone 11 Pro landscape',
+      'iPhone 11 Pro Max',
+      'iPhone 11 Pro Max landscape',
+      'iPhone 12',
+      'iPhone 12 landscape',
+      'iPhone 12 Pro',
+      'iPhone 12 Pro landscape',
+      'iPhone 12 Pro Max',
+      'iPhone 12 Pro Max landscape',
+      'iPhone 12 Mini',
+      'iPhone 12 Mini landscape',
+      'iPhone 13',
+      'iPhone 13 landscape',
+      'iPhone 13 Pro',
+      'iPhone 13 Pro landscape',
+      'iPhone 13 Pro Max',
+      'iPhone 13 Pro Max landscape',
+      'iPhone 13 Mini',
+      'iPhone 13 Mini landscape','Desktop Safari'];
+
     } else {
       json_firefox[dev_name]=dev_ua_json
       dev_name = dev_name.substring(1, dev_name.length-1)
       devNamesFirfox.push(dev_name)
+      console.log(devNamesFirfox)
     }
-
+  
   }
 
   fs.writeFileSync(`./tests/chromium_dev.json`, JSON.stringify(json_chromium))
