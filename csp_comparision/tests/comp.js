@@ -15,7 +15,7 @@ const { NOTFOUND } = require('dns');
 const { join } = require('path');
 // change
 const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
-const jsonsInDir =  fs.readdirSync("./tests").filter((filename) => path.extname(filename) === '.json');
+const jsonsInDir =  fs.readdirSync("./csp-headers").filter((filename) => path.extname(filename) === '.json');
 var uri = fs.readFileSync("./tests/urls", 'utf-8').split(/\r?\n/);
 var permission = true;
 const compare_option = process.argv.splice(2);

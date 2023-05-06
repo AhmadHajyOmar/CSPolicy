@@ -5,7 +5,7 @@ let path_to_json_files = info[0]
 let pattern = info[1]
 if (info.length === 1 && info[0] === "all") {
     var allfiles = new Array();
-    const paths = ['./tests', './viewport_comp', './compare', './nonceValue', './nonceDuplicate', './comparePagesWithDevices', './compareHomeWithSubpages']
+    const paths = ['./tests', './viewport_comp', './compare', './nonceValue', './nonceDuplicate', './comparePagesWithDevices', './compareHomeWithSubpages', './csp-headers', './user-agents']
     for(var p of paths) {
         const files_From_All_Paths =  fs.readdirSync(p).map(file => path.join(p, file));
         for(var f of files_From_All_Paths) {

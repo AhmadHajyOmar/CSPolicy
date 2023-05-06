@@ -22,8 +22,8 @@ let devNamesFirfox = new Array();
 let devNamesWebkit = new Array();
 let devNames = new Array();
 let subpagesWithMark = new Array();
-console.log("CCCCCCCCCCCCCCCCCCCCCCCCCC")
-console.log(JSON.stringify(playwright.chromium))
+//console.log("CCCCCCCCCCCCCCCCCCCCCCCCCC")
+//console.log(JSON.stringify(playwright.chromium))
 
 getUA(devNames);
 //console.log(devNames)
@@ -36,8 +36,8 @@ for(let i = 0; i < subPagesAll.length; i++) {
     pagesUN.push(subPagesAll[i].split(/\s/)[0].split(".")[1].split(".")[0])
   }
 }
-console.log("UUUUUUUUUUUUUUUUUUUUUUUUUU")
-console.log(pagesUN)
+//console.log("UUUUUUUUUUUUUUUUUUUUUUUUUU")
+//console.log(pagesUN)
 var subPages = new Array();
 for(let pun of pagesUN){
   let partPages = new Array();
@@ -75,7 +75,7 @@ let notReachableLinks = "";
 if (fs.existsSync("./tests/notReachableLinks")){
   notReachableLinksArray = fs.readFileSync(`./tests/notReachableLinks`, 'utf-8').split(/\r?\n/);
   for(let i = 0; i < notReachableLinksArray.length; i++){
-    console.log(notReachableLinksArray[i])
+    //console.log(notReachableLinksArray[i])
     if(i == notReachableLinksArray.length -1 ){
       notReachableLinks += notReachableLinksArray[i]
     }else{
@@ -114,25 +114,21 @@ if(usedBrowserToTest.includes("Firefox")){
 //console.log(devNames);
 
 const run_option = process.argv.splice(2);
-console.log(run_option.length);
-console.log(run_option);
-console.log(subPages);
+//console.log(run_option.length);
+//console.log(run_option);
+//console.log(subPages);
 
 
 switch(run_option.length) {
   case 1:
-    if(run_option[0] === 'rf'){
-      console.log("check not reachable websites")
-      run(urls, false, true);
-    }
 
     if(run_option[0] === 'h'){
-      console.log("visit homepages")
+      //console.log("visit homepages")
       run(urls, true, false);
     }
 
     if(run_option[0] === 's'){
-      console.log("visit subpages")
+      //console.log("visit subpages")
       if(subPages.length === 0) {
         console.log("There is no subpages stored in the data base")
         console.log("Please use the following command :  node ./tests/example.spec.js h")
@@ -190,8 +186,8 @@ switch(run_option.length) {
           
           homePageDB[p] = [homePageDB[p].split(".")[1].split(".")[0],1]
         }*/
-        console.log(homePageDB)
-        console.log(subpages_Shuffel)
+        //console.log(homePageDB)
+        //console.log(subpages_Shuffel)
         run(subpages_Shuffel, false, false);
       }
     }
@@ -229,13 +225,13 @@ function run(urls, searchSubPages, requestedFailed) {
       page_name = page_name.split(".")[0]
       
       if(!searchSubPages){
-        console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
-        console.log(subpagesWithMark)
+        //console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
+        //console.log(subpagesWithMark)
         for(let x = 0; x < subpagesWithMark.length; x++){
           let x_y = subpagesWithMark[x].split("Ahmad")
-          console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
-          console.log(x_y)
-          console.log(u)
+          //console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+          //console.log(x_y)
+          //console.log(u)
           if(x_y[0] === u) {
             page_name = x_y[1]
             break;  
@@ -246,14 +242,14 @@ function run(urls, searchSubPages, requestedFailed) {
         for(let o = 0; o < homePageDB.length; o++){
           for(let k = 0; k < homePageDB[o][0].length; k++){
             if(homePageDB[o][0][k] === u){
-              console.log("LOOK HERE :")
-              console.log(homePageDB[o][0])
-              console.log(u)
-              console.log(homePageDB[o][1])
+              //console.log("LOOK HERE :")
+              //console.log(homePageDB[o][0])
+              //console.log(u)
+              //console.log(homePageDB[o][1])
               page_name = `${page_name}§${homePageDB[o][1]}`
               homePageDB[o][1] = homePageDB[o][1] + 1
-              console.log(page_name)
-              console.log(homePageDB[o][1])
+              //console.log(page_name)
+              //console.log(homePageDB[o][1])
               found = true;
               break;
             }
@@ -354,16 +350,16 @@ function run(urls, searchSubPages, requestedFailed) {
           
             if(requestedFailed){
               await page.on("requestfailed", async (response) => {
-                console.log(model_name)
-                console.log(page_name)
-                console.log("requestfailed");
-                console.log(page_name)
+                //console.log(model_name)
+                //console.log(page_name)
+                //console.log("requestfailed");
+                //console.log(page_name)
                 notReachableWebsites += `${model_name}_${broserName}_${browserversion}_${userAgentInfo.os.name}_${dev.viewport.height}_${dev.viewport.width}_${userAgentInfo.os.version}_${page_name}`+"\n"
                 });
                 try{
                   await page.goto(url);
                 }catch (e) {
-                  console.log(e);
+                  //console.log(e);
                 }
      
             }else{
@@ -374,9 +370,9 @@ function run(urls, searchSubPages, requestedFailed) {
                 
                   if(op.includes(os) && (usedBrowserToTest.includes(userAgentInfo.browser.name) || (userAgentInfo.browser.name === "Android Browser" && usedBrowserToTest.includes(userAgentInfo.engine.name)))) {
                     if(response.request().resourceType() == 'document'){
-                      console.log(`${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url}`)
+                      //console.log(`${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url}`)
                       let requestAllHeaders = response.request().headers();
-                      console.log(requestAllHeaders)
+                      //console.log(requestAllHeaders)
                       requestHeadersArray = parser.requestHeaders(JSON.stringify(requestAllHeaders), requestHeadersArray);
   
                       /*let allHeaders = await response.headers();
@@ -396,7 +392,7 @@ function run(urls, searchSubPages, requestedFailed) {
                       //csp = parser.getCSP_Policy(csp, headers, headers_arr);
                       csp = parser.cspParserGetAllResponseHeaders(finalheaders, allCSP, csp)*/
                       let allHeaders = await response.headers();
-                      console.log(allHeaders)
+                      //console.log(allHeaders)
                       let headers_arr = parser.cspParser(allHeaders);
                       let headers = parser.cspParser_GetAllHeaders(headers_arr)
                       allCSP.push(headers_arr)
@@ -421,14 +417,14 @@ function run(urls, searchSubPages, requestedFailed) {
                       } 
                       json['url'] = url
                       //console.log(json)
-                      fs.writeFileSync(`./tests/${fileName}`, JSON.stringify(json))
+                      fs.writeFileSync(`./csp-headers/${fileName}`, JSON.stringify(json))
   
                       let json_2 = {};
                       for(let i = 0; i < requestHeadersArray.length; i++){
                         json_2[requestHeadersArray[i][0]] = requestHeadersArray[i][1]
                       }
                       let fileName_UA = `UserAgent ${fileName}`;
-                      fs.writeFileSync(`./tests/${fileName_UA}`, JSON.stringify(json_2))
+                      fs.writeFileSync(`./user-agents/${fileName_UA}`, JSON.stringify(json_2))
   
                     }               
                   }
@@ -482,7 +478,14 @@ function run(urls, searchSubPages, requestedFailed) {
               try{
                 await page.goto(url, { waitUntil: "load", timeout: 600000 });
               }catch (e) {
-                console.log(e);
+                //console.log(e);
+                const os = userAgentInfo.os.name
+                const os_version = userAgentInfo.os.version;
+                let fileName = `csp_${model_name}_${broserName}_${browserversion}_${os}_${dev.viewport.height}_${dev.viewport.width}_${os_version}_${page_name}.json`
+                let json = {}
+                json["Not Reachable webpage"] = page_name
+                json["visited links"] = url
+                fs.writeFileSync(`./notReachableLinks/${fileName}`, JSON.stringify(json))
                 reachable = false
               }
               //await waitingTime(2000)
@@ -787,7 +790,7 @@ function getUA(devNames) {
       json_firefox[dev_name]=dev_ua_json
       dev_name = dev_name.substring(1, dev_name.length-1)
       devNamesFirfox.push(dev_name)
-      console.log(devNamesFirfox)
+      //console.log(devNamesFirfox)
     }
   
   }
