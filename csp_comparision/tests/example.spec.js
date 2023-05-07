@@ -9,6 +9,7 @@ const { Console } = require('console');
 const path = require('path');
 const { version } = require('os');
 
+
 // user-agents for chrom, firfox and webkit-safari
 let dev = JSON.stringify(playwright.devices)
 dev = dev.substring(1, dev.length-1)
@@ -28,30 +29,10 @@ let subpagesWithMark = new Array();
 getUA(devNames);
 //console.log(devNames)
 //devNames = devNames.slice(32,36);
-var subPagesAll = fs.readFileSync("./tests/subpages.txt", 'utf-8').split(/\r?\n/);
-let pagesUN = new Array();
-//subPagesAll.pop();
-for(let i = 0; i < subPagesAll.length; i++) {
-  if(/\s/. test(subPagesAll[i])){
-    pagesUN.push(subPagesAll[i].split(/\s/)[0].split(".")[1].split(".")[0])
-  }
-}
-//console.log("UUUUUUUUUUUUUUUUUUUUUUUUUU")
-//console.log(pagesUN)
 var subPages = new Array();
-for(let pun of pagesUN){
-  let partPages = new Array();
-  for(let i = 0; i < subPagesAll.length; i++){
-    let pages = subPagesAll[i].split(/\s/)
-    for(let sp of pages){
-      if(sp.endsWith(pun)){
-        subpagesWithMark.push(sp)
-        partPages.push(sp.split("Ahmad")[0])
-      }
-    }
-  }
-  subPages.push(partPages)
-}
+
+
+
 /*for(let sp of subPagesAll) {
   subPages.push(sp.split(/\s/))
 }*/
@@ -64,6 +45,15 @@ const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
 var acceptLanguage = op[op.length-1]
 op.pop();
 const usedBrowserToTest = fs.readFileSync("./tests/browserToTest", 'utf-8').split(/\r?\n/);
+var dir = "(";
+for(let i = 0; i < op.length; i++){
+  if(i === op.length-1){
+    dir += op[i] + ")"
+  }else{
+    dir += op[i] + " "
+  }
+}
+dir += "-(" + usedBrowserToTest[0]+")"
 var page_names = new Array()
 var subPagesToTest = new Array()
 var subPagesDB = new Array();
@@ -118,6 +108,31 @@ const run_option = process.argv.splice(2);
 //console.log(run_option);
 //console.log(subPages);
 
+if (fs.existsSync(`./tests/subpages-${acceptLanguage}-${dir}.txt`)){
+  var subPagesAll = fs.readFileSync(`./tests/subpages-${acceptLanguage}-${dir}.txt`, 'utf-8').split(/\r?\n/);
+  let pagesUN = new Array();
+  //subPagesAll.pop();
+  for(let i = 0; i < subPagesAll.length; i++) {
+    if(/\s/. test(subPagesAll[i])){
+      pagesUN.push(subPagesAll[i].split(/\s/)[0].split(".")[1].split(".")[0])
+    }
+  }
+  //console.log("UUUUUUUUUUUUUUUUUUUUUUUUUU")
+  //console.log(pagesUN)
+  for(let pun of pagesUN){
+    let partPages = new Array();
+    for(let i = 0; i < subPagesAll.length; i++){
+      let pages = subPagesAll[i].split(/\s/)
+      for(let sp of pages){
+        if(sp.endsWith(pun)){
+          subpagesWithMark.push(sp)
+          partPages.push(sp.split("Ahmad")[0])
+        }
+      }
+    }
+    subPages.push(partPages)
+  }
+}
 
 switch(run_option.length) {
   case 1:
@@ -204,14 +219,26 @@ switch(run_option.length) {
 
 
 function run(urls, searchSubPages, requestedFailed) {
-  //console.log(urls)
 
   (async() => {
+    let i = 0;
     let notReachableWebsites = "";
+    if(!fs.existsSync(`./cspHeaders-${acceptLanguage}-${dir}`)){
+      fs.mkdirSync(path.join("./", `cspHeaders-${acceptLanguage}-${dir}`));
+    }
     
-    
+    if(!fs.existsSync(`./notReachableLinks-${acceptLanguage}-${dir}`)){
+      fs.mkdirSync(path.join("./", `notReachableLinks-${acceptLanguage}-${dir}`));
+    }
+
+    if(!fs.existsSync(`./UserAgents-${acceptLanguage}-${dir}`)){
+      fs.mkdirSync(path.join("./", `UserAgents-${acceptLanguage}-${dir}`));
+    }
     //console.log(urls)
     for(var u of urls) {
+      i++;
+      console.log(u)
+      console.log(i)
       var page_name_var = 1;
       let flage_homePage = true;
       let flage_subpages = true;
@@ -280,15 +307,6 @@ function run(urls, searchSubPages, requestedFailed) {
         let reachable = true;
         for(let i = 0; i < choosedBrowsers.length; i++){
           let chBro = choosedBrowsers[i]
-          //await waitingTime(5000)
-          /*if(i == 0){
-            if(searchSubPages)
-            searchSubPages = true;
-            //getResHeaders(url, devNames, page_name, true, flage_homePage, flage_subpages, chBro)
-          }/*else {
-  
-            getResHeaders(url, devNames, page_name, false, flage_homePage, flage_subpages, chBro)
-          }*/
   
           homePageDB.push(url);
           //console.log(url)
@@ -363,6 +381,12 @@ function run(urls, searchSubPages, requestedFailed) {
                 }
      
             }else{
+              if(!fs.existsSync(`./cspHeaders-${acceptLanguage}-${dir}/${page_name}`)){
+                fs.mkdirSync(path.join(`./cspHeaders-${acceptLanguage}-${dir}/`, `${page_name}`));
+              }
+              if(!fs.existsSync(`./UserAgents-${acceptLanguage}-${dir}/${page_name}`)){
+                fs.mkdirSync(path.join(`./UserAgents-${acceptLanguage}-${dir}/`, `${page_name}`));
+              }
               await page.on("response", async (response) => {
                 try {
                   const os = userAgentInfo.os.name
@@ -392,7 +416,7 @@ function run(urls, searchSubPages, requestedFailed) {
                       //csp = parser.getCSP_Policy(csp, headers, headers_arr);
                       csp = parser.cspParserGetAllResponseHeaders(finalheaders, allCSP, csp)*/
                       let allHeaders = await response.headers();
-                      //console.log(allHeaders)
+           
                       let headers_arr = parser.cspParser(allHeaders);
                       let headers = parser.cspParser_GetAllHeaders(headers_arr)
                       allCSP.push(headers_arr)
@@ -417,14 +441,14 @@ function run(urls, searchSubPages, requestedFailed) {
                       } 
                       json['url'] = url
                       //console.log(json)
-                      fs.writeFileSync(`./csp-headers/${fileName}`, JSON.stringify(json))
+                      fs.writeFileSync(`./cspHeaders-${acceptLanguage}-${dir}/${page_name}/${fileName}`, JSON.stringify(json))
   
                       let json_2 = {};
                       for(let i = 0; i < requestHeadersArray.length; i++){
                         json_2[requestHeadersArray[i][0]] = requestHeadersArray[i][1]
                       }
                       let fileName_UA = `UserAgent ${fileName}`;
-                      fs.writeFileSync(`./user-agents/${fileName_UA}`, JSON.stringify(json_2))
+                      fs.writeFileSync(`./UserAgents-${acceptLanguage}-${dir}/${page_name}/${fileName_UA}`, JSON.stringify(json_2))
   
                     }               
                   }
@@ -434,58 +458,21 @@ function run(urls, searchSubPages, requestedFailed) {
                
               });          
               
-              //console.log("RRRRRRRRRRRRRRRRRRRRR")
-              //console.log(allcspolicy)
-              /*let loadStatus = "";
-              loadStatus += failed + "\n"
-              loadStatus += searchSubPages
-              fs.writeFileSync(`./tests/${page_name}_${model_name}`, loadStatus)
-              console.log(failed)
-              await page.on("requestfailed", async (response) => {
-                console.log(dev)
-                console.log("requestfailed");
-                failed = true;
-                searchSubPages = false;
-                loadStatus = new String()
-                loadStatus += failed + "\n"
-                loadStatus += searchSubPages
-                fs.writeFileSync(`./tests/${page_name}_${model_name}`, loadStatus)
-                
-              });
-              const loadStatusOptions = fs.readFileSync(`./tests/${page_name}_${model_name}`, 'utf-8').split(/\r?\n/);
-              console.log(loadStatusOptions)
-              failed = loadStatusOptions[1]
-              searchSubPages = loadStatusOptions[0]
-              console.log(failed)
-              console.log(failed === "false")
-              if(failed === "false"){
-                await page.goto(url, { waitUntil: "load", timeout: 600000 });
-              }else{
-                let notReachableLinksVar = page_name +`(${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url})` + ", "
-                let found = false
-                for(let e of notReachableLinksArray){
-                  //console.log(e)
-                  //console.log(notReachableLinksVar)
-                  if(e === notReachableLinksVar){
-                    found = true
-                  }
-                }
-        
-                if(!found){
-                  notReachableLinks += notReachableLinksVar + "\n"
-                }
-              }*/
               try{
-                await page.goto(url, { waitUntil: "load", timeout: 600000 });
+                await page.goto(url, { waitUntil: "load"});
               }catch (e) {
                 //console.log(e);
+                ``
+                if(!fs.existsSync(`./notReachableLinks-${acceptLanguage}-${dir}/${page_name}`)){
+                  fs.mkdirSync(path.join(`./notReachableLinks-${acceptLanguage}-${dir}/`, `${page_name}`));
+                }
                 const os = userAgentInfo.os.name
                 const os_version = userAgentInfo.os.version;
                 let fileName = `csp_${model_name}_${broserName}_${browserversion}_${os}_${dev.viewport.height}_${dev.viewport.width}_${os_version}_${page_name}.json`
                 let json = {}
                 json["Not Reachable webpage"] = page_name
                 json["visited links"] = url
-                fs.writeFileSync(`./notReachableLinks/${fileName}`, JSON.stringify(json))
+                fs.writeFileSync(`./notReachableLinks-${acceptLanguage}-${dir}/${page_name}/${fileName}`, JSON.stringify(json))
                 reachable = false
               }
               //await waitingTime(2000)
@@ -495,7 +482,9 @@ function run(urls, searchSubPages, requestedFailed) {
               var index_url = 0
               var paths = new Array();
               //console.log(subPages)
+
               if(searchSubPages && reachable) {
+
                 for(let i = 0; i < subPages.length; i++) {
                   if(subPages[i][0] === url) {
                     urlIsThere = true
@@ -563,6 +552,7 @@ function run(urls, searchSubPages, requestedFailed) {
                     }
                     
                     if(paths.length <= 4) {
+                      console.log("OR HIERRRRRRRRRRRRRRRRRRRRRRRRR")
                       let counter = 0;
     
                       for(let i = 0; i < paths.length ; i++) {
@@ -583,7 +573,7 @@ function run(urls, searchSubPages, requestedFailed) {
                       line += "\n"
     
                     }else {
-                      //console.log("HIER HIER!!!!")
+                      console.log("HIER HIIIIIIIIIEEEEEEEEEEEEEER!!!!")
                       //console.log(url)
                       //console.log(paths)
                       let used_paths = new Array()
@@ -630,7 +620,7 @@ function run(urls, searchSubPages, requestedFailed) {
                       line += "\n"
                     }
         
-                    fs.writeFileSync(`./tests/subpages.txt`, line)
+                    fs.writeFileSync(`./tests/subpages-${acceptLanguage}-${dir}.txt`, line)
                   }
                   
                 }	
@@ -737,32 +727,8 @@ function getUA(devNames) {
       'Galaxy Note II landscape',
       'Galaxy S III',
       'Galaxy S III landscape',
-      'iPad (gen 6)',
-      'iPad (gen 6) landscape',
-      'iPad (gen 7)',
-      'iPad (gen 7) landscape',
-      'iPad Mini',
-      'iPad Mini landscape',
       'iPad Pro 11',
       'iPad Pro 11 landscape',
-      'iPhone 6',
-      'iPhone 6 landscape',
-      'iPhone 6 Plus',
-      'iPhone 6 Plus landscape',
-      'iPhone 7',
-      'iPhone 7 landscape',
-      'iPhone 7 Plus',
-      'iPhone 7 Plus landscape',
-      'iPhone 8',
-      'iPhone 8 landscape',
-      'iPhone 8 Plus',
-      'iPhone 8 Plus landscape',
-      'iPhone SE',
-      'iPhone SE landscape',
-      'iPhone X',
-      'iPhone X landscape',
-      'iPhone XR',
-      'iPhone XR landscape',
       'iPhone 11',
       'iPhone 11 landscape',
       'iPhone 11 Pro',
