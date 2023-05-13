@@ -33,6 +33,7 @@ var folder2 = `./compare-${acceptLanguage}-${dir}`
 var folder3 = `./nonceValue-${acceptLanguage}-${dir}`
 var resultFolder = `./comparePagesWithDevices-${acceptLanguage}-${dir}`
 var resultFolder2 = `./compareHomeWithSubpages-${acceptLanguage}-${dir}`
+var resultFolderViewPort = `./compareViewPortDevices-${acceptLanguage}-${dir}`
 
 const jsonsInDir =  fs.readdirSync(folder);
 //console.log(`./cspHeaders-${acceptLanguage}-${dir}`)
@@ -79,6 +80,8 @@ for(var u of uri){
 });*/
 let websites = new Array();
 let check;
+let devUA = new Array()
+let devArr = new Array()
 if(permission) {
     let allDeveices = new Array();
     let allBrowsers = new Array();
@@ -438,6 +441,17 @@ if(permission) {
                         if(!fs.existsSync(folder2)){
                             fs.mkdirSync(path.join("./", folder2));
                         }
+                        if(!devUA.includes(`${details[0]}_${details[4]}_${details[5]}`)){
+                            if(!details[0].includes("Desktop")){
+                                devUA.push(`${details[0]}_${details[4]}_${details[5]}`)
+                            }
+                        }
+                        if(!devArr.includes(details[0])){
+                            if(!details[0].includes("Desktop")){
+                                devArr.push(details[0])
+                            }
+                        }
+                        
                         fs.writeFileSync(`${folder2}/${fileName}`, JSON.stringify(json))
                     }
                     //console.log(csp_policies.length)
@@ -447,29 +461,9 @@ if(permission) {
                 
                 // *******************************************************************************************************************************************************
                 // Viewport-similarity tests
+               
+
                 /*
-                let viewport_arr = new Array();
-                let num_dev_viewport = 0;
-    
-                console.log(csp_safe.length)
-                for (let i = 0; i < csp_safe.length; i++) {
-                    let arr_comp = csp_safe[i];
-                    //console.log(arr_comp)
-                    //let fileName = `csp_${arr_comp[0][1]}_${arr_comp[1][1]}_${arr_comp[2][1]}_${arr_comp[3][1]}_${arr_comp[4][1]}_${arr_comp[5][1]}_${page_name}.json`
-                    if(!websites.includes(page_name)){
-                        websites.push(page_name)
-                    }
-                    //console.log("---------------------------------------------------------------------")
-                    //console.log(arr_comp)
-                    
-                    viewport_arr.push(`${arr_comp[0][1]}: {height${arr_comp[4][1]}, width:${arr_comp[5][1]}}`)
-                    //[`${arr_comp[0][1]}`, `${arr_comp[4][1]}`, `${arr_comp[5][1]}`]
-                    let dev = `${arr_comp[0][1]}: {height${arr_comp[4][1]}, width:${arr_comp[5][1]}}`
-                    if(!allDeveices.includes(dev)) {
-                        allDeveices.push(dev)
-                    }
-                }
-    
                 //console.log("PPPPPPPPPPPPPP")
                 //console.log(viewport_arr)
                 let viewport_arr_ND = new Array();
@@ -645,56 +639,167 @@ if(permission) {
      
     }
 
-    /*if(compare_option[0] === "alluri") {
-        let json_comp_reuslt = {};
-        uri = removeDuplikate(uri)
-        allDeveices = removeDuplikate(allDeveices)
-        allBrowsers = removeDuplikate(allBrowsers)
-        NSB = removeDuplikate(NSB)
-        SB = removeDuplikate(SB)
-        devices_offerd_safe_csp = removeDuplikate(devices_offerd_safe_csp)
-        devices_offerd_unsafe_csp = removeDuplikate(devices_offerd_unsafe_csp)
-
-        json_comp_reuslt["number of uris"] = uri.length
-        json_comp_reuslt["uris"] = uri
-        json_comp_reuslt["Uris have been visited by the following devices"] = allDeveices
-        json_comp_reuslt["Uris have been visited using the following browsers"] = allBrowsers
-        json_comp_reuslt["Uris that sent unsafe csp"] = NSB
-        json_comp_reuslt["Devices with unsafe csp"] = devices_offerd_unsafe_csp
-        json_comp_reuslt["Uris that sent safe csp"] = SB
-        json_comp_reuslt["Devices with safe csp"] = devices_offerd_safe_csp
-        fs.writeFileSync(`./compare/compResult_${osystem}_AllUris.json`, JSON.stringify(json_comp_reuslt))
-        
-    }*/
     
-
     
     //console.log(files)
     console.log(uri)
     console.log(web)
+    console.log(devUA)
+    console.log(devArr)
+    for(var u of web){
+        console.log(u)
+        if(!fs.existsSync(resultFolderViewPort)){
+            fs.mkdirSync(path.join("./", resultFolderViewPort));
+        }
+        compareViewport(u, folder2, resultFolderViewPort)
+    }
+    /*
     for(let u of web){
-        //console.log("JJJJJJJJJJJJJJJJJJJJJJJ")
-        //console.log(u)
+
         if(!fs.existsSync(resultFolder)){
             fs.mkdirSync(path.join("./", resultFolder));
         }
     
         //compareWebsite(u, folder2, resultFolder)
         
-        //console.log("ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ")
     }
     for(let u of uri){
         u = u.split(".")[0]
-        console.log(u) 
-        console.log(!fs.existsSync(resultFolder2))
-        console.log(fs.existsSync(resultFolder2))
         if(!fs.existsSync(resultFolder2)){
             fs.mkdirSync(path.join("./", resultFolder2));
         }
         compareHomeWithSunpages(u, resultFolder, resultFolder2)
     }
-   
+   */
      
+}
+
+function compareViewport(pageName, comparePath, resultPath){
+    const  jsonsFiles =  fs.readdirSync(comparePath).filter((filename) => path.extname(filename) === '.json');
+    for(var d of devArr){
+        let arr = new Array()
+        for(var dev of devUA){
+            
+            if(dev.split("_")[0] === d){
+                if(!arr.includes(dev)){
+                    arr.push(dev)
+                }
+            }
+        }
+        //console.log(arr)
+        
+        let csp_policies = new Array();
+        let dev1Details = arr[0].split("_")
+        let dev2Details = arr[1].split("_")
+
+        jsonsFiles.forEach(filename => {
+            let csp = new Array()
+            if(filename.includes(`${pageName}.json`) && ((filename.includes(`${dev1Details[0]}_`) &&  filename.includes(dev1Details[1]) && filename.includes(dev1Details[2])) || (filename.includes(`${dev2Details[0]}_`) &&  filename.includes(dev2Details[1]) && filename.includes(dev2Details[2])))) {
+                //console.log("KKKKKKKKKKKKKKKKKKKKKKKKK")
+                //console.log(filename)
+                const fileData = fs.readFileSync(path.join(comparePath, filename));                    
+                const json_arr = JSON.parse(fileData.toString());
+                let json_str = JSON.stringify(json_arr);
+                json_after_split = json_str.substring(1, json_str.length - 1);
+                json_after_split = json_after_split.split(/,"/)
+                let check = false;
+                for(var cs of csp){
+                    if(cs[0] === filename.split(".json")[0].substring(4)){
+                        check = true;
+                    }
+                }
+                if(!check){
+                    csp.push(filename.split(".json")[0].substring(4))
+                    filename_debuger = filename
+                    let arr_2 = new Array();
+                    //console.log("OOOOOOOOOOOOOOOOOOOO")
+                    //console.log(json_after_split)
+                    for (var elem of json_after_split) {
+                        let header;
+                        let arr_;
+                        let header_value;
+                        
+                        if((elem.includes(":") && !elem.includes("http") && !elem.includes("data")&& !elem.includes("mediastream")&& !elem.includes("blob")&& !elem.includes("filesystem")&& !elem.includes("resource")&& !elem.includes(":*")) || elem.includes("visited_Webpage")){
+                            arr_ = elem.split(/":/);
+                            //console.log(arr_)
+                            header = delete_StrSy(arr_[0], "\"");
+                            //console.log("UUUUUUUUUUUUUUUUUUUUU")
+                            //console.log(arr_)
+                            //console.log(arr_[1])
+                            header_value = delete_StrSy(arr_[1], "\"")
+                            header_value = delete_StrSy(header_value, "\\")
+                            arr_2.push([header, header_value])
+                        }else {
+                            elem = elem.replaceAll("\"", "")
+                            if(elem.endsWith(" ")){
+                                arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + elem
+                            }else{
+                                arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + " " + elem
+                            }
+                        }
+                                        
+                    }
+                    csp.push(arr_2)
+                   
+                    csp_policies.push(csp)
+                    //console.log(csp)
+                }
+               
+            }
+    
+        });
+        //console.log(csp_policies)
+        if(csp_policies.length > 0){
+            let deviceWithTwoVP = arr;
+            let safeCSPdev1 = csp_policies[0][1][7][1];
+            let safeCSPdev2 = csp_policies[1][1][7][1];
+            let bothDevicesOfferSafeCsp = safeCSPdev1 === safeCSPdev2;
+            let dev1WithCsp = csp_policies[0][1][8][1];
+            let dev2WithCsp = csp_policies[1][1][8][1];
+            let whichDeviceIsWithCsp;
+            let dev1Withnonce = csp_policies[0][1][13][1];
+            let dev2Withnonce = csp_policies[1][1][13][1];
+            let whichDeviceIsWithNonce;
+            let bothDevicesWithCspHeader = false;
+            let bothDevicesWithNonceValue = false;
+            if(dev1WithCsp != 'csp dose not contain script-srcc or default-src' && dev2WithCsp != 'csp dose not contain script-srcc or default-src'){
+                bothDevicesWithCspHeader = true;
+            }else{
+                if(dev1WithCsp != 'csp dose not contain script-srcc or default-src'){
+                    whichDeviceIsWithCsp = csp_policies[0][1][8][1];
+                }
+                if(dev2WithCsp != 'csp dose not contain script-srcc or default-src'){
+                    whichDeviceIsWithCsp = csp_policies[1][1][8][1];
+                }
+            }
+            if(dev1Withnonce === 'true' && dev2Withnonce === 'true'){
+                bothDevicesWithNonceValue = true;
+            }else{
+                if(dev1Withnonce === 'true'){
+                    whichDeviceIsWithNonce = csp_policies[0][1][13][1];
+                }
+                if(dev2Withnonce === 'true'){
+                    whichDeviceIsWithNonce = csp_policies[1][1][13][1];
+                }
+            }
+            let json={}
+            json["visited links"] = csp_policies[1][1][28][1];
+            json["devices"] = deviceWithTwoVP
+            json["both devices received safe csp"] = bothDevicesOfferSafeCsp
+            json["dev 1 received safe csp"] = safeCSPdev1
+            json["dev 2 received safe csp"] = safeCSPdev2
+            json["both devices received csp header"] = bothDevicesWithCspHeader
+            json["dev 1 received csp header"] = dev1WithCsp
+            json["dev 2 received csp header"] = dev2WithCsp
+            json["both devices received nonces"] = bothDevicesWithNonceValue
+            json["dev 1 received nonce value"] = dev1Withnonce
+            json["dev 2 received nonce value"] = dev2Withnonce
+            
+            fs.writeFileSync(`./${resultPath}/compViewPort_${pageName}.json`, JSON.stringify(json))
+        }
+        
+    }
+
 }
 
 function compareHomeWithSunpages(pageName, comparePath, resultPath){

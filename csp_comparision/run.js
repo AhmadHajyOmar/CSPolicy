@@ -103,9 +103,8 @@ for(var fileName of fileNames) {
         usedBrowserToTest.push("Mobile Safari")
         usedBrowserToTest.push("Safari")
         usedBrowserToTest.push("Firefox")
-    }
-
-    if(fileName === 'fr-CH' || fileName === 'en-US' || fileName === 'de-DE' || fileName === 'ru-RU' || fileName === 'en-GB' || fileName === 'fr-FR'){
+    } 
+    if(fileName === 'hi-IN' || fileName === 'nl-BE' || fileName === 'ar-SA' || fileName === 'ar-IQ' || fileName === 'ar-EG' || fileName === 'fr-CH' || fileName === 'en-US' || fileName === 'de-DE' || fileName === 'ru-RU' || fileName === 'en-GB' || fileName === 'fr-FR'){
         acceptLanguage = fileName
         if (acceptLanguage.length === 0){
             option.push("de-DE")
