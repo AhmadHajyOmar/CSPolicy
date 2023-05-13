@@ -12,8 +12,24 @@ const path = require('path');
 const { isContext, createContext } = require('vm');
 const { NOTFOUND } = require('dns');
 const { join } = require('path');
+const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
+var acceptLanguage = op[op.length-1]
+op.pop();
+const usedBrowserToTest = fs.readFileSync("./tests/browserToTest", 'utf-8').split(/\r?\n/);
+var dir = "(";
+for(let i = 0; i < op.length; i++){
+  if(i === op.length-1){
+    dir += op[i] + ")"
+  }else{
+    dir += op[i] + " "
+  }
+}
 
-const  jsonsFiles =  fs.readdirSync("./nonceValue").filter((filename) => path.extname(filename) === '.json');
+dir += "-(" + usedBrowserToTest[0]+")"
+var folder = `./nonceValue-${acceptLanguage}-${dir}`
+var resultFolder = `./HomeSubNonce-${acceptLanguage}-${dir}`
+var resultFolder2 = `./nonceDuplicate-${acceptLanguage}-${dir}`
+const  jsonsFiles =  fs.readdirSync(folder).filter((filename) => path.extname(filename) === '.json');
 let homePages = new Array()
 let subpages = new Array()
 let nonceInfo = new Array()
@@ -30,7 +46,7 @@ jsonsFiles.forEach(filename => {
 
     let opNonce = new Array()
     //console.log(filename)
-    const fileData = fs.readFileSync(path.join("./nonceValue", filename));                    
+    const fileData = fs.readFileSync(path.join(folder, filename));                    
     const json_arr = JSON.parse(fileData.toString());
     let json_str = JSON.stringify(json_arr);
     json_after_split = json_str.substring(1, json_str.length - 1);
@@ -38,16 +54,16 @@ jsonsFiles.forEach(filename => {
     opNonce.push(filename.split("_")[0])
     filename_debuger = filename
     let arr_2 = new Array();
-    console.log(json_after_split)
+    //console.log(json_after_split)
     for (var elem of json_after_split) {
         let header;
         let arr_;
         let header_value;
         if((elem.includes(":") && !elem.includes("http")) || elem.includes("visited link")){
             arr_ = elem.split(/":/);
-            console.log(arr_)
-            console.log("UUUUUUUUUUUUUUUUUUUUU")
-            console.log(arr_)
+            //console.log(arr_)
+            //console.log("UUUUUUUUUUUUUUUUUUUUU")
+            //console.log(arr_)
             //console.log(arr_[1])
             header = delete_StrSy(arr_[0], "\"");
             header_value = delete_StrSy(arr_[1], "\"")
@@ -71,14 +87,17 @@ jsonsFiles.forEach(filename => {
 });
 
 
-console.log(homePages)
-console.log(subpages)
+//console.log(homePages)
+//console.log(subpages)
 //console.log(nonceInfo)
 
 run();
 checkNonceHomeSubPages();
-
+//console.log(nonceInfo)
 function checkNonceHomeSubPages(){
+    if(!fs.existsSync(resultFolder)){
+        fs.mkdirSync(path.join("./", resultFolder));
+    }
     for(var e of homePages){
         for(var t of nonceInfo){
             if(e === t[0]){
@@ -125,8 +144,10 @@ function checkNonceHomeSubPages(){
                         }
                     }
                 }
+              
                 json["similar with"] = similarnoncevaluesinSubpages;
-                fs.writeFileSync(`./HomeSubNonce/${info}_nonceDuplicated.json`, JSON.stringify(json))
+
+                fs.writeFileSync(`${resultFolder}/${info}_nonceDuplicated.json`, JSON.stringify(json))
             }
         }
         
@@ -134,6 +155,9 @@ function checkNonceHomeSubPages(){
 }
 
 function run() {
+    if(!fs.existsSync(resultFolder2)){
+        fs.mkdirSync(path.join("./", resultFolder2));
+    }
     (async () => {
         for(var e of nonceInfo){
             //console.log(e)
@@ -197,8 +221,9 @@ function run() {
                             json['operating system version'] = operSysVersion
                             json['page name'] = uriPageName
                             json['duplicate nonce value'] = nonceStr
-    
-                            fs.writeFileSync(`./nonceDuplicate/${fileName}_nonceDuplicated.json`, JSON.stringify(json))
+                            console.log("KKKKKKKKKKKKKKKKK")
+                           
+                            fs.writeFileSync(`${resultFolder2}/${fileName}_nonceDuplicated.json`, JSON.stringify(json))
                         
                         }
                         
@@ -211,7 +236,7 @@ function run() {
             await page.goto(uriPageName, { waitUntil: "load", timeout: 600000 });
             await context.close();
             await bro.close();
-            waitingTime(2000)
+            //waitingTime(2000)
             
             //console.log(nonceInfo.length)
             /*for(let i = 0; i < 2; i++){

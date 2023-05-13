@@ -40,7 +40,11 @@ var subPages = new Array();
 //console.log(subPages)
 
 const input = fs.readFileSync("./tests/urls", 'utf-8')
+
 const urls = input.split(/\r?\n/);
+urls.pop()
+urls.pop()
+console.log(urls)
 const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
 var acceptLanguage = op[op.length-1]
 op.pop();
@@ -77,6 +81,18 @@ if (fs.existsSync("./tests/notReachableLinks")){
 let choosedBrowsers = new Array();
 let allcspolicy;
 let fn;
+var lat = 51.2822469
+var lon = 9.5334177
+
+if (fs.existsSync("./tests/geo")){
+  var geo = fs.readFileSync("./tests/geo", 'utf-8').split(/\r?\n/);
+  console.log(geo)
+  lat = parseFloat(geo[0])
+  lon = parseFloat(geo[1])
+
+}
+
+
 // determine the required set of devicese according to the used browser and which broser should be used
 
 if(usedBrowserToTest.includes("WebKit")){
@@ -252,18 +268,19 @@ function run(urls, searchSubPages, requestedFailed) {
       page_name = page_name.split(".")[0]
       
       if(!searchSubPages){
+        let arrSub = new Array()
         //console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
-        //console.log(subpagesWithMark)
+        console.log(subpagesWithMark)
         for(let x = 0; x < subpagesWithMark.length; x++){
           let x_y = subpagesWithMark[x].split("Ahmad")
-          //console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
-          //console.log(x_y)
-          //console.log(u)
+          console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+          console.log(x_y)
+          console.log(u)
           if(x_y[0] === u) {
             page_name = x_y[1]
             break;  
           }
-          
+          console.log(page_name)
         }
         let found = false;
         for(let o = 0; o < homePageDB.length; o++){
@@ -343,7 +360,7 @@ function run(urls, searchSubPages, requestedFailed) {
             let context = await browser.newContext({
               ...dev,
               premissions: ['geolocation'],
-              geolocation: {latitude: 19.432608, longitude: -99.133209},
+              geolocation: {latitude: lat, longitude: lon},
               locale: `${acceptLanguage}`,
               ignoreHTTPSErrors: true
             });
@@ -527,7 +544,7 @@ function run(urls, searchSubPages, requestedFailed) {
                     /*const browser = await playwright.chromium.launch()
                     const page = await browser.newPage()
                     */
-          
+                    
                     //await page.goto(url, { timeout: 80000 })
                     if(flage_homePage){
                       flage_homePage = false;
@@ -536,6 +553,8 @@ function run(urls, searchSubPages, requestedFailed) {
                     const links = await page.evaluate(() => {
                       return Array.from(document.links).map(item => item.href);
                     });
+                    console.log(model_name)
+                    console.log(links)
                     //console.log("GGGGGGGGGGGGGGGGGGGGGGGGGGGG")
                     //console.log(links)
                     //urls.push(lk)
@@ -721,14 +740,7 @@ function getUA(devNames) {
     } else if(dev_ua_option[dev_ua_option.length-1].includes("webkit")) {
       json_webkit[dev_name]=dev_ua_json
       dev_name = dev_name.substring(1, dev_name.length-1)
-      devNamesWebkit = ['Galaxy Note 3',
-      'Galaxy Note 3 landscape',
-      'Galaxy Note II',
-      'Galaxy Note II landscape',
-      'Galaxy S III',
-      'Galaxy S III landscape',
-      'iPad Pro 11',
-      'iPad Pro 11 landscape',
+      devNamesWebkit = [
       'iPhone 11',
       'iPhone 11 landscape',
       'iPhone 11 Pro',
@@ -750,7 +762,15 @@ function getUA(devNames) {
       'iPhone 13 Pro Max',
       'iPhone 13 Pro Max landscape',
       'iPhone 13 Mini',
-      'iPhone 13 Mini landscape','Desktop Safari'];
+      'iPhone 13 Mini landscape','Desktop Safari',
+      'Galaxy Note 3',
+      'Galaxy Note 3 landscape',
+      'Galaxy Note II',
+      'Galaxy Note II landscape',
+      'Galaxy S III',
+      'Galaxy S III landscape',
+      'iPad Pro 11',
+      'iPad Pro 11 landscape',];
 
     } else {
       json_firefox[dev_name]=dev_ua_json

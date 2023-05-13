@@ -11,6 +11,7 @@ var acceptLanguage = "";
 const fileNames = process.argv.splice(2);
 console.log(fileNames)
 let option = new Array();
+let geo = new Array();
 for(var fileName of fileNames) {
     if(fileName.endsWith("json") || fileName.endsWith("txt")) {
             if (fileName.endsWith('.json')) {
@@ -113,6 +114,14 @@ for(var fileName of fileNames) {
         }
         
     }
+    if(hasNumber(fileName) && fileName.includes("lat")){
+        geo.push(fileName.substring(3))
+    } 
+
+    if(hasNumber(fileName) && fileName.includes("lon")){
+        geo.push(fileName.substring(3))
+    } 
+    
     
    
 
@@ -133,7 +142,7 @@ console.log(input_arr.length)
 writeFiles("./tests/urls", input_arr)
 writeFiles("./tests/browserToTest", usedBrowserToTest)
 writeFiles("./tests/option", option)
-
+writeFiles("./tests/geo", geo)
 
 function writeFiles(path, array) {
     let content = new String()
@@ -160,3 +169,8 @@ function writeFiles(path, array) {
         }
     });
 }
+
+function hasNumber(str) {
+    return /[0-9]/.test(str);
+  }
+  
