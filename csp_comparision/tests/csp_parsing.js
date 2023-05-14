@@ -17,10 +17,45 @@ function cspParser(headers) {
 	}
 	//console.log("OUTPUT")
 	//console.log(csp_arr)
+	for(var e of csp_arr){
+		if(e[0] === 'content-security-policy'){
+			if(e[1][0].includes("\\n")){
+				e[1][0] = e[1][0].replaceAll("\\n",";")
+			}
+			e[1][0] = ignoreDuplikateDirectives(e[1][0], "script-src")
+			e[1][0] = ignoreDuplikateDirectives(e[1][0], "default-src")
+			e[1][0] = ignoreDuplikateDirectives(e[1][0], "script-src-elem")
+		}
+	}
 	return csp_arr
 }
 
+function ignoreDuplikateDirectives(directives, dierctive){
+	let arr = directives.split(";")
+	console.log(arr)
+	let i = 0;
+	let index = 0;
+	for(let j = 0; j < arr.length; j++){
+		if(arr[j].includes(`${dierctive}`)){
+			i++
+			if(i>1){
+				let elem = "";
+				for(let n = 0; n < arr.length; n++){
+					if(n === arr.length-1 && (n != j)){
+						elem += arr[n]
+					}else{
+						if(n != j){
+							elem += arr[n]+";"
+						}
+					}
+				}
+				directives = elem;
+			}
+		}
 
+	}
+	return directives;
+}
 
 function getHeader(arr, header) {
 	for(var h of arr) {
@@ -251,7 +286,7 @@ function getCSP_Policy(csp, headers, headers_arr) {
 
 						}
 						let mulcsp = "";
-						if(headers_arr[j][0].includes("content-security-policy")){
+						if(headers_arr[j][0].includes("content-security-policy") && headers_arr[j][0].includes("report-only")){
 							//console.log("LOOKKKKK")
 							//console.log(csp[index])
 							let acsp = getDirectives(csp[index])
