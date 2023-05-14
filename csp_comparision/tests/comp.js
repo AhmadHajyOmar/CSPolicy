@@ -647,22 +647,23 @@ if(permission) {
     console.log(devUA)
     console.log(devArr)
     for(var u of web){
-        console.log(u)
+        //console.log(u)
         if(!fs.existsSync(resultFolderViewPort)){
             fs.mkdirSync(path.join("./", resultFolderViewPort));
         }
         compareViewport(u, folder2, resultFolderViewPort)
     }
-    /*
+   
     for(let u of web){
 
         if(!fs.existsSync(resultFolder)){
             fs.mkdirSync(path.join("./", resultFolder));
         }
     
-        //compareWebsite(u, folder2, resultFolder)
+        compareWebsite(u, folder2, resultFolder)
         
     }
+     
     for(let u of uri){
         u = u.split(".")[0]
         if(!fs.existsSync(resultFolder2)){
@@ -670,7 +671,7 @@ if(permission) {
         }
         compareHomeWithSunpages(u, resultFolder, resultFolder2)
     }
-   */
+   
      
 }
 
@@ -783,7 +784,7 @@ function compareViewport(pageName, comparePath, resultPath){
                 }
             }
             let json={}
-            json["visited links"] = csp_policies[1][1][28][1];
+            json["visited links"] = csp_policies[1][1][30][1];
             json["devices"] = deviceWithTwoVP
             json["both devices received safe csp"] = bothDevicesOfferSafeCsp
             json["dev 1 received safe csp"] = safeCSPdev1

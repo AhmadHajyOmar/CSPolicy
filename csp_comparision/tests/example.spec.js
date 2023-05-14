@@ -124,8 +124,8 @@ const run_option = process.argv.splice(2);
 //console.log(run_option);
 //console.log(subPages);
 
-if (fs.existsSync(`./tests/subpages-${acceptLanguage}-${dir}.txt`)){
-  var subPagesAll = fs.readFileSync(`./tests/subpages-${acceptLanguage}-${dir}.txt`, 'utf-8').split(/\r?\n/);
+if (fs.existsSync(`./tests/subpages.txt`)){
+  var subPagesAll = fs.readFileSync(`./tests/subpages.txt`, 'utf-8').split(/\r?\n/);
   let pagesUN = new Array();
   //subPagesAll.pop();
   for(let i = 0; i < subPagesAll.length; i++) {
@@ -270,17 +270,17 @@ function run(urls, searchSubPages, requestedFailed) {
       if(!searchSubPages){
         let arrSub = new Array()
         //console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
-        console.log(subpagesWithMark)
+        //console.log(subpagesWithMark)
         for(let x = 0; x < subpagesWithMark.length; x++){
           let x_y = subpagesWithMark[x].split("Ahmad")
-          console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
-          console.log(x_y)
-          console.log(u)
+          //console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+          //console.log(x_y)
+          //console.log(u)
           if(x_y[0] === u) {
             page_name = x_y[1]
             break;  
           }
-          console.log(page_name)
+          //console.log(page_name)
         }
         let found = false;
         for(let o = 0; o < homePageDB.length; o++){
@@ -291,6 +291,11 @@ function run(urls, searchSubPages, requestedFailed) {
               //console.log(u)
               //console.log(homePageDB[o][1])
               page_name = `${page_name}§${homePageDB[o][1]}`
+              if(homePageDB[o][1] > 5){
+                console.log(page_name)
+                console.log(u)
+                console.log(homePageDB[o][0][k])
+              }
               homePageDB[o][1] = homePageDB[o][1] + 1
               //console.log(page_name)
               //console.log(homePageDB[o][1])
@@ -398,12 +403,17 @@ function run(urls, searchSubPages, requestedFailed) {
                 }
      
             }else{
-              if(!fs.existsSync(`./cspHeaders-${acceptLanguage}-${dir}/${page_name}`)){
-                fs.mkdirSync(path.join(`./cspHeaders-${acceptLanguage}-${dir}/`, `${page_name}`));
+              try{
+                if(!fs.existsSync(`./cspHeaders-${acceptLanguage}-${dir}/${page_name}`)){
+                  fs.mkdirSync(path.join(`./cspHeaders-${acceptLanguage}-${dir}/`, `${page_name}`));
+                }
+                if(!fs.existsSync(`./UserAgents-${acceptLanguage}-${dir}/${page_name}`)){
+                  fs.mkdirSync(path.join(`./UserAgents-${acceptLanguage}-${dir}/`, `${page_name}`));
+                }
+              }catch(err){
+                console.log(err)
               }
-              if(!fs.existsSync(`./UserAgents-${acceptLanguage}-${dir}/${page_name}`)){
-                fs.mkdirSync(path.join(`./UserAgents-${acceptLanguage}-${dir}/`, `${page_name}`));
-              }
+            
               await page.on("response", async (response) => {
                 try {
                   const os = userAgentInfo.os.name
@@ -639,7 +649,7 @@ function run(urls, searchSubPages, requestedFailed) {
                       line += "\n"
                     }
         
-                    fs.writeFileSync(`./tests/subpages-${acceptLanguage}-${dir}.txt`, line)
+                    fs.writeFileSync(`./tests/subpages.txt`, line)
                   }
                   
                 }	
