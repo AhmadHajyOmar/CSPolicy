@@ -335,6 +335,18 @@ function run(urls, searchSubPages, requestedFailed) {
           
             let model_name = dev;
             dev = devices[dev];
+        
+           
+            //let devStr = JSON.stringify(dev);
+            //console.log(dev)
+            //console.log(devStr)
+            //devStr = devStr.replace("}"," }")
+        
+            //console.log("KKKKKKKKK")
+            //console.log(devStr)
+            //dev = JSON.parse(devStr);
+            //console.log(dev)
+            
             //let dev = devNames[i];
             let browser;
             let broserName;
@@ -361,7 +373,9 @@ function run(urls, searchSubPages, requestedFailed) {
               devStr = devStr.replace("\"isMobile\":false,", "")
               dev = JSON.parse(devStr);
             }
-      
+            
+         
+
             let context = await browser.newContext({
               ...dev,
               premissions: ['geolocation'],
@@ -379,7 +393,8 @@ function run(urls, searchSubPages, requestedFailed) {
             //let collectResHeaders = false;
             //const getUA = await page.evaluate(() => navigator.userAgent);
             const userAgentInfo= uaParser(dev.userAgent);
-            
+            console.log("IIIIIIIIIIIIIII")
+            console.log(userAgentInfo)
             let browserversion = browser.version();
             /*if(chBro === 2) {
               browserversion = version.product.split("/")[1]
@@ -417,10 +432,13 @@ function run(urls, searchSubPages, requestedFailed) {
               await page.on("response", async (response) => {
                 try {
                   const os = userAgentInfo.os.name
+                  //console.log(os)
+                  op.push(os)
                   const os_version = userAgentInfo.os.version;
                 
                   if(op.includes(os) && (usedBrowserToTest.includes(userAgentInfo.browser.name) || (userAgentInfo.browser.name === "Android Browser" && usedBrowserToTest.includes(userAgentInfo.engine.name)))) {
                     if(response.request().resourceType() == 'document'){
+                      //console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
                       //console.log(`${model_name} ${dev.viewport.height} ${dev.viewport.width} ${url}`)
                       let requestAllHeaders = response.request().headers();
                       //console.log(requestAllHeaders)
@@ -443,12 +461,16 @@ function run(urls, searchSubPages, requestedFailed) {
                       //csp = parser.getCSP_Policy(csp, headers, headers_arr);
                       csp = parser.cspParserGetAllResponseHeaders(finalheaders, allCSP, csp)*/
                       let allHeaders = await response.headers();
-           
+                      console.log("PPPPPPPPPPPPPPPPPPPPP")
+                      console.log(allHeaders)
                       let headers_arr = parser.cspParser(allHeaders);
+                      console.log(headers_arr)
                       let headers = parser.cspParser_GetAllHeaders(headers_arr)
+                      console.log(headers)
                       allCSP.push(headers_arr)
                       allcspolicy += headers_arr + ","
                       csp = parser.getCSP_Policy(csp, headers, headers_arr);
+                      console.log(csp)
         
                       if(model_name.endsWith("landscape")) {
                         model_name = model_name.substring(0,model_name.indexOf(" landscape"))
