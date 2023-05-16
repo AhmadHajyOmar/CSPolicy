@@ -529,7 +529,7 @@ function run(urls, searchSubPages, requestedFailed) {
           }); 
           
           try{
-            await page.goto(url, { waitUntil: "load"});
+            await page.goto(url, { waitUntil: "load"}, {timeout: 30000});
           }catch (e) {
             //console.log(e);
             ``
@@ -589,16 +589,9 @@ function run(urls, searchSubPages, requestedFailed) {
               
               line += "\n"
     
-              //console.log(subPagesToTest)
             } else {
               if(flage_subpages){
                 flage_subpages = false;
-                //console.log("Is Not there !!!")
-                /*const browser = await playwright.chromium.launch()
-                const page = await browser.newPage()
-                */
-                
-                //await page.goto(url, { timeout: 80000 })
                 if(flage_homePage){
                   flage_homePage = false;
                   line += `${url}Ahmad${page_name}` + " "
@@ -610,67 +603,68 @@ function run(urls, searchSubPages, requestedFailed) {
                   });
                   console.log(model_name)
                   //console.log(links)
+                  if(links.length > 0){
+                    for(var u of links) {
+                      if(u.includes("://") && u.split("://").length > 1){
+                        const url = new URL(u);
+                        if( !paths.includes(url.pathname) ) {
+                          paths.push(url.pathname);
+                        }
+                      }
+                      
+                      //console.log(u)
+                      //console.log(url.pathname)
+                    }
+                    
+                    if(paths.length <= 4) {
+                      console.log("OR HIERRRRRRRRRRRRRRRRRRRRRRRRR")
+                      let counter = 0;
+    
+                      for(let i = 0; i < paths.length ; i++) {
+                        for(let j = 0; j < links.length; j++) {
+                          if(links[j].includes(paths[i])){
+                            if(!subPagesToTest.includes(links[j])){
+                              subPagesToTest.push(links[j])
+                              if (i == paths.length - 1){
+                                line += `${links[j]}Ahmad${page_name}`
+                              }else{
+                                line += `${links[j]}Ahmad${page_name}` + " "
+                              }
+                              break;
+                            }
+                          } 
+                        }
+                      }
+                      line += "\n"
+                    }else {
+                      console.log("HIER HIIIIIIIIIEEEEEEEEEEEEEER!!!!")
+                      let used_paths = new Array()
+                      for(let i = 0; i < 5 ; i++) {
+                        for(let j = 0; j < links.length; j++) {
+                          if(links[j].includes(paths[i])){
+                            if(!subPagesToTest.includes(links[j])){
+                              console.log(url)
+                              subPagesToTest.push(links[j])
+                              if (i == 4){
+                                line += `${links[j]}Ahmad${page_name}` 
+                              }else{
+                                line += `${links[j]}Ahmad${page_name}` + " "
+                              }
+                              break;
+                            }
+                          }
+                        }
+                      }
+                      line += "\n"
+                    }
+                    fs.writeFileSync(`./tests/subpages.txt`, line)
+                  }
+
                 }catch(err){
                   console.log(err)
                 }
                 
-                //console.log("GGGGGGGGGGGGGGGGGGGGGGGGGGGG")
-                //console.log(links)
-                //urls.push(lk)
-                for(var u of links) {
-                  if(u.includes("://")){
-                    const url = new URL(u);
-                    if( !paths.includes(url.pathname) ) {
-                      paths.push(url.pathname);
-                    }
-                  }
-                  
-                  //console.log(u)
-                  //console.log(url.pathname)
-                }
-                
-                if(paths.length <= 4) {
-                  console.log("OR HIERRRRRRRRRRRRRRRRRRRRRRRRR")
-                  let counter = 0;
-
-                  for(let i = 0; i < paths.length ; i++) {
-                    for(let j = 0; j < links.length; j++) {
-                      if(links[j].includes(paths[i])){
-                        if(!subPagesToTest.includes(links[j])){
-                          subPagesToTest.push(links[j])
-                          if (i == paths.length - 1){
-                            line += `${links[j]}Ahmad${page_name}`
-                          }else{
-                            line += `${links[j]}Ahmad${page_name}` + " "
-                          }
-                          break;
-                        }
-                      } 
-                    }
-                  }
-                  line += "\n"
-                }else {
-                  console.log("HIER HIIIIIIIIIEEEEEEEEEEEEEER!!!!")
-                  let used_paths = new Array()
-                  for(let i = 0; i < 5 ; i++) {
-                    for(let j = 0; j < links.length; j++) {
-                      if(links[j].includes(paths[i])){
-                        if(!subPagesToTest.includes(links[j])){
-                          console.log(url)
-                          subPagesToTest.push(links[j])
-                          if (i == 4){
-                            line += `${links[j]}Ahmad${page_name}` 
-                          }else{
-                            line += `${links[j]}Ahmad${page_name}` + " "
-                          }
-                          break;
-                        }
-                      }
-                    }
-                  }
-                  line += "\n"
-                }
-                fs.writeFileSync(`./tests/subpages.txt`, line)
+               
               } 
             }	
           }
