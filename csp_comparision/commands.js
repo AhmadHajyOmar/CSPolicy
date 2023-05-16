@@ -26,31 +26,31 @@ while(1){
 }
 
 
-exec(`node ./run.js website_1.txt all ${browser} ${accLanguage} lat${latitude} lon${longitude}`, (error, stdout, stderr) => {
+exec(`node ./run.js website_1.txt all ${browser} ${accLanguage} lat${latitude} lon${longitude}`,{maxBuffer: undefined}, (error, stdout, stderr) => {
     if (error) {
         console.error(error)
         return;
     }
     console.log(stdout)
-    exec('node ./tests/example.spec.js h', (error, stdout, stderr) => {
+    exec('node ./tests/example.spec.js h',{maxBuffer: undefined}, (error, stdout, stderr) => {
         if (error) {
             console.error(error)
             return;
         }
         console.log(stdout)
-        exec('node ./tests/example.spec.js s', (error, stdout, stderr) => {
+        exec('node ./tests/example.spec.js s',{maxBuffer: undefined}, (error, stdout, stderr) => {
             if (error) {
                 console.error(error)
                 return;
             }
             console.log(stdout)
-            exec('node ./tests/comp.js alluris', (error, stdout, stderr) => {
+            exec('node ./tests/comp.js alluris',{maxBuffer: undefined}, (error, stdout, stderr) => {
                 if (error) {
                     console.error(error)
                     return;
                 }
                 console.log(stdout)
-                exec('node ./tests/checkNonce.js', (error, stdout, stderr) => {
+                exec('node ./tests/checkNonce.js',{maxBuffer: undefined}, (error, stdout, stderr) => {
                     if (error) {
                         console.error(error)
                         return;

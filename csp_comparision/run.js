@@ -71,6 +71,7 @@ for(var fileName of fileNames) {
     }
     if(fileName === 'c' || fileName === 'C') {
         usedBrowserToTest.push("Chrome")
+        usedBrowserToTest.push("Edge")
     }
     if(fileName === 'w' || fileName === 'W') {
         usedBrowserToTest.push("WebKit")
@@ -82,6 +83,7 @@ for(var fileName of fileNames) {
     }
     if(fileName === 'cw' || fileName === 'Cw' || fileName === 'CW' || fileName === 'cW' || fileName === 'wc' || fileName === ' wC' || fileName === 'WC' || fileName === 'Wc') {
         usedBrowserToTest.push("Chrome")
+        usedBrowserToTest.push("Edge")
         usedBrowserToTest.push("WebKit")
         usedBrowserToTest.push("Mobile Safari")
         usedBrowserToTest.push("Safari")
@@ -94,11 +96,13 @@ for(var fileName of fileNames) {
     }
     if(fileName === 'cf' || fileName === 'Cf' || fileName === 'CF' || fileName === 'cF' || fileName === 'fc' || fileName === 'fC' || fileName === 'FC' || fileName === 'Fc') {
         usedBrowserToTest.push("Chrome")
+        usedBrowserToTest.push("Edge")
         usedBrowserToTest.push("Firefox")
 
     }
     if(fileName === 'b' || fileName === 'B') {
         usedBrowserToTest.push("Chrome")
+        usedBrowserToTest.push("Edge")
         usedBrowserToTest.push("WebKit")
         usedBrowserToTest.push("Mobile Safari")
         usedBrowserToTest.push("Safari")

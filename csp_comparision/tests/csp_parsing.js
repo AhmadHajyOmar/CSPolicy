@@ -32,7 +32,7 @@ function cspParser(headers) {
 
 function ignoreDuplikateDirectives(directives, dierctive){
 	let arr = directives.split(";")
-	console.log(arr)
+	//console.log(arr)
 	let i = 0;
 	let index = 0;
 	for(let j = 0; j < arr.length; j++){
@@ -277,7 +277,7 @@ function getCSP_Policy(csp, headers, headers_arr) {
 							}
 							if(x_FrameOptions.length > 0){
 								//x_FrameOptions = x_FrameOptions.substring(1, x_FrameOptions.length)
-								console.log(csp[index][1][0])
+								//console.log(csp[index][1][0])
 								x_FrameOptions = " " + x_FrameOptions;
 								csp[index][1][0] = csp[index][1][0] + x_FrameOptions
 							}

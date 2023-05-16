@@ -70,8 +70,16 @@ if (compare_option.length === 0 || compare_option.length > 1 || (compare_option.
 }
 let web = new Array();
 for(var u of uri){
-    u = u.split(".")[0]
-    web.push(u)
+    let i = u.split(".")
+    let page = ""
+    for(let j = 0; j < i.length; j++){
+        if(j!=i.length-1){
+            page += i[j]+"-"
+        }else{
+            page += i[j]
+        }
+    }
+    web.push(page)
 }
 /*jsonsInDir.forEach(filename => {
     if(filename.includes("csp")){
@@ -665,11 +673,19 @@ if(permission) {
     }
      
     for(let u of uri){
-        u = u.split(".")[0]
         if(!fs.existsSync(resultFolder2)){
             fs.mkdirSync(path.join("./", resultFolder2));
         }
-        compareHomeWithSunpages(u, resultFolder, resultFolder2)
+        let i = u.split(".")
+        let page = ""
+        for(let j = 0; j < i.length; j++){
+            if(j!=i.length-1){
+                page += i[j]+"-"
+            }else{
+                page += i[j]
+            }
+        }   
+        compareHomeWithSunpages(page, resultFolder, resultFolder2)
     }
    
      
@@ -1525,7 +1541,7 @@ function delete_StrSy(str, character) {
 }
 
 
-
+//jhjh
 
 
 
