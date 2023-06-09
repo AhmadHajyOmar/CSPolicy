@@ -45,7 +45,7 @@ const input = fs.readFileSync("./tests/urls", 'utf-8')
 const urls = input.split(/\r?\n/);
 urls.pop()
 urls.pop()
-console.log(urls)
+//console.log(urls)
 const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
 var acceptLanguage = op[op.length-1]
 op.pop();
@@ -124,18 +124,41 @@ const run_option = process.argv.splice(2);
 //console.log(run_option.length);
 //console.log(run_option);
 //console.log(subPages);
+let pages = new Array()
+for(var t of urls){
+  let page = "";
+  let hp = t.split(".")
+  for(let i = 0; i < hp.length; i++){
+    if(i != hp.length-1){
+      page += hp[i]+"-"
+    }else{
+      page += hp[i]
 
+    }
+  }
+  pages.push(page)
+}
 if (fs.existsSync(`./tests/subpages.txt`)){
   var subPagesAll = fs.readFileSync(`./tests/subpages.txt`, 'utf-8').split(/\r?\n/);
+  console.log(subPagesAll)
+  console.log(subPagesAll.length)
   let pagesUN = new Array();
   //subPagesAll.pop();
   for(let i = 0; i < subPagesAll.length; i++) {
     if(/\s/. test(subPagesAll[i])){
       let p = subPagesAll[i].split(/\s/)[0].split(".")
       let page = p[p.length-1].split("Ahmad")[1]
-      pagesUN.push(page)
+      if(pages.includes(page)){
+        pagesUN.push(page)
+      }
     }
   }
+  console.log(pagesUN)
+  console.log(pagesUN.length)
+  console.log(pages)
+  console.log(pages.length)
+  console.log(urls)
+  console.log(urls.length)
   //console.log("UUUUUUUUUUUUUUUUUUUUUUUUUU")
   //console.log(pagesUN)
   for(let pun of pagesUN){
@@ -172,7 +195,7 @@ switch(run_option.length) {
         const index_2 = new Array();
         let subpages_Shuffel = new Array();
         let allSubPages = new Array();
-        console.log(subPages)
+        //console.log(subPages)
         for(let n = 0; n < subPages.length; n++){
           homePageDB.push([subPages[n], 1])
           for(let m = 0; m < subPages[n].length; m++){
@@ -223,6 +246,7 @@ switch(run_option.length) {
         }*/
         //console.log(homePageDB)
         //console.log(subpages_Shuffel)
+        //console.log(subpages_Shuffel.length)
         run(subpages_Shuffel, false, false);
       }
     }
@@ -529,7 +553,7 @@ function run(urls, searchSubPages, requestedFailed) {
           }); 
           
           try{
-            await page.goto(url, { waitUntil: "load"}, {timeout: 30000});
+            await page.goto(url, { waitUntil: "load"});
           }catch (e) {
             //console.log(e);
             ``
@@ -791,52 +815,4 @@ function getUA(devNames) {
 
 
 
- /*if(requestedFailed){
-            await page.on("requestfailed", async (response) => {
-              //console.log(model_name)
-              //console.log(page_name)
-              //console.log("requestfailed");
-              //console.log(page_name)
-              notReachableWebsites += `${model_name}_${broserName}_${browserversion}_${userAgentInfo.os.name}_${dev.viewport.height}_${dev.viewport.width}_${userAgentInfo.os.version}_${page_name}`+"\n"
-              });
-              try{
-                await page.goto(url);
-              }catch (e) {
-                //console.log(e);
-              }
-    
-          }else{
-            
-          }*/
-
-          /*if(failed){
-              fs.unlinkSync(`./tests/${page_name}_${model_name}`);
-              
-              fs.writeFileSync("./tests/notReachableLinks.txt", notReachableLinks)
-            }*/
-            /*const metaDescription = page.locator('meta[name="description"]');
-            console.log(metaDescription)
-            const gh = locator.getAttribute("http-equiv");
-            console.log(gh)
-            //await expect(metaDescription).toHaveAttribute('content', 'something')
-            
-            /*
-            const descriptionTag = await page.$('meta[name="description"]');
-            const description = await descriptionTag?.getAttribute('content');
-      
-            console.log(description)*/
-                                    /*console.log(links[j])
-                        console.log(paths[i])
-                        const resultStrComp = paths[i].localeCompare(new URL(links[j]).pathname, undefined, { sensitivity: 'base' });
-                        if(resultStrComp == 0 && !subPagesToTest.includes(links[j])){
-                          if(links[j].includes(url.substring(12,links[j].length-1).split(".")[0])){
-                            subPagesToTest.push(links[j])
-                            if (i == 3){
-                              line += links[j] 
-                            }else{
-                              line += links[j] + " "
-                            }
-                          }
-                          break;
-                        } */
-                        
+ 

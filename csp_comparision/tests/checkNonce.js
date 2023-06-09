@@ -13,6 +13,8 @@ const { isContext, createContext } = require('vm');
 const { NOTFOUND } = require('dns');
 const { join } = require('path');
 const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
+const geo = fs.readFileSync("./tests/geo", 'utf-8').split(/\r?\n/);
+
 var acceptLanguage = op[op.length-1]
 op.pop();
 const usedBrowserToTest = fs.readFileSync("./tests/browserToTest", 'utf-8').split(/\r?\n/);
@@ -172,12 +174,25 @@ function run() {
             let uriPageName = e[1][8][1];
             let page_name = e[0]
             console.log("wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
+            console.log(page_name)
             console.log(devName)
-        
+            
+
             let dev = devices[devName];
+            //console.log(dev)
+            //console.log(vHeight)
+            //console.log(dev.viewport.height)
+            if(parseInt(dev.viewport.height)  != vHeight){
+                dev = devices[`${devName} landscape`]
+                //let devtry = devices["Galaxy S5 landscape"]
+                //console.log(devtry)
+            }
+            //console.log(vHeight)
+            //console.log(dev.viewport.height)
+        
             let bro;
             if(browserName === "Chrome"){
-                console.log("LLLLLLLLLLLLLLLLLLL")
+                //console.log("LLLLLLLLLLLLLLLLLLL")
                 bro = await playwright.chromium.launch({ headless: true, timeout: 30 * 100000});
             }
             if(browserName === "WebKit"){
@@ -194,7 +209,7 @@ function run() {
             let context = await bro.newContext({
                 ...dev,
                 premissions: ['geolocation'],
-                geolocation: {latitude: 19.432608, longitude: -99.133209},
+                geolocation: {latitude: parseFloat(geo[0]), longitude: parseFloat(geo[1])},
                 locale: 'de-DE',
                 ignoreHTTPSErrors: true
             });
@@ -221,7 +236,7 @@ function run() {
                             json['operating system version'] = operSysVersion
                             json['page name'] = uriPageName
                             json['duplicate nonce value'] = nonceStr
-                            console.log("KKKKKKKKKKKKKKKKK")
+                            //console.log("KKKKKKKKKKKKKKKKK")
                            
                             fs.writeFileSync(`${resultFolder2}/${fileName}_nonceDuplicated.json`, JSON.stringify(json))
                         
@@ -232,8 +247,11 @@ function run() {
                 }    
             
             });          
-                    
-            await page.goto(uriPageName, { waitUntil: "load", timeout: 600000 });
+            try{
+                await page.goto(uriPageName, { waitUntil: "load"});
+            }catch(err){
+                console.log(err)
+            }        
             await context.close();
             await bro.close();
             //waitingTime(2000)
@@ -243,9 +261,9 @@ function run() {
                 check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName, page_name);
             } */   
         }
+        console.log("JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ")
     })();
 
-    
 }
 
 
@@ -314,11 +332,13 @@ function check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, 
             }    
            
         });          
-                   
-        await page.goto(uriPageName, { waitUntil: "load", timeout: 600000 });
+        try{
+            await page.goto(uriPageName, { waitUntil: "load"});
+        }catch(err){
+            console.log(err)
+        }      
         await context.close();
         await bro.close();
-        waitingTime(2000)
     })();
 }
 

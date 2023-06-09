@@ -56,6 +56,13 @@ exec(`node ./run.js website_1.txt all ${browser} ${accLanguage} lat${latitude} l
                         return;
                     }
                     console.log(stdout)
+                    exec('node ./tests/HSNonceResult.js',{maxBuffer: undefined}, (error, stdout, stderr) => {
+                        if (error) {
+                            console.error(error)
+                            return;
+                        }
+                        console.log(stdout)
+                    });
                 });
             });
         });

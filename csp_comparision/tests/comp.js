@@ -13,6 +13,7 @@ const path = require('path');
 const { isContext, createContext } = require('vm');
 const { NOTFOUND } = require('dns');
 const { join } = require('path');
+const { url } = require('inspector');
 // change
 const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
 var acceptLanguage = op[op.length-1]
@@ -31,9 +32,34 @@ dir += "-(" + usedBrowserToTest[0]+")"
 var folder = `./cspHeaders-${acceptLanguage}-${dir}`
 var folder2 = `./compare-${acceptLanguage}-${dir}`
 var folder3 = `./nonceValue-${acceptLanguage}-${dir}`
-var resultFolder = `./comparePagesWithDevices-${acceptLanguage}-${dir}`
-var resultFolder2 = `./compareHomeWithSubpages-${acceptLanguage}-${dir}`
+var resultFolderMobile = `./comparePagesWithDevices(Mobile)-${acceptLanguage}-${dir}`
+var resultFolderDesktop = `./comparePagesWithDevice(Desktop)s-${acceptLanguage}-${dir}`
+var resultFolder2Desktop = `./compareHomeWithSubpages(Desktop)-${acceptLanguage}-${dir}`
+var resultFolder2Mobile = `./compareHomeWithSubpages(Mobile)-${acceptLanguage}-${dir}`
 var resultFolderViewPort = `./compareViewPortDevices-${acceptLanguage}-${dir}`
+var finalResult = `./final_Result-${acceptLanguage}-${dir}`
+let numberOfPagesDViewPSafeCSP = 0;
+let numberOfPagesDViewPNotSafeCSP = 0;
+let numberOfPagesDViewPSafeAndNotSafeCSP = 0;
+let pagesDViewPSafeCSP = new Array();
+let pagesDViewPNotSafeCSP = new Array();
+let pagesDViewPSafeAndNotSafeCSP = new Array();
+let pagesDViewPSafeAndNotSafeCSPWithDevicesInfo = new Array();
+
+let numberOfPagesWithSafeCSPWithAllUserAgent = 0;
+let numberOfPagesWithNotSafeCSPWithAllUserAgent = 0;
+let numberOfPagesWithSafeAndNotSafeCSPWithAllUserAgent = 0;
+let pagesWithSafeCSPWithAllUserAgent = new Array();
+let pagesWithNotSafeCSPWithAlluserAgent = new Array();
+let pagesWithSafeAndNotCSPWithAllUserAgent = new Array();
+
+
+let numberOfHomeSubpagesWithSafeCSPForAllUserAgent = 0
+let numberOfHomeSubpagesWithNotSafeCSPForAllUserAgent = 0
+let numberOfHomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent = 0
+let HomeSubpagesWithSafeCSPForAllUserAgent = new Array()
+let HomeSubpagesWithNotSafeCSPForAllUserAgent = new Array()
+let HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent = new Array();
 
 const jsonsInDir =  fs.readdirSync(folder);
 //console.log(`./cspHeaders-${acceptLanguage}-${dir}`)
@@ -90,6 +116,7 @@ let websites = new Array();
 let check;
 let devUA = new Array()
 let devArr = new Array()
+let allDev = new Array();
 if(permission) {
     let allDeveices = new Array();
     let allBrowsers = new Array();
@@ -294,7 +321,7 @@ if(permission) {
                         // check if the csp is safe or unsafe
                         
                         let source = new Array();
-                        let directive = "csp dose not contain script-srcc or default-src";
+                        let directive = "csp dose not contain script-src or default-src";
                         let flage = false;
                         let script_elem_falge = false;
                         let script_flage = false;
@@ -434,13 +461,13 @@ if(permission) {
                         
                         //console.log("DDDDDDDDDDEEEEEEETTTTTTTTAAAAAAILLLLLLLLLLSSSSS")
                         //console.log(details)
-                        csp_safe.push([["device model", details[0]],["browser name", details[1]],["browser version", details[2]],["os", details[3]],["viewport-height", details[4]],["viewport-width", details[5]], ["origins", source], ["safe csp", safe_flage], ["directive to check", directive], ["script-src", script_flage], ["default-src", default_flage], ["'unsafe-inline'", inline_flage], ["'unsafe-eval'", eval_flage], ["nonce", nonce_flage], ["hash", hash_flage], ["strict-dynamic", strictD_flage], ["wildcard*", wildcard_flage], ["protocol", protocol_flage], ["data", data_flage], ["sts_max_age", max_age_sts], ["sts_max_age_year_protection", max_age_YearValue] , ["sts_includeSD", insub_sts], ["sts_preload", preload_sts], ["hsts classe", hsts_classe], ["protection level against sll stripping", level_of_protection_against_SSL_Stripping], ["protection against clickjacking provided by", protectionClickJacking_value_Class[0]], ["protection-level against clickjacking", protectionClickJacking_value_Class[1]], ["protection against hijacking", protection_against_hijacking], ["protection against csrf", protection_against_csrf_flage], ["protection level against csrf", protection_against_csrf], ["protection against steeling cookies", httponly_flage], ["visited_Webpage", uriPageName]])
+                        csp_safe.push([["device model", details[0]],["browser name", details[1]],["browser version", details[2]],["os", details[3]],["viewport-height", details[4]],["viewport-width", details[5]], ["origins", source], ["safe csp", safe_flage], ["directive to check", directive], ["script-src", script_flage], ["default-src", default_flage], ["'unsafe-inline'", inline_flage], ["'unsafe-eval'", eval_flage], ["nonce", nonce_flage], ["hash", hash_flage], ["strict-dynamic", strictD_flage], ["wildcard*", wildcard_flage], ["protocol", protocol_flage], ["dataURL", data_flage], ["sts_max_age", max_age_sts], ["sts_max_age_year_protection", max_age_YearValue] , ["sts_includeSD", insub_sts], ["sts_preload", preload_sts], ["hsts classe", hsts_classe], ["protection level against sll stripping", level_of_protection_against_SSL_Stripping], ["protection against clickjacking provided by", protectionClickJacking_value_Class[0]], ["protection-level against clickjacking", protectionClickJacking_value_Class[1]], ["protection against hijacking", protection_against_hijacking], ["protection against csrf", protection_against_csrf_flage], ["protection level against csrf", protection_against_csrf], ["protection against steeling cookies", httponly_flage], ["visited_Webpage", uriPageName]])
                         let fileName = `csp_${details[0]}_${details[1]}_${details[2]}_${details[3]}_${details[4]}_${details[5]}_${page_name}.json`
                         
                         //console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
                         //console.log(details)
                         let json = {};
-                        let arr_comp = [["device model", details[0]],["browser name", details[1]],["browser version", details[2]],["os", details[3]],["viewport-height", details[4]],["viewport-width", details[5]], ["origins", source], ["safe csp", safe_flage], ["directive to check", directive], ["script-src", script_flage], ["default-src", default_flage], ["'unsafe-inline'", inline_flage], ["'unsafe-eval'", eval_flage], ["nonce", nonce_flage], ["hash", hash_flage], ["strict-dynamic", strictD_flage], ["wildcard*", wildcard_flage], ["protocol", protocol_flage], ["data", data_flage], ["sts_max_age", max_age_sts], ["sts_max_age_year_protection", max_age_YearValue] , ["sts_includeSD", insub_sts], ["sts_preload", preload_sts], ["hsts classe", hsts_classe], ["protection level against sll stripping", level_of_protection_against_SSL_Stripping], ["protection against clickjacking provided by", protectionClickJacking_value_Class[0]], ["protection-level against clickjacking", protectionClickJacking_value_Class[1]], ["protection against hijacking", protection_against_hijacking], ["protection against csrf", protection_against_csrf_flage], ["protection level against csrf", protection_against_csrf], ["protection against steeling cookies", httponly_flage], ["visited_Webpage", uriPageName]]
+                        let arr_comp = [["device model", details[0]],["browser name", details[1]],["browser version", details[2]],["os", details[3]],["viewport-height", details[4]],["viewport-width", details[5]], ["origins", source], ["safe csp", safe_flage], ["directive to check", directive], ["script-src", script_flage], ["default-src", default_flage], ["'unsafe-inline'", inline_flage], ["'unsafe-eval'", eval_flage], ["nonce", nonce_flage], ["hash", hash_flage], ["strict-dynamic", strictD_flage], ["wildcard*", wildcard_flage], ["protocol", protocol_flage], ["dataURL", data_flage], ["sts_max_age", max_age_sts], ["sts_max_age_year_protection", max_age_YearValue] , ["sts_includeSD", insub_sts], ["sts_preload", preload_sts], ["hsts classe", hsts_classe], ["protection level against sll stripping", level_of_protection_against_SSL_Stripping], ["protection against clickjacking provided by", protectionClickJacking_value_Class[0]], ["protection-level against clickjacking", protectionClickJacking_value_Class[1]], ["protection against hijacking", protection_against_hijacking], ["protection against csrf", protection_against_csrf_flage], ["protection level against csrf", protection_against_csrf], ["protection against steeling cookies", httponly_flage], ["visited_Webpage", uriPageName]]
                         for(let j = 0; j < arr_comp.length; j++) {
                             let key = arr_comp[j][0]
                             let value = arr_comp[j][1];
@@ -460,6 +487,9 @@ if(permission) {
                             }
                         }
                         
+                        if(!allDev.includes(`${details[0]}_${details[4]}_${details[5]}`)){
+                            allDev.push(`${details[0]}_${details[4]}_${details[5]}`)
+                        }
                         fs.writeFileSync(`${folder2}/${fileName}`, JSON.stringify(json))
                     }
                     //console.log(csp_policies.length)
@@ -467,181 +497,6 @@ if(permission) {
                    
                 }
                 
-                // *******************************************************************************************************************************************************
-                // Viewport-similarity tests
-               
-
-                /*
-                //console.log("PPPPPPPPPPPPPP")
-                //console.log(viewport_arr)
-                let viewport_arr_ND = new Array();
-                let viewport_arr_VD = new Array();
-                num_dev_viewport = viewport_arr.length;
-                const user_agents_with_different_viewport = viewport_arr => viewport_arr.filter((item, index) => viewport_arr.indexOf(item) !== index)
-                var os_ViewportArr = new Array();
-                if(viewport_arr.length > 1) {
-                    viewport_arr = user_agents_with_different_viewport(viewport_arr);
-                    for(let vd of viewport_arr){
-                        if(!viewport_arr_ND.includes(vd)){
-                            viewport_arr_ND.push(vd)
-                        }
-                    }
-                } else {
-                    viewport_arr.pop();
-                }
-                //console.log("LLLLLLLLLLLLLLLLLLLLLLLL")
-                //console.log(viewport_arr_ND)
-                let browsers = new Array();
-                for(let i = 0; i < csp_safe.length; i++) {
-                    let browser_Name = csp_safe[i][1][1];
-                    if(!browsers.includes(browser_Name)){
-                        browsers.push(browser_Name)
-                    }
-                }
-                
-                for(let j = 0; j < viewport_arr_ND.length; j++) {
-                    for(let i = 0; i < csp_safe.length; i++) {
-                        if(csp_safe[i][0][1] === viewport_arr_ND[j]){
-                            if(!viewport_arr_VD.includes(`${viewport_arr_ND[j]}_${csp_safe[i][1][1]}_${csp_safe[i][2][1]}_${csp_safe[i][3][1]}_${csp_safe[i][4][1]}_${csp_safe[i][5][1]}_${page_name}`)){
-                                viewport_arr_VD.push(`${viewport_arr_ND[j]}_${csp_safe[i][1][1]}_${csp_safe[i][2][1]}_${csp_safe[i][3][1]}_${csp_safe[i][4][1]}_${csp_safe[i][5][1]}_${page_name}`)
-                            }
-                        }
-                    }
-                }
-    
-                //console.log(viewport_arr_VD)
-    
-                let viewport_arr_ = new Array();
-                
-                if(viewport_arr_VD.length > 1) {
-                    
-                    for (let i = 0; i < browsers.length; i++) {
-                        let viewport_comp = new Array();
-                        for(let j = 0; j < viewport_arr_VD.length; j++) {                           
-                            if (viewport_arr_VD[j].includes(browsers[i])) {
-                                viewport_comp.push(csp_safe[j])
-                            }
-                            //console.log(viewport_comp)
-                        }
-                        
-                        //console.log("------------------------------------------------------------")
-                        //console.log(viewport_comp)
-                
-                        let index_vc = 0;
-                        while(index_vc < viewport_comp.length){
-                            let same_attributes_values = 0;
-                            let same_attributes_values_flage = false;
-                            let safe = false;
-                            let arr__1 = viewport_comp[index_vc];
-                            let arr__2 = viewport_comp[index_vc + 1];
-    
-                            let dev_1_2_safe_csp = false;
-                            //console.log("JJJJJJJJJJJJJJJJJJJ")
-                            //console.log(arr__1)
-                            //console.log(arr__2)
-                            if(arr__1[7][1] === arr__2[7][1]){
-                                dev_1_2_safe_csp = true
-                            }
-    
-                            if(arr__1[7][1] === arr__2[7][1]) {
-                                same_attributes_values_flage = true;
-                            }
-                            
-                            for(let n = 7; n < arr__1.length; n++) {
-                                if(arr__2[n][1] === arr__1[n][1] ) {                               
-                                    //console.log(arr__2[n][1])
-                                    same_attributes_values++;
-                                }
-                            }
-                    
-                            let v_comp = new Array();
-                            let dev_mod = arr__1[0][1];
-                            //console.log("t4all")
-                            //console.log(same_attributes_values)
-                            let browser_name;
-                            let browser_version;
-                            if (same_attributes_values === 25) {
-                                
-                                //let dev_mod = arr__1[0][1];
-    
-                                v_comp.push(['the model of the two devices is', dev_mod])
-                                browser_name = arr__1[1][1];
-                                v_comp.push(["the used browser an the two devices is", browser_name])
-                                browser_version = arr__1[2][1];
-                                v_comp.push(["the used browser-version an the tow devices is", browser_version])
-                                let operating_system = arr__1[3][1];
-                                v_comp.push(["the operating system of the two devices is", operating_system])
-                                let arr_v = {"device_1": `height-${arr__1[4][1]} width-${arr__1[5][1]}`, "device_2": `height-${arr__2[4][1]} width-${arr__2[5][1]}`}
-                                v_comp.push(["the heights and widths of the tow devices are", arr_v])
-                                let safe_csp = arr__1[7][1]
-                                v_comp.push(["both of the tow devices get a safe csp", safe_csp])
-                                v_comp.push(["both of the tow devices get the same csp attributes", true])
-    
-                                //let sllstrpping = arr__1[7][1]
-                                //v_comp.push(["both of the two devices get a safe csp", safe_csp])
-    
-                                if(!os_ViewportArr.includes(operating_system)) {
-                                    os_ViewportArr.push(operating_system)
-                                }
-    
-                                viewport_res.push(dev_mod, dev_mod)
-                                
-                                //console.log(viewport_res)
-                    
-                            } else {
-                                v_comp.push(['the model of the two devices is', dev_mod])
-                                browser_name = arr__1[1][1];
-                                v_comp.push(["the used browser an the two devices is", browser_name])
-                                browser_version = arr__1[2][1];
-                                v_comp.push(["the used browser-version an the tow devices is", browser_version])
-                                let operating_system = arr__1[3][1];
-                                v_comp.push(["the operating system of the two devices is", operating_system])
-                                let arr_v = {"device_1": `height-${arr__1[4][1]} width-${arr__1[5][1]}`, "device_2": `height-${arr__2[4][1]} width-${arr__2[5][1]}`}
-                                v_comp.push(["the heights and widths of the tow devices are", arr_v])
-                                if(dev_1_2_safe_csp){
-                                    v_comp.push(["both of the tow devices get a safe csp", dev_1_2_safe_csp])
-                                } else {
-                                    v_comp.push(["both of the tow devices get a safe csp", dev_1_2_safe_csp])
-                                    v_comp.push(["dev 1 get a safe csp", arr__1[7][1]])
-                                    v_comp.push(["dev 1 get a safe csp", arr__2[7][1]])
-                                }
-                                v_comp.push(["both of the tow devices get the same csp attributes", false])
-    
-                            }
-                    
-                            let fileName_viewport = `${dev_mod}_${browser_name}_${browser_version}_${page_name}.json` 
-                            //console.log(fileName_viewport)
-                                let json_viewport = {};
-                                for (let v = 0; v < v_comp.length; v++) {
-                                    let key = v_comp[v][0];
-                                    let value = v_comp[v][1];
-                                    json_viewport[key] = value;
-                                }
-                            fs.writeFileSync(`./viewport_comp/${fileName_viewport}`, JSON.stringify(json_viewport))
-                            index_vc = index_vc + 2
-                        }    
-                    }
-    
-                    if(num_dev_viewport === viewport_res.length) {
-                        let json_viewport_result = {};
-                        json_viewport_result["Devices with two differents viewport"] = viewport_arr_ND
-                        json_viewport_result["each of the devices with two differents viewport provide the same csp-saftey level "] = true
-                        json_viewport_result["number of total devices"] = viewport_arr.length + 1
-                        json_viewport_result["number of devices that provide the same csp-safty level "] = viewport_res.length
-                        json_viewport_result["number of devices that dose not provide the same csp-safty level "] = num_dev_viewport - viewport_res.length
-                        json_viewport_result["operating system "] = os_ViewportArr
-                        fs.writeFileSync(`./viewport_comp/compResultViewport_${osystem}_${page_name}.json`, JSON.stringify(json_viewport_result))    
-                    } else {
-                        let json_viewport_result = {};
-                        json_viewport_result["Devices with two differents viewport"] = viewport_arr_ND
-                        json_viewport_result["each of the following devices with two differents viewport provide the same csp-saftey level "] = false
-                        json_viewport_result["number of devices that provide the same csp-safty level "] = viewport_res.length + 1
-                        json_viewport_result["number of devices that dose not provide the same csp-safty level "] =  num_dev_viewport - viewport_res.length
-                        json_viewport_result["operating system "] = os_ViewportArr
-                        fs.writeFileSync(`./viewport_comp/compResultViewport_${osystem}_${page_name}.json`, JSON.stringify(json_viewport_result))
-                    } 
-                }
-                */
             } 
         }
      
@@ -654,6 +509,87 @@ if(permission) {
     console.log(web)
     console.log(devUA)
     console.log(devArr)
+    console.log(allDev)
+    let mobile = new Array()
+    let desktop = new Array()
+
+    for(var dev of allDev){
+        if(dev.includes("Desktop")){
+            desktop.push(dev)
+        }else{
+            mobile.push(dev)
+        }
+    }
+    if(!fs.existsSync(finalResult)){
+        fs.mkdirSync(path.join("./", finalResult));
+    }
+    //console.log(mobile)
+    //console.log(desktop)
+    for(let u of web){
+        if(!fs.existsSync(resultFolderDesktop)){
+            fs.mkdirSync(path.join("./", resultFolderDesktop));
+        }
+        compareWebsite(u, folder2, resultFolderDesktop, desktop)
+    }
+   
+
+    let jsonPagesDesktop = {}
+    
+    jsonPagesDesktop["number of total pages"] = `${web.length}`
+    jsonPagesDesktop["number of total devices"] = `${desktop.length}`
+    jsonPagesDesktop["number of pages (safe csp with all user agent)"] = `${numberOfPagesWithSafeCSPWithAllUserAgent}`
+    jsonPagesDesktop["pages (safe csp with all user agent)"] = pagesWithSafeCSPWithAllUserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllPagesUsingDesktopBrowsers(safe csp with all user agent).json`, JSON.stringify(jsonPagesDesktop))
+    jsonPagesDesktop = {}
+    jsonPagesDesktop["number of total pages"] = `${web.length}`
+    jsonPagesDesktop["number of total devices"] = `${desktop.length}`
+    jsonPagesDesktop["number of pages (not safe csp with all user agent)"] = `${numberOfPagesWithNotSafeCSPWithAllUserAgent}`
+    jsonPagesDesktop["pages (not safe csp with all user agent)"] = pagesWithNotSafeCSPWithAlluserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllPagesUsingDesktopBrowsers(not safe csp with all user agent).json`, JSON.stringify(jsonPagesDesktop))
+    jsonPagesDesktop = {}
+    jsonPagesDesktop["number of total pages"] = `${web.length}`
+    jsonPagesDesktop["number of total devices"] = `${desktop.length}`
+    jsonPagesDesktop["number of pages (safe and not safe csp with all user agent)"] = `${numberOfPagesWithSafeAndNotSafeCSPWithAllUserAgent}`
+    jsonPagesDesktop["pages (safe and not safe csp with all user agent)"] = pagesWithSafeAndNotCSPWithAllUserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllPagesUsingDesktopBrowsers(safe and not safe csp with all user agent).json`, JSON.stringify(jsonPagesDesktop))
+
+
+    numberOfPagesWithSafeCSPWithAllUserAgent = 0;
+    numberOfPagesWithNotSafeCSPWithAllUserAgent = 0;
+    numberOfPagesWithSafeAndNotSafeCSPWithAllUserAgent = 0;
+    pagesWithSafeCSPWithAllUserAgent = new Array();
+    pagesWithNotSafeCSPWithAlluserAgent = new Array();
+    pagesWithSafeAndNotCSPWithAllUserAgent = new Array();
+
+    for(let u of web){
+        if(!fs.existsSync(resultFolderMobile)){
+            fs.mkdirSync(path.join("./", resultFolderMobile));
+        }
+        compareWebsite(u, folder2, resultFolderMobile, mobile)
+    }
+
+    
+   
+
+    let jsonPagesMobile = {}
+    jsonPagesMobile["number of total pages"] = `${web.length}`
+    jsonPagesMobile["number of total devices"] = `${mobile.length}`
+    jsonPagesMobile["number of pages (safe csp with all user agent)"] = `${numberOfPagesWithSafeCSPWithAllUserAgent}`
+    jsonPagesMobile["pages (safe csp with all user agent)"] = pagesWithSafeCSPWithAllUserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllPagesUsingMobileBrowsers(safe csp with all user agent).json`, JSON.stringify(jsonPagesMobile))
+    jsonPagesMobile = {}
+    jsonPagesMobile["number of total pages"] = `${web.length}`
+    jsonPagesMobile["number of total devices"] = `${mobile.length}`
+    jsonPagesMobile["number of pages (not safe csp with all user agent)"] = `${numberOfPagesWithNotSafeCSPWithAllUserAgent}`
+    jsonPagesMobile["pages (not safe csp with all user agent)"] = pagesWithNotSafeCSPWithAlluserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllPagesUsingMobileBrowsers(not safe csp with all user agent).json`, JSON.stringify(jsonPagesMobile))
+    jsonPagesMobile = {}
+    jsonPagesMobile["number of total pages"] = `${web.length}`
+    jsonPagesMobile["number of total devices"] = `${mobile.length}`
+    jsonPagesMobile["number of pages (safe and not safe csp with all user agent)"] = `${numberOfPagesWithSafeAndNotSafeCSPWithAllUserAgent}`
+    jsonPagesMobile["pages (safe and not safe csp with all user agent)"] = pagesWithSafeAndNotCSPWithAllUserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllPagesUsingMobileBrowsers(safe and not safe csp with all user agent).json`, JSON.stringify(jsonPagesMobile))
+
     for(var u of web){
         //console.log(u)
         if(!fs.existsSync(resultFolderViewPort)){
@@ -661,21 +597,29 @@ if(permission) {
         }
         compareViewport(u, folder2, resultFolderViewPort)
     }
-   
-    for(let u of web){
 
-        if(!fs.existsSync(resultFolder)){
-            fs.mkdirSync(path.join("./", resultFolder));
-        }
-    
-        compareWebsite(u, folder2, resultFolder)
-        
-    }
+    let jsonFV = {}
+    jsonFV["number of total pages"] = `${web.length}`
+    jsonFV["total devices (each device with 2 different viewport)"] = devArr
+    jsonFV["number of pages (all safe csp with diff view port)"] = `${numberOfPagesDViewPSafeCSP}`
+    jsonFV["pages (safe csp with diff view port)"] = pagesDViewPSafeCSP
+    fs.writeFileSync(`./${finalResult}/ViewPort(all safe csp with diff view port).json`, JSON.stringify(jsonFV))
+    jsonFV = {}
+    jsonFV["number of total pages"] = `${web.length}`
+    jsonFV["total devices (each device with 2 different viewport)"] = devArr
+    jsonFV["number of pages (all not safe csp with diff view port)"] = `${numberOfPagesDViewPNotSafeCSP}`
+    jsonFV["pages (all not safe csp with diff view port)"] = pagesDViewPNotSafeCSP
+    fs.writeFileSync(`./${finalResult}/ViewPort(all not safe csp with diff view port).json`, JSON.stringify(jsonFV))
+    jsonFV = {}
+    jsonFV["number of total pages"] = `${web.length}`
+    jsonFV["total devices (each device with 2 different viewport)"] = devArr
+    jsonFV["number of pages (safe csp and not safe csp with diff view port)"] = `${numberOfPagesDViewPSafeAndNotSafeCSP}`
+    jsonFV["pages (safe csp and not safe csp with diff view port)"] = pagesDViewPSafeAndNotSafeCSPWithDevicesInfo
+  
+    fs.writeFileSync(`./${finalResult}/ViewPort(safe csp and not safe csp with diff view port).json`, JSON.stringify(jsonFV))
      
+ 
     for(let u of uri){
-        if(!fs.existsSync(resultFolder2)){
-            fs.mkdirSync(path.join("./", resultFolder2));
-        }
         let i = u.split(".")
         let page = ""
         for(let j = 0; j < i.length; j++){
@@ -684,15 +628,857 @@ if(permission) {
             }else{
                 page += i[j]
             }
-        }   
-        compareHomeWithSunpages(page, resultFolder, resultFolder2)
+        } 
+        if(!fs.existsSync(resultFolder2Desktop)){
+            fs.mkdirSync(path.join("./", resultFolder2Desktop));
+        }
+       
+        compareHomeWithSubpages(page, resultFolderDesktop, resultFolder2Desktop, desktop)
     }
-   
+    
+    let jsonHomeSubpagesDesktop = {}
+    jsonHomeSubpagesDesktop["number of Home and Subpages(safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithSafeCSPForAllUserAgent}`
+    jsonHomeSubpagesDesktop["Home and Subpages(safe CSP for all user agents)"] = HomeSubpagesWithSafeCSPForAllUserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllHome-SubpagesUsingDesktopBrowsers(safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesDesktop))
+    jsonHomeSubpagesDesktop = {}
+    jsonHomeSubpagesDesktop["number of Home and Subpages(not safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithNotSafeCSPForAllUserAgent}`
+    jsonHomeSubpagesDesktop["Home and Subpages(not safe CSP for all user agents)"] = HomeSubpagesWithNotSafeCSPForAllUserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllHome-SubpagesUsingDesktopBrowsers(not safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesDesktop))
+    jsonHomeSubpagesDesktop = {}
+    jsonHomeSubpagesDesktop["number of Home and Subpages(safe and not safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent}`
+    jsonHomeSubpagesDesktop["Home and Subpages(safe and not safe CSP for all user agents)"] = HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllHome-SubpagesUsingDesktopBrowsers(safe and not safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesDesktop))
+
+
+
+    numberOfHomeSubpagesWithSafeCSPForAllUserAgent = 0
+    numberOfHomeSubpagesWithNotSafeCSPForAllUserAgent = 0
+    numberOfHomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent = 0
+    HomeSubpagesWithSafeCSPForAllUserAgent = new Array()
+    HomeSubpagesWithNotSafeCSPForAllUserAgent = new Array()
+    HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent = new Array();
+
+    for(let u of uri){
+        let i = u.split(".")
+        let page = ""
+        for(let j = 0; j < i.length; j++){
+            if(j!=i.length-1){
+                page += i[j]+"-"
+            }else{
+                page += i[j]
+            }
+        } 
+        if(!fs.existsSync(resultFolder2Mobile)){
+            fs.mkdirSync(path.join("./", resultFolder2Mobile));
+        }
+       
+        compareHomeWithSubpages(page, resultFolderMobile, resultFolder2Mobile, mobile)
+    }
+
+    let jsonHomeSubpagesMobile = {}
+    jsonHomeSubpagesMobile["number of Home and Subpages(safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithSafeCSPForAllUserAgent}`
+    jsonHomeSubpagesMobile["Home and Subpages(safe CSP for all user agents)"] = HomeSubpagesWithSafeCSPForAllUserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllHome-SubpagesUsingMobileBrowsers(safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesMobile))
+    jsonHomeSubpagesMobile = {}
+    jsonHomeSubpagesMobile["number of Home and Subpages(not safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithNotSafeCSPForAllUserAgent}`
+    jsonHomeSubpagesMobile["Home and Subpages(not safe CSP for all user agents)"] = HomeSubpagesWithNotSafeCSPForAllUserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllHome-SubpagesUsingMobileBrowsers(not safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesMobile))
+    jsonHomeSubpagesMobile = {}
+    jsonHomeSubpagesMobile["number of Home and Subpages(safe and not safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent}`
+    jsonHomeSubpagesMobile["Home and Subpages(safe and not safe CSP for all user agents)"] = HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent
+    fs.writeFileSync(`./${finalResult}/compResultAllHome-SubpagesUsingMobileBrowsers(safe and not safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesMobile))
+
      
 }
 
+
+
+function compareHomeWithSubpages(pageName, comparePath, resultPath, devicesList){
+    //console.log(pageName)
+    const  jsonsFiles =  fs.readdirSync(comparePath).filter((filename) => path.extname(filename) === '.json');
+
+    console.log(jsonsFiles)
+    let csp_policies = new Array();
+    jsonsFiles.forEach(filename => {
+        let csp = new Array()
+        if(filename.includes(`${pageName}.json`) || filename.includes(`${pageName}§`)) {
+            //console.log(filename)
+            const fileData = fs.readFileSync(path.join(comparePath, filename));                    
+            const json_arr = JSON.parse(fileData.toString());
+            let json_str = JSON.stringify(json_arr);
+            json_after_split = json_str.substring(1, json_str.length - 1);
+            json_after_split = json_after_split.split(/,"/)
+            //let dev = `${json_after_split[0].split(":")[1].replaceAll("\"","")}_${json_after_split[4].split(":")[1].replaceAll("\"","")}_${json_after_split[5].split(":")[1].replaceAll("\"","")}`
+            //if(devices.includes(dev))
+            csp.push(filename.split(".json")[0].substring(4))
+            filename_debuger = filename
+            let arr_2 = new Array();
+            //console.log(json_after_split)
+            console.log(json_after_split)
+            for (var elem of json_after_split) {
+                let header;
+                let arr_;
+                let header_value;
+                //&& !elem.includes(devUA)
+                console.log(elem)
+                if(elem.includes("total devices:")){
+                    devArr.pushe(2)
+                }
+                if((elem.includes("\":") && !elem.includes("http")) || elem.includes("visited link") || (elem.includes("total devices:"))){
+                    arr_ = elem.split(/":/);
+                    console.log(arr_)
+                    header = arr_[0]
+                    header_value = arr_[1]
+                    header = delete_StrSy(arr_[0], "\"");
+                    header_value = delete_StrSy(arr_[1], "\"")
+                    //header_value = delete_StrSy(header_value, "\\")
+                    arr_2.push([header, header_value])
+                }else{
+                    elem = elem.replaceAll("\"", "")
+                    //console.log(elem)
+                    //console.log(arr_2)
+                    if(elem.endsWith(" ")){
+                        arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] +","+ elem
+                    }else{
+                        arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + ", " + elem
+                    }
+                    //console.log("Watchccccccccccccccccccccccccccccccccc")
+                    //console.log( arr_2[arr_2.length-1][1])
+                }
+            }
+
+            csp.push(arr_2)
+           
+            csp_policies.push(csp)
+            //console.log(csp)
+        }
+
+    });
+    //console.log(pageName)
+    //console.log("PPPPPPPPPPPPPPPPPPPPPPPPPP")
+    //console.log(csp_policies)
+    //console.log(csp_policies.length)
+    let devices = new Array();
+    let homePage_Security = false;
+    let homePage_Security_arr = new Array()
+    let homePage_Security_arr_NotSafe = new Array();
+    let homePage_CSPHeaderisThere = false;
+    let homePage_CSPHeaderisThere_arr = new Array()
+    let homePage_CSPHeaderisThere_arr_NoCSPHeader = new Array()
+    
+    let subPages_Security = 0;
+    let subPages_Security_arr = new Array();
+    let subPages_Security_arr_NotSafe = new Array();
+    let subPages_cspHeader = 0;
+    let subPages_cspHeader_arr = new Array();
+    let subPages_cspHeader_arr_NoCSPHeader = new Array();
+
+    //console.log("JJJJJJJJJJJJJJJJJJJ")
+    //console.log(pageName)
+    console.log(csp_policies[0])
+    let urls = new Array()
+    let numberOfSubPages = csp_policies.length-1
+    for(let i = 0; i < csp_policies.length; i++){
+        console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
+        console.log(csp_policies[i])
+        console.log(csp_policies[i][1][1][1])
+
+        let dev = csp_policies[i][1][1][1];
+        let dev_ = dev.replace("[", "")
+        dev_ = dev_.replace("]", "")
+        let dev_arr = dev_.split(", ")
+        console.log("QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ")
+        console.log(dev_arr)
+        for(var d of dev_arr){
+            let dArr = d.split(" operating")[0]
+            let info = dArr.split(" height:")
+            let devName = info[0]
+            let vp =info[1]
+            console.log(vp)
+            console.log(d)
+            let h = vp.split(" width:")[0]
+            let w = vp.split(" width:")[1]
+            let devDet = devName+"_"+h+"_"+w
+            if(!devices.includes(devDet)){
+                devices.push(devDet)
+            }
+        }
+        if(i === 0){
+            urls.push( csp_policies[i][1][csp_policies[i][1].length-1][1])
+            let homePage_Check = parseInt(csp_policies[0][1][2][1]) 
+            let homePage_cspHeader = parseInt(csp_policies[0][1][14][1])
+            console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
+            console.log(homePage_Check)
+
+            console.log(homePage_cspHeader)
+            if(homePage_Check > 0){
+                homePage_Security = true;
+                let dev = csp_policies[i][1][3][1];
+                let dev_ = dev.replace("[", "")
+                dev_ = dev_.replace("]", "")
+                let dev_arr = dev_.split(", ")
+                for(var d of dev_arr){
+                    let dArr = d.split(" operating")[0]
+                    let info = dArr.split(" height:")
+                    let devName = info[0]
+                    let vp =info[1]
+                    console.log(vp)
+                    let h = vp.split(" width:")[0]
+                    let w = vp.split(" width:")[1]
+                    let devDet = devName+"_"+h+"_"+w
+                    if(!homePage_Security_arr.includes(devDet)){
+                        homePage_Security_arr.push(devDet)
+                    }
+                }
+                for(var d of devices){
+                    if(!homePage_Security_arr.includes(d)){
+                        if(!homePage_Security_arr_NotSafe.includes(d)){
+                            homePage_Security_arr_NotSafe.push(d)
+                        }
+                    }
+                }
+                
+            }else{
+                
+                homePage_Security_arr_NotSafe = devices;
+            }
+            if(homePage_cspHeader > 0){
+                homePage_CSPHeaderisThere = true;
+                let dev = csp_policies[i][1][15][1];
+                let dev_ = dev.replace("[", "")
+                dev_ = dev_.replace("]", "")
+                let dev_arr = dev_.split(", ")
+                for(var d of dev_arr){
+                    let dArr = d.split(" operating")[0]
+                    let info = dArr.split(" height:")
+                    let devName = info[0]
+                    let vp =info[1]
+                    console.log(vp)
+                    let h = vp.split(" width:")[0]
+                    let w = vp.split(" width:")[1]
+                    let devDet = devName+"_"+h+"_"+w
+                    if(!homePage_CSPHeaderisThere_arr.includes(devDet)){
+                        homePage_CSPHeaderisThere_arr.push(devDet)
+                    }
+                }
+                for(var d of devices){
+                    if(!homePage_CSPHeaderisThere_arr.includes(d)){
+                        if(!homePage_CSPHeaderisThere_arr_NoCSPHeader.includes(d)){
+                            homePage_CSPHeaderisThere_arr_NoCSPHeader.push(d)
+                        }
+                    }
+                }
+            }else{
+                homePage_CSPHeaderisThere_arr_NoCSPHeader = devices
+            }
+        }else{
+            //console.log("KKKKKKKKKKKKKKKKKKKKKKKKKK")
+            //console.log(i)
+            //console.log(csp_policies[i])
+            console.log(devices)
+            console.log("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+            console.log(homePage_Security)
+            console.log(homePage_Security_arr)        
+            console.log(homePage_Security_arr_NotSafe)
+            console.log(homePage_CSPHeaderisThere)
+            console.log(homePage_CSPHeaderisThere_arr)
+            console.log(homePage_CSPHeaderisThere_arr_NoCSPHeader)
+            console.log(csp_policies[i])
+            let url = csp_policies[i][1][csp_policies[i][1].length-1][1]
+            urls.push(url)
+            //devArr.pushe(2)
+            //console.log(csp_policies[i][1][2][1])
+            if(parseInt(csp_policies[i][1][2][1]) > 0 && (i > 0)){
+                //console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+                subPages_Security++;
+                let dev = csp_policies[i][1][3][1];
+                let dev_ = dev.replace("[", "")
+                dev_ = dev_.replace("]", "")
+                let dev_arr = dev_.split(", ")
+                for(var d of dev_arr){
+                    let dArr = d.split(" operating")[0]
+                    let info = dArr.split(" height:")
+                    let devName = info[0]
+                    let vp =info[1]
+                    console.log(vp)
+                    let h = vp.split(" width:")[0]
+                    let w = vp.split(" width:")[1]
+                    let devDet = devName+"_"+h+"_"+w
+                    if(!subPages_Security_arr.includes(`${devDet}, url:${url}`)){
+                        subPages_Security_arr.push(`${devDet}, url:${url}`)
+                    }
+                }
+                //console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
+                //console.log(devices)
+                //console.log(subPages_Security_arr)
+                console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
+                console.log(subPages_Security_arr_NotSafe)
+                for(var d of devices){
+                    if(!subPages_Security_arr.includes(`${d}, url:${url}`)){
+                        if(!subPages_Security_arr_NotSafe.includes(`${d}, url:${url}`)){
+                            subPages_Security_arr_NotSafe.push(`${d}, url:${url}`)
+                        }
+                    }
+                }
+                
+
+            }else{
+                for(var d of devices){
+                    subPages_Security_arr_NotSafe.push(`${d}, url:${url}`)
+                }
+            }
+            console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+            console.log(subPages_Security_arr_NotSafe)
+
+
+            if(parseInt(csp_policies[i][1][14][1]) > 0 && (i > 0)){
+                subPages_cspHeader++;
+                
+                let dev = csp_policies[i][1][15][1];
+                let dev_ = dev.replace("[", "")
+                dev_ = dev_.replace("]", "")
+                let dev_arr = dev_.split(", ")
+                for(var d of dev_arr){
+                    let dArr = d.split(" operating")[0]
+                    let info = dArr.split(" height:")
+                    let devName = info[0]
+                    let vp =info[1]
+                    console.log(vp)
+                    let h = vp.split(" width:")[0]
+                    let w = vp.split(" width:")[1]
+                    let devDet = devName+"_"+h+"_"+w
+                    if(!subPages_cspHeader_arr.includes(`${d}, url:${url}`)){
+                        subPages_cspHeader_arr.push(`${d}, url:${url}`)
+                    }
+                }
+                for(var d of devices){
+                    if(!subPages_cspHeader_arr.includes(`${d}, url:${url}`)){
+                        if(!subPages_cspHeader_arr_NoCSPHeader.includes(`${d}, url:${url}`)){
+                            subPages_cspHeader_arr_NoCSPHeader.push(`${d}, url:${url}`)
+                        }
+                    }
+                }
+            }else{
+                for(var d of devices){
+                    subPages_cspHeader_arr_NoCSPHeader.push(`${d}, url:${url}`)
+                }
+            }
+            console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
+            console.log(subPages_cspHeader_arr_NoCSPHeader)
+            //devArr.pushe(2)
+
+            //console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
+        }
+       
+
+    }
+    let subPages_SecurityNotSafe = numberOfSubPages - subPages_Security;
+    let subPages_withoutcspHeader = numberOfSubPages - subPages_cspHeader;
+    let json_comp = {};
+  
+    json_comp["Total devices"] = devices
+    json_comp["Homepage with safe csp"] = homePage_Security
+    json_comp["Homepage with safe csp using following devices"] = homePage_Security_arr
+    json_comp["Homepage with not safe csp using following devices"] = homePage_Security_arr_NotSafe
+    json_comp["Subpages with safe csp"] = `${subPages_Security} are with safe csp`
+    json_comp["Subpages with safe csp using following devices"] = subPages_Security_arr
+    json_comp["Subpages with not safe csp"] = `${subPages_SecurityNotSafe} are with not safe csp`
+    json_comp["Subpages with not safe csp using following devices"] = subPages_Security_arr_NotSafe
+    json_comp["Homepage with csp header"] = homePage_CSPHeaderisThere
+    json_comp["Homepage with csp header using following devices"] = homePage_CSPHeaderisThere_arr
+    json_comp["Homepage without csp header using following devices"] = homePage_CSPHeaderisThere_arr_NoCSPHeader
+    json_comp["Subpages with csp header"] = subPages_cspHeader
+    json_comp["Subpages without csp header"] = subPages_withoutcspHeader
+    json_comp["Subpages with csp header using following devices"] = subPages_cspHeader_arr
+    json_comp["Subpages without csp header using following devices"] = subPages_cspHeader_arr_NoCSPHeader
+    fs.writeFileSync(`./${resultPath}/compResult_${pageName}.json`, JSON.stringify(json_comp))
+
+    
+
+    if(homePage_Security && (subPages_SecurityNotSafe === 0) && (numberOfSubPages*devicesList.length === subPages_Security)){
+        HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent = new Array();
+        if(!HomeSubpagesWithSafeCSPForAllUserAgent.includes(uri)){
+            numberOfHomeSubpagesWithSafeCSPForAllUserAgent++;
+            HomeSubpagesWithSafeCSPForAllUserAgent.push(urls)
+        }
+    }else if ((!homePage_Security) && (subPages_Security === 0) && (subPages_SecurityNotSafe === numberOfSubPages*devicesList.length) ){
+        HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent = new Array()
+        if(!HomeSubpagesWithNotSafeCSPForAllUserAgent.includes(uri)){
+            HomeSubpagesWithNotSafeCSPForAllUserAgent.push(urls)
+            numberOfHomeSubpagesWithNotSafeCSPForAllUserAgent++;
+        }
+    }else{
+        numberOfHomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent++;
+        HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent.push(["HomePage", `Safe CSP: ${homePage_Security_arr}`, `Safe CSP: ${homePage_Security_arr_NotSafe}`, "Subpages", `Safe CSP: ${subPages_Security_arr}`, `Safe CSP: ${subPages_Security_arr_NotSafe}`])
+    }
+    //console.log("Endddddddddddddddddddddddddddddddddddd")
+    //devArr.pushe(2)
+
+
+
+    //console.log(homePage_Security)
+    //console.log(subPages_Security)
+    
+
+}
+
+function compareWebsite(pageName, comparePath, resultPath, devices){
+    //console.log(pageName)
+    const  jsonsFiles =  fs.readdirSync(comparePath).filter((filename) => path.extname(filename) === '.json');
+    //console.log(jsonsFiles)
+    let csp_policies = new Array();
+    jsonsFiles.forEach(filename => {
+        let csp = new Array()
+        if(filename.includes(`${pageName}.json`)) {
+            //console.log("KKKKKKKKKKKKKKKKKKKKKKKKK")
+            //console.log(filename)
+            const fileData = fs.readFileSync(path.join(comparePath, filename));                    
+            const json_arr = JSON.parse(fileData.toString());
+            let json_str = JSON.stringify(json_arr);
+            json_after_split = json_str.substring(1, json_str.length - 1);
+            json_after_split = json_after_split.split(/,"/)
+            let dev = `${json_after_split[0].split(":")[1].replaceAll("\"","")}_${json_after_split[4].split(":")[1].replaceAll("\"","")}_${json_after_split[5].split(":")[1].replaceAll("\"","")}`
+            if(devices.includes(dev)){
+                csp.push(filename.split(".json")[0].substring(4))
+                filename_debuger = filename
+                let arr_2 = new Array();
+                //console.log("OOOOOOOOOOOOOOOOOOOO")
+                //console.log(json_after_split)
+                for (var elem of json_after_split) {
+                    let header;
+                    let arr_;
+                    let header_value;
+                    
+                    if((elem.includes(":") && !elem.includes("http") && !(/.+:\/\//.test(elem)) && !(/.+:"$/.test(elem)) && !elem.includes("data")&& !elem.includes("mediastream")&& !elem.includes("blob")&& !elem.includes("filesystem")&& !elem.includes("resource")&& !elem.includes(":*")) || elem.includes("visited_Webpage") || elem.includes("dataURL") || elem.includes("origins")){
+                        arr_ = elem.split(/":/);
+                        //console.log(arr_)
+                        header = delete_StrSy(arr_[0], "\"");
+                        //console.log("UUUUUUUUUUUUUUUUUUUUU")
+                        //console.log(arr_)
+                        //console.log(arr_[1])
+                        header_value = delete_StrSy(arr_[1], "\"")
+                        header_value = delete_StrSy(header_value, "\\")
+                        arr_2.push([header, header_value])
+                    }else {
+                        elem = elem.replaceAll("\"", "")
+                        if(elem.endsWith(" ")){
+                            arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + elem
+                        }else{
+                            arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + " " + elem
+                        }
+                    }
+                                    
+                }
+                csp.push(arr_2)
+               
+                csp_policies.push(csp)
+                //console.log(csp)
+            }
+            
+        }
+
+    });
+
+    //console.log("JJJJJJJJJJJJJJJJJJJJJ")
+    console.log(csp_policies[7])
+    //devArr.pushe(2)
+    if(csp_policies.length > 0){
+        let pagesWithSafeCSPWithAllUserAgentsNr = 0;
+        let pagesWithNotSafeCSPWithAllUserAgentsNr = 0;
+        let pagesWithSafeAndNotSafeCSPWithAllUserAgentsNr = 0;
+
+        let json_comp = {};
+        let devices = new Array();
+        let devices_safe_csp = new Array()
+        let devices_notSafe_csp = new Array()
+        let dev_provide_no_protection_against_sslStripping_level_0 = new Array()
+        let dev_provide_protection_against_sslStripping_level_1 = new Array()
+        let dev_provide_protection_against_sslStripping_level_2 = new Array()
+        let dev_provide_protection_against_sslStripping_level_3 = new Array()
+        let dev_provide_protection_against_sslStripping_level_4 = new Array()
+        let arr_dev_sts_max_age_protection_classe1 = new Array()
+        let arr_dev_sts_max_age_protection_classe2 = new Array()
+        let arr_dev_sts_max_age_protection_classe3 = new Array()
+        let dev_provide_no_protection_against_clickjacking_level_0 = new Array()
+        let dev_provide_protection_against_clickjacking_xfo_level_1 = new Array()
+        let dev_provide_protection_against_clickjacking_csp_level_1 = new Array()
+        let dev_provide_protection_against_clickjacking_xfo_level_2 = new Array()
+        let dev_provide_protection_against_clickjacking_csp_level_2 = new Array()
+        let dev_provide_protection_against_clickjacking_xfo_level_3 = new Array()
+        let dev_provide_protection_against_clickjacking_csp_level_3 = new Array()
+        let dev_provide_protection_against_hijacking = new Array()
+        let dev_provide_no_protection_against_hijacking = new Array()
+        let dev_provide_protection_against_steeling_cookies = new Array()
+        let dev_provide_no_protection_against_steeling_cookies = new Array()
+        let dev_provide_no_protection_against_csrf_level_0 = new Array()
+        let dev_provide_protection_against_csrf_level_1 = new Array()
+        let dev_provide_protection_against_csrf_level_2 = new Array()
+        let dev_no_cspHeader = new Array()
+        let dev_with_cspHeader = new Array()
+        let isCSPsafe = 0;
+        let pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray = new Array()
+        //console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
+        //console.log(csp_policies[7])
+        let filename;
+        let device;
+        let causeOfSafty= new String()
+        let causeOfNotSafty = new String()
+        let url;
+        for(let i = 0; i < csp_policies.length; i++){
+            //console.log(csp_policies[i])
+            let reasonFound = false;
+            filename = `${csp_policies[i][1][0][1]}_${csp_policies[i][1][4][1]}_${csp_policies[i][1][5][1]}_${csp_policies[i][1][3][1]}_${csp_policies[i][1][1][1]}_${csp_policies[i][1][2][1]}`
+            device = `${csp_policies[i][1][0][1]} height:${csp_policies[i][1][4][1]} width:${csp_policies[i][1][5][1]} operatingSystem:${csp_policies[i][1][3][1]} browser:${csp_policies[i][1][1][1]} browser_version:${csp_policies[i][1][2][1]}`
+            url = csp_policies[i][1][csp_policies[i][1].length-1][1]
+            devices.push(device)
+            console.log(csp_policies[i])
+            //devArr.pushe(2)
+            if(csp_policies[i][1][7][1] === 'true'){
+                causeOfSafty += "("
+                if(csp_policies[i][1][13][1] === 'true'){
+                    causeOfSafty += "nonce_"
+                    reasonFound = true
+                }
+                if(csp_policies[i][1][14][1] === 'true'){
+                    causeOfSafty += "hash_"
+                    reasonFound = true
+                }
+                if((csp_policies[i][1][13][1] === 'true' && csp_policies[i][1][15][1] === 'true') || (csp_policies[i][1][14][1] === 'true' && csp_policies[i][1][15][1] === 'true')){
+                    causeOfSafty += "strict-dynamic_"
+                    reasonFound = true
+                }
+                //console.log(causeOfSafty.length)
+                //devArr.pushe(2)
+                if(reasonFound){
+                    causeOfSafty += `_${csp_policies[i][1][0][1]} height:${csp_policies[i][1][4][1]} width:${csp_policies[i][1][5][1]}),`
+                }
+
+                isCSPsafe = 1;
+                devices_safe_csp.push(device)
+                dev_with_cspHeader.push(device)
+                pagesWithSafeCSPWithAllUserAgentsNr++;
+                pagesWithSafeAndNotSafeCSPWithAllUserAgentsNr++;
+                pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray.push([url, `${csp_policies[i][1][0][1]} hXw:${csp_policies[i][1][4][1]}x${csp_policies[i][1][5][1]}`])
+            }
+            if(csp_policies[i][1][7][1] === 'false'){
+                isCSPsafe = 2;
+                causeOfNotSafty += "("
+                devices_notSafe_csp.push(device)
+                if(csp_policies[i][1][8][1] === 'csp dose not contain script-src-elem, script-src or default-src') {
+                    reasonFound = true
+                    causeOfNotSafty += 'csp dose not contain script-src-elem, script-src or default-src'
+                    dev_no_cspHeader.push(device)
+                } else {
+                    if(csp_policies[i][1][11][1] === 'true'){
+                        causeOfNotSafty += "unsafe-inline_"
+                        reasonFound = true
+                    }
+                    if(csp_policies[i][1][12][1] === 'true'){
+                        causeOfNotSafty += "unsafe-eval_"
+                        reasonFound = true
+                    }
+                    if(csp_policies[i][1][16][1] === 'true'){
+                        causeOfNotSafty += "wildcard*_"
+                        reasonFound = true
+                    }
+                    if(csp_policies[i][1][17][1] === 'true'){
+                        causeOfNotSafty += "protocol_"
+                        reasonFound = true
+                    }
+                    if(csp_policies[i][1][18][1] === 'true'){
+                        causeOfNotSafty += "data-URL_"
+                        reasonFound = true
+                    }
+                    dev_with_cspHeader.push(device)
+                }
+                //console.log(causeOfNotSafty.length)
+                //console.log(causeOfNotSafty.le > 1)
+                //devArr.pushe(2)
+                if(reasonFound){
+                    causeOfNotSafty += `_${csp_policies[i][1][0][1]} height:${csp_policies[i][1][4][1]} width:${csp_policies[i][1][5][1]}),`
+                }
+                //console.log(causeOfSaftyOrNotSafty)
+                pagesWithNotSafeCSPWithAllUserAgentsNr++;
+                pagesWithSafeAndNotSafeCSPWithAllUserAgentsNr++;
+                pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray.push([url, `${csp_policies[i][1][0][1]} hXw:${csp_policies[i][1][4][1]}x${csp_policies[i][1][5][1]}`])
+            }   
+            switch(csp_policies[i][1][23][1]) {
+                case '0' : {
+                    dev_provide_no_protection_against_sslStripping_level_0.push(device)
+                }
+                break;
+    
+                case '1': {
+                    dev_provide_protection_against_sslStripping_level_1.push(device)
+                }
+                break;
+    
+                case '2': {
+                    dev_provide_protection_against_sslStripping_level_2.push(device)
+                }
+                break;
+    
+                case '3': {
+                    dev_provide_protection_against_sslStripping_level_3.push(device)
+                }
+                break;
+    
+                case '4': {
+                    dev_provide_protection_against_sslStripping_level_4.push(device)
+                }
+                break;
+    
+                default : console.log('-_-')
+                break;
+            }
+    
+            switch(csp_policies[i][1][22][1]) {   
+                case '1': {
+                    arr_dev_sts_max_age_protection_classe1.push(device)
+                }
+                break;
+                case '2': {
+                    arr_dev_sts_max_age_protection_classe2.push(device)                      
+                }
+                break;
+                case '3': {
+                    arr_dev_sts_max_age_protection_classe3.push(device)                      
+                }
+                break;
+                default: {
+                    console.log("sts_max_age")
+                    console.log(csp_policies[i])
+                    console.log(check)
+                    console.log(i)
+                }
+                break;
+        
+            }
+    
+            switch(csp_policies[i][1][26][1]) {
+                case '0' : {
+                    dev_provide_no_protection_against_clickjacking_level_0.push(device)
+                }
+                break;
+                case 'false' :{
+                    dev_provide_no_protection_against_clickjacking_level_0.push(device)
+                }
+                break;
+             
+                case '1': {
+                    if (csp_policies[i][1][25][1] === 'x') {
+                        dev_provide_protection_against_clickjacking_xfo_level_1.push(device)
+                    }
+                    if (csp_policies[i][1][25][1] === 'c') {
+                        dev_provide_protection_against_clickjacking_csp_level_1.push(device)
+                    }
+                
+                }
+                break;
+    
+                case '2': {
+                    if (csp_policies[i][1][25][1] === 'x') {
+                        dev_provide_protection_against_clickjacking_xfo_level_2.push(device)
+                    }
+                    if (csp_policies[i][1][25][1] === 'c') {
+                        dev_provide_protection_against_clickjacking_csp_level_2.push(device)
+                    }
+                }
+                break;
+    
+                case '3': {
+                    if (csp_policies[i][1][25][1] === 'x') {
+                        dev_provide_protection_against_clickjacking_xfo_level_3.push(device)
+                    }
+                    if (csp_policies[i][1][25][1] === 'c') {
+                        dev_provide_protection_against_clickjacking_csp_level_3.push(device)
+                    }
+                }
+                break;
+                default: console.log('-clickjacking-');
+                //console.log(csp_policies[i][1][26])
+    
+                break;
+    
+            }
+    
+            switch(csp_policies[i][1][27][1]) {   
+                case 'true': {
+                    dev_provide_protection_against_hijacking.push(device)
+                }
+                break;
+    
+                case 'false': {
+                    dev_provide_no_protection_against_hijacking.push(device)
+                }
+                break;
+    
+                default: console.log('-hijacking-')
+                break;
+    
+            }
+    
+            switch(csp_policies[i][1][29][1]) {
+                            
+                case 'true': {
+                    dev_provide_protection_against_steeling_cookies.push(device)
+                }
+                break;
+    
+                case 'false': {
+                    dev_provide_no_protection_against_steeling_cookies.push(device)
+                }
+                break;
+    
+                default: console.log('stealing cookes')
+                break;
+    
+            }
+    
+            switch(csp_policies[i][1][29][1]) { 
+                case '0': {
+                    dev_provide_no_protection_against_csrf_level_0.push(device)
+                }
+                break;
+    
+                case '1': {
+                    dev_provide_protection_against_csrf_level_1.push(device)
+                }
+                break;
+    
+                case '2': {
+                    dev_provide_protection_against_csrf_level_2.push(device)
+                }
+                break;
+            }
+        }
+        //console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
+        //console.log(devices)
+        //console.log(devices_safe_csp)
+        //console.log(devices_notSafe_csp)
+    
+        json_comp["number of total devices"] = devices.length
+        json_comp["total devices"] = devices
+        json_comp["number of devices that offer safe csp"] = devices_safe_csp.length
+        json_comp["devices that offer safe csp"] = devices_safe_csp
+        json_comp["caus Of safe CSP"] = causeOfSafty
+        json_comp["number of devices that offer unsafe csp"] = devices_notSafe_csp.length
+        json_comp["devices that offer unsafe csp"] = devices_notSafe_csp
+        json_comp["caus Of not safe CSP"] = causeOfNotSafty
+       
+        json_comp["number of devices that offer zero max age for hsts"] = arr_dev_sts_max_age_protection_classe1.length
+        json_comp["devices that offer zero max age for hsts"] = arr_dev_sts_max_age_protection_classe1
+        json_comp["number of devices that offer max age < 1 for hsts"] = arr_dev_sts_max_age_protection_classe2.length
+        json_comp["devices that offer max age < 1 for hsts"] = arr_dev_sts_max_age_protection_classe2
+        json_comp["number of devices that offer max age >= 1 for hsts"] = arr_dev_sts_max_age_protection_classe3.length
+        json_comp["devices that offer max age >= 1 for hsts"] = arr_dev_sts_max_age_protection_classe3
+        
+        // csp header exisit ?
+        json_comp["number of devices without csp header"] = dev_no_cspHeader.length
+        json_comp["devices without csp header"] = dev_no_cspHeader
+        json_comp["number of devices with csp header"] = dev_with_cspHeader.length
+        json_comp["devices with csp header"] = dev_with_cspHeader
+    
+        // level of protection against ssl stripping
+        json_comp["number of devices that dose not offer protection against sll stripping"] = dev_provide_no_protection_against_sslStripping_level_0.length
+        json_comp["devices that dose not offer protection against sll stripping"] = dev_provide_no_protection_against_sslStripping_level_0
+        json_comp["number of devices that offer protection_level_1 against sll stripping"] = dev_provide_protection_against_sslStripping_level_1.length
+        json_comp["devices that offer protection_level_1 against sll stripping"] = dev_provide_protection_against_sslStripping_level_1
+        json_comp["number of devices that offer protection_level_2 against sll stripping"] = dev_provide_protection_against_sslStripping_level_2.length
+        json_comp["devices that offer protection_level_2 against sll stripping"] = dev_provide_protection_against_sslStripping_level_2
+        json_comp["number of devices that offer protection_level_3 against sll stripping"] = dev_provide_protection_against_sslStripping_level_3.length
+        json_comp["devices that offer protection_level_3 against sll stripping"] = dev_provide_protection_against_sslStripping_level_3
+        json_comp["number of devices that offer protection_level_4 against sll stripping"] = dev_provide_protection_against_sslStripping_level_4.length
+        json_comp["devices that offer protection_level_4 against sll stripping"] = dev_provide_protection_against_sslStripping_level_4
+        
+        // level of protection against clickjacking(x-fram-option)
+        json_comp["number of devices that dose not offer protection against clickjacking"] = dev_provide_no_protection_against_clickjacking_level_0.length
+        json_comp["devices that dose not offer protection against clickjacking"] = dev_provide_no_protection_against_clickjacking_level_0
+    
+        json_comp["number of devices that offer protection_level_1 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_1.length
+        json_comp["devices that offer protection_level_1 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_1
+        json_comp["number of devices that offer protection_level_2 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_2.length
+        json_comp["devices that offer protection_level_2 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_2
+        json_comp["number of devices that offer protection_level_3 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_3.length
+        json_comp["devices that offer protection_level_3 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_3
+    
+        json_comp["number of devices that offer protection_level_1 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_1.length
+        json_comp["devices that offer protection_level_1 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_1
+        json_comp["number of devices that offer protection_level_2 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_2.length
+        json_comp["devices that offer protection_level_2 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_2
+        json_comp["number of devices that offer protection_level_3 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_3.length
+        json_comp["devices that offer protection_level_3 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_3
+       
+        // protection against hijacking
+        json_comp["number of devices that dose not offer protection against hijacking"] = dev_provide_no_protection_against_hijacking.length
+        json_comp["devices that dose not offer protection against hijacking"] = dev_provide_no_protection_against_hijacking
+        json_comp["number of devices that offer protection against hijacking"] = dev_provide_protection_against_hijacking.length
+        json_comp["devices that offer protection against hijacking"] = dev_provide_protection_against_hijacking
+        
+        // level of protection against csrf
+        json_comp["number of devices that dose not offer protection against csrf"] = dev_provide_no_protection_against_csrf_level_0.length
+        json_comp["devices that dose not offer protection against csrf"] = dev_provide_no_protection_against_csrf_level_0
+        json_comp["number of devices that offer protection_level_1 against csrf"] = dev_provide_protection_against_csrf_level_1.length
+        json_comp["devices that offer protection_level_1 against csrf"] = dev_provide_protection_against_csrf_level_1
+        json_comp["number of devices that offer protection_level_2 against csrf"] = dev_provide_protection_against_csrf_level_2.length
+        json_comp["devices that offer protection_level_2 against csrf"] = dev_provide_protection_against_csrf_level_2
+        
+        // protection against steeling the cookies (XXS)
+        json_comp["number of devices that dose not offer protection against steeling the cookies"] = dev_provide_no_protection_against_steeling_cookies.length
+        json_comp["devices that dose not offer protection against steeling the cookies"] = dev_provide_no_protection_against_steeling_cookies
+        json_comp["number of devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies.length
+        json_comp["devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies
+
+        console.log("FFFFFFFFFFFFFFFFFFFFFF")
+        console.log(csp_policies)
+        console.log(isCSPsafe)
+
+        json_comp["visited link"] = csp_policies[0][1][csp_policies[0][1].length-1][1]
+        //console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+        //console.log(pageName)
+        //console.log(JSON.stringify(json_comp))
+        //console.log(resultPath)
+        //console.log(osystem)
+        //console.log(websites)
+        for(var e of websites){
+            //console.log(e)
+        }
+        fs.writeFileSync(`./${resultPath}/compResult_${pageName}.json`, JSON.stringify(json_comp))
+
+        if(pagesWithSafeCSPWithAllUserAgentsNr === devices.length){
+            pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray = new Array()
+            if(!pagesWithSafeCSPWithAllUserAgent.includes(uri)){
+                pagesWithSafeCSPWithAllUserAgent.push(url)
+                numberOfPagesWithSafeCSPWithAllUserAgent++;
+            }
+        }else if(pagesWithNotSafeCSPWithAllUserAgentsNr === devices.length){
+            pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray = new Array()
+            if(!pagesWithNotSafeCSPWithAlluserAgent.includes(uri)){
+                pagesWithNotSafeCSPWithAlluserAgent.push(url)
+                numberOfPagesWithNotSafeCSPWithAllUserAgent++;
+            }
+        }else{
+            if(pagesWithSafeAndNotSafeCSPWithAllUserAgentsNr > 0){
+                for(let v of pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray){
+                    pagesWithSafeAndNotCSPWithAllUserAgent.push(v)
+                }
+                
+                numberOfPagesWithSafeAndNotSafeCSPWithAllUserAgent++;
+            }
+        }
+    }
+    //console.log("dfdfdfdfdfdf")
+   // devArr.pushe(2)
+}
+
+
 function compareViewport(pageName, comparePath, resultPath){
     const  jsonsFiles =  fs.readdirSync(comparePath).filter((filename) => path.extname(filename) === '.json');
+    let deviceWithDifferentViewPortSafeCSP = 0;
+    let deviceWithDifferentViewPortNotSafeCSP = 0;
+    let deviceWithDifferentViewPortSafeAndNotSafeCSP = 0;
+    let pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray = new Array();
+    let uri = "";
     for(var d of devArr){
         let arr = new Array()
         for(var dev of devUA){
@@ -735,16 +1521,21 @@ function compareViewport(pageName, comparePath, resultPath){
                         let header;
                         let arr_;
                         let header_value;
-                        
-                        if((elem.includes(":") && !elem.includes("http") && !elem.includes("data")&& !elem.includes("mediastream")&& !elem.includes("blob")&& !elem.includes("filesystem")&& !elem.includes("resource")&& !elem.includes(":*")) || elem.includes("visited_Webpage")){
+                        //console.log("KKKKKKKKKKKKKKKKKKKKKKK")
+                        //console.log(elem)
+                        if((elem.includes(":") && !elem.includes("http") && !(/.+:\/\//.test(elem)) && !(/.+:"$/.test(elem)) && !elem.includes("data")&& !elem.includes("mediastream")&& !elem.includes("blob")&& !elem.includes("filesystem")&& !elem.includes("resource")&& !elem.includes(":*")) || elem.includes("visited_Webpage") || (elem.includes("origins"))){
                             arr_ = elem.split(/":/);
                             //console.log(arr_)
                             header = delete_StrSy(arr_[0], "\"");
                             //console.log("UUUUUUUUUUUUUUUUUUUUU")
                             //console.log(arr_)
                             //console.log(arr_[1])
+                            //console.log(arr_)
                             header_value = delete_StrSy(arr_[1], "\"")
                             header_value = delete_StrSy(header_value, "\\")
+                            if(header === "visited_Webpage"){
+                                uri = header_value;
+                            }
                             arr_2.push([header, header_value])
                         }else {
                             elem = elem.replaceAll("\"", "")
@@ -765,13 +1556,19 @@ function compareViewport(pageName, comparePath, resultPath){
             }
     
         });
+        //console.log("IIIIIIIIIIIIIIIIIIIIIIII")
         //console.log(csp_policies)
-        if(csp_policies.length > 0){
+        if(csp_policies.length === 2){
             let deviceWithTwoVP = arr;
             let safeCSPdev1 = csp_policies[0][1][7][1];
+            //console.log(safeCSPdev1)
+            //console.log(csp_policies)
+
             let safeCSPdev2 = csp_policies[1][1][7][1];
-            let bothDevicesOfferSafeCsp = safeCSPdev1 === safeCSPdev2;
+            let bothDevicesOfferSafeCsp = false;
             let dev1WithCsp = csp_policies[0][1][8][1];
+            let dev1 = `${ csp_policies[0][1][0][1]} hXw:${ csp_policies[0][1][4][1]}X${ csp_policies[0][1][5][1]} Safe: ${ csp_policies[0][1][7][1]}`
+            let dev2 = `${ csp_policies[1][1][0][1]} hXw:${ csp_policies[1][1][4][1]}X${ csp_policies[1][1][5][1]} Safe: ${ csp_policies[1][1][7][1]}`
             let dev2WithCsp = csp_policies[1][1][8][1];
             let whichDeviceIsWithCsp;
             let dev1Withnonce = csp_policies[0][1][13][1];
@@ -779,13 +1576,16 @@ function compareViewport(pageName, comparePath, resultPath){
             let whichDeviceIsWithNonce;
             let bothDevicesWithCspHeader = false;
             let bothDevicesWithNonceValue = false;
-            if(dev1WithCsp != 'csp dose not contain script-srcc or default-src' && dev2WithCsp != 'csp dose not contain script-srcc or default-src'){
+            if(safeCSPdev1 === 'true' && safeCSPdev2 === 'true'){
+                bothDevicesOfferSafeCsp = true;
+            }
+            if(dev1WithCsp != 'csp dose not contain script-src or default-src' && dev2WithCsp != 'csp dose not contain script-src or default-src'){
                 bothDevicesWithCspHeader = true;
             }else{
-                if(dev1WithCsp != 'csp dose not contain script-srcc or default-src'){
+                if(dev1WithCsp != 'csp dose not contain script-src or default-src'){
                     whichDeviceIsWithCsp = csp_policies[0][1][8][1];
                 }
-                if(dev2WithCsp != 'csp dose not contain script-srcc or default-src'){
+                if(dev2WithCsp != 'csp dose not contain script-src or default-src'){
                     whichDeviceIsWithCsp = csp_policies[1][1][8][1];
                 }
             }
@@ -800,6 +1600,7 @@ function compareViewport(pageName, comparePath, resultPath){
                 }
             }
             let json={}
+            console.log(csp_policies[1][1])
             json["visited links"] = csp_policies[1][1][30][1];
             json["devices"] = deviceWithTwoVP
             json["both devices received safe csp"] = bothDevicesOfferSafeCsp
@@ -811,585 +1612,41 @@ function compareViewport(pageName, comparePath, resultPath){
             json["both devices received nonces"] = bothDevicesWithNonceValue
             json["dev 1 received nonce value"] = dev1Withnonce
             json["dev 2 received nonce value"] = dev2Withnonce
-            
-            fs.writeFileSync(`./${resultPath}/compViewPort_${pageName}.json`, JSON.stringify(json))
-        }
-        
-    }
-
-}
-
-function compareHomeWithSunpages(pageName, comparePath, resultPath){
-    //console.log(pageName)
-    const  jsonsFiles =  fs.readdirSync(comparePath).filter((filename) => path.extname(filename) === '.json');
-
-    console.log(jsonsFiles)
-    let csp_policies = new Array();
-    jsonsFiles.forEach(filename => {
-        let csp = new Array()
-        if(filename.includes(`${pageName}.json`) || filename.includes(`${pageName}§`)) {
-            //console.log(filename)
-            const fileData = fs.readFileSync(path.join(comparePath, filename));                    
-            const json_arr = JSON.parse(fileData.toString());
-            let json_str = JSON.stringify(json_arr);
-            json_after_split = json_str.substring(1, json_str.length - 1);
-            json_after_split = json_after_split.split(/,"/)
-            csp.push(filename.split(".json")[0].substring(4))
-            filename_debuger = filename
-            let arr_2 = new Array();
-            //console.log(json_after_split)
-            for (var elem of json_after_split) {
-                let header;
-                let arr_;
-                let header_value;
-              
-                if((elem.includes("\":") && !elem.includes("http")) || elem.includes("visited link")){
-                    arr_ = elem.split(/":/);
-                    //console.log(arr_)
-                    header = arr_[0]
-                    header_value = arr_[1]
-                    header = delete_StrSy(arr_[0], "\"");
-                    header_value = delete_StrSy(arr_[1], "\"")
-                    //header_value = delete_StrSy(header_value, "\\")
-                    arr_2.push([header, header_value])
+            if(bothDevicesOfferSafeCsp){
+                deviceWithDifferentViewPortSafeCSP++;
+            }else{
+                if(safeCSPdev1 === 'false' && safeCSPdev2 === 'false'){
+                    deviceWithDifferentViewPortNotSafeCSP++;
                 }else{
-                    elem = elem.replaceAll("\"", "")
-                    if(elem.endsWith(" ")){
-                        arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] +","+ elem
-                    }else{
-                        arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + ", " + elem
-                    }
-                    //console.log("Watchccccccccccccccccccccccccccccccccc")
-                    //console.log( arr_2[arr_2.length-1][1])
+                    deviceWithDifferentViewPortSafeAndNotSafeCSP++;
+                    pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray.push([uri, dev1, dev2])
                 }
             }
-             
-            csp.push(arr_2)
-           
-            csp_policies.push(csp)
-            //console.log(csp)
+            fs.writeFileSync(`./${resultPath}/compViewPort_${pageName}_${csp_policies[1][1][0][1]}.json`, JSON.stringify(json))
         }
-
-    });
-    //console.log(pageName)
-    //console.log("PPPPPPPPPPPPPPPPPPPPPPPPPP")
-    //console.log(csp_policies)
-    //console.log(csp_policies.length)
-    let devices = new Array();
-    let homePage_Security = false;
-    let homePage_Security_arr = new Array()
-    let homePage_Security_arr_NotSafe = new Array();
-    let homePage_CSPHeaderisThere = false;
-    let homePage_CSPHeaderisThere_arr = new Array()
-    let homePage_CSPHeaderisThere_arr_NoCSPHeader = new Array()
-    
-    let subPages_Security = 0;
-    let subPages_Security_arr = new Array();
-    let subPages_Security_arr_NotSafe = new Array();
-    let subPages_cspHeader = 0;
-    let subPages_cspHeader_arr = new Array();
-    let subPages_cspHeader_arr_NoCSPHeader = new Array();
-
-    //console.log("JJJJJJJJJJJJJJJJJJJ")
-    //console.log(pageName)
   
-    for(let i = 0; i < csp_policies.length; i++){
-        //console.log(csp_policies[i])
-        let dev = csp_policies[i][1][1][1];
-        let dev_ = dev.replace("[", "")
-        dev_ = dev_.replace("]", "")
-        let dev_arr = dev_.split(", ")
-        for(var d of dev_arr){
-            if(!devices.includes(d)){
-                devices.push(d)
-            }
-        }
-        if(i === 0){
-            let homePage_Check = parseInt(csp_policies[0][1][2][1]) 
-            let homePage_cspHeader = parseInt(csp_policies[0][1][14][1]) 
-            if(homePage_Check > 0){
-                homePage_Security = true;
-                let dev = csp_policies[i][1][3][1];
-                //console.log(dev)
-                let dev_ = dev.replace("[", "")
-                dev_ = dev_.replace("]", "")
-                let dev_arr = dev_.split(", ")
-                for(var d of dev_arr){
-                    if(!homePage_Security_arr.includes(d)){
-                        homePage_Security_arr.push(d)
-                    }
-                }
-                for(var d of devices){
-                    if(!homePage_Security_arr.includes(d)){
-                        if(!homePage_Security_arr_NotSafe.includes(d)){
-                            homePage_Security_arr_NotSafe.push(d)
-                        }
-                    }
-                }
-                
-            }else{
-                homePage_Security_arr_NotSafe = devices;
-            }
-            if(homePage_cspHeader > 0){
-                homePage_CSPHeaderisThere = true;
-                let dev = csp_policies[i][1][15][1];
-                let dev_ = dev.replace("[", "")
-                dev_ = dev_.replace("]", "")
-                let dev_arr = dev_.split(", ")
-                for(var d of dev_arr){
-                    if(!homePage_CSPHeaderisThere_arr.includes(d)){
-                        homePage_CSPHeaderisThere_arr.push(d)
-                    }
-                }
-                for(var d of devices){
-                    if(!homePage_CSPHeaderisThere_arr.includes(d)){
-                        if(!homePage_CSPHeaderisThere_arr_NoCSPHeader.includes(d)){
-                            homePage_CSPHeaderisThere_arr_NoCSPHeader.push(d)
-                        }
-                    }
-                }
-            }else{
-                homePage_CSPHeaderisThere_arr_NoCSPHeader = devices
-            }
-        }
-        //console.log("KKKKKKKKKKKKKKKKKKKKKKKKKK")
-        //console.log(i)
-        //console.log(csp_policies[i])
-       
-        //console.log(csp_policies[i][1][2][1])
-        if(parseInt(csp_policies[i][1][2][1]) > 0 && (i > 0)){
-            //console.log("PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP")
-            subPages_Security++;
-            let dev = csp_policies[i][1][3][1];
-            let dev_ = dev.replace("[", "")
-            dev_ = dev_.replace("]", "")
-            let dev_arr = dev_.split(", ")
-            for(var d of dev_arr){
-                if(!subPages_Security_arr.includes(d)){
-                    subPages_Security_arr.push(d)
-                }
-            }
-            //console.log("TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
-            //console.log(devices)
-            //console.log(subPages_Security_arr)
-            for(var d of devices){
-                if(!subPages_Security_arr.includes(d)){
-                    if(!subPages_Security_arr_NotSafe.includes(d)){
-                        subPages_Security_arr_NotSafe.push(d)
-                    }
-                }
-            }
-        }else{
-            subPages_Security_arr_NotSafe = devices;
-        }
-
-        if(parseInt(csp_policies[i][1][14][1]) > 0 && (i > 0)){
-            subPages_cspHeader++;
-            
-            let dev = csp_policies[i][1][15][1];
-            let dev_ = dev.replace("[", "")
-            dev_ = dev_.replace("]", "")
-            let dev_arr = dev_.split(", ")
-            for(var d of dev_arr){
-                if(!subPages_cspHeader_arr.includes(d)){
-                    subPages_cspHeader_arr.push(d)
-                }
-            }
-            for(var d of devices){
-                if(!subPages_cspHeader_arr.includes(d)){
-                    if(!subPages_cspHeader_arr_NoCSPHeader.includes(d)){
-                        subPages_cspHeader_arr_NoCSPHeader.push(d)
-                    }
-                }
-            }
-        }else{
-            subPages_cspHeader_arr_NoCSPHeader = devices
-        }
-
-
-        //console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
-
     }
-    let subPages_SecurityNotSafe = 5 - subPages_Security;
-    let subPages_withoutcspHeader = 5 - subPages_cspHeader;
-    let json_comp = {};
-    json_comp["Total devices"] = devices
-    json_comp["Homepage with safe csp"] = homePage_Security
-    json_comp["Homepage with safe csp using following devices"] = homePage_Security_arr
-    json_comp["Homepage with not safe csp using following devices"] = homePage_Security_arr_NotSafe
-    json_comp["Subpages with safe csp"] = `${subPages_Security} are with safe csp`
-    json_comp["Subpages with not safe csp"] = `${subPages_SecurityNotSafe} are with not safe csp`
-    json_comp["Subpages with safe csp using following devices"] = subPages_Security_arr
-    json_comp["Subpages with not safe csp using following devices"] = subPages_Security_arr_NotSafe
-    json_comp["Homepage with csp header"] = homePage_CSPHeaderisThere
-    json_comp["Homepage with csp header using following devices"] = homePage_CSPHeaderisThere_arr
-    json_comp["Homepage without csp header using following devices"] = homePage_CSPHeaderisThere_arr_NoCSPHeader
-    json_comp["Subpages with csp header"] = subPages_cspHeader
-    json_comp["Subpages without csp header"] = subPages_withoutcspHeader
-    json_comp["Subpages with csp header using following devices"] = subPages_cspHeader_arr
-    json_comp["Subpages without csp header using following devices"] = subPages_cspHeader_arr_NoCSPHeader
-    fs.writeFileSync(`./${resultPath}/compResult_${pageName}.json`, JSON.stringify(json_comp))
-    //console.log("Endddddddddddddddddddddddddddddddddddd")
-
-
-
-
-    //console.log(homePage_Security)
-    //console.log(subPages_Security)
-    
-
+    if(deviceWithDifferentViewPortSafeCSP === devArr.length){
+        pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray = new Array()
+        if(!pagesDViewPSafeCSP.includes(uri)){
+            pagesDViewPSafeCSP.push(uri)
+            numberOfPagesDViewPSafeCSP++;
+        }
+    }else if(deviceWithDifferentViewPortNotSafeCSP === devArr.length){
+        pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray = new Array()
+        if(!pagesDViewPNotSafeCSP.includes(uri)){
+            pagesDViewPNotSafeCSP.push(uri)
+            numberOfPagesDViewPNotSafeCSP++;
+        }
+    }else{
+        if(deviceWithDifferentViewPortSafeAndNotSafeCSP > 0){
+            for(let v of pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray){
+                pagesDViewPSafeAndNotSafeCSPWithDevicesInfo.push(v);
+            }
+            numberOfPagesDViewPSafeAndNotSafeCSP++;
+        }
+    }
 }
-
-function compareWebsite(pageName, comparePath, resultPath){
-
-    //console.log(pageName)
-    const  jsonsFiles =  fs.readdirSync(comparePath).filter((filename) => path.extname(filename) === '.json');
-    //console.log(jsonsFiles)
-    let csp_policies = new Array();
-    jsonsFiles.forEach(filename => {
-        let csp = new Array()
-        if(filename.includes(`${pageName}.json`)) {
-            //console.log("KKKKKKKKKKKKKKKKKKKKKKKKK")
-            //console.log(filename)
-            const fileData = fs.readFileSync(path.join(comparePath, filename));                    
-            const json_arr = JSON.parse(fileData.toString());
-            let json_str = JSON.stringify(json_arr);
-            json_after_split = json_str.substring(1, json_str.length - 1);
-            json_after_split = json_after_split.split(/,"/)
-            csp.push(filename.split(".json")[0].substring(4))
-            filename_debuger = filename
-            let arr_2 = new Array();
-            //console.log("OOOOOOOOOOOOOOOOOOOO")
-            //console.log(json_after_split)
-            for (var elem of json_after_split) {
-                let header;
-                let arr_;
-                let header_value;
-                
-                if((elem.includes(":") && !elem.includes("http") && !elem.includes("data")&& !elem.includes("mediastream")&& !elem.includes("blob")&& !elem.includes("filesystem")&& !elem.includes("resource")&& !elem.includes(":*")) || elem.includes("visited_Webpage")){
-                    arr_ = elem.split(/":/);
-                    //console.log(arr_)
-                    header = delete_StrSy(arr_[0], "\"");
-                    //console.log("UUUUUUUUUUUUUUUUUUUUU")
-                    //console.log(arr_)
-                    //console.log(arr_[1])
-                    header_value = delete_StrSy(arr_[1], "\"")
-                    header_value = delete_StrSy(header_value, "\\")
-                    arr_2.push([header, header_value])
-                }else {
-                    elem = elem.replaceAll("\"", "")
-                    if(elem.endsWith(" ")){
-                        arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + elem
-                    }else{
-                        arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + " " + elem
-                    }
-                }
-                                
-            }
-            csp.push(arr_2)
-           
-            csp_policies.push(csp)
-            //console.log(csp)
-        }
-
-    });
-    //console.log("JJJJJJJJJJJJJJJJJJJJJ")
-    //console.log(csp_policies)
-    let json_comp = {};
-    
-    let devices = new Array();
-    let devices_safe_csp = new Array()
-    let devices_notSafe_csp = new Array()
-    let dev_provide_no_protection_against_sslStripping_level_0 = new Array()
-    let dev_provide_protection_against_sslStripping_level_1 = new Array()
-    let dev_provide_protection_against_sslStripping_level_2 = new Array()
-    let dev_provide_protection_against_sslStripping_level_3 = new Array()
-    let dev_provide_protection_against_sslStripping_level_4 = new Array()
-    let arr_dev_sts_max_age_protection_classe1 = new Array()
-    let arr_dev_sts_max_age_protection_classe2 = new Array()
-    let arr_dev_sts_max_age_protection_classe3 = new Array()
-    let dev_provide_no_protection_against_clickjacking_level_0 = new Array()
-    let dev_provide_protection_against_clickjacking_xfo_level_1 = new Array()
-    let dev_provide_protection_against_clickjacking_csp_level_1 = new Array()
-    let dev_provide_protection_against_clickjacking_xfo_level_2 = new Array()
-    let dev_provide_protection_against_clickjacking_csp_level_2 = new Array()
-    let dev_provide_protection_against_clickjacking_xfo_level_3 = new Array()
-    let dev_provide_protection_against_clickjacking_csp_level_3 = new Array()
-    let dev_provide_protection_against_hijacking = new Array()
-    let dev_provide_no_protection_against_hijacking = new Array()
-    let dev_provide_protection_against_steeling_cookies = new Array()
-    let dev_provide_no_protection_against_steeling_cookies = new Array()
-    let dev_provide_no_protection_against_csrf_level_0 = new Array()
-    let dev_provide_protection_against_csrf_level_1 = new Array()
-    let dev_provide_protection_against_csrf_level_2 = new Array()
-    let dev_no_cspHeader = new Array()
-    let dev_with_cspHeader = new Array()
-    //console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
-    //console.log(csp_policies)
-    let filename;
-    let device;
-    for(let i = 0; i < csp_policies.length; i++){
-        //console.log(csp_policies[i])
-        filename = `${csp_policies[i][1][0][1]}_${csp_policies[i][1][4][1]}_${csp_policies[i][1][5][1]}_${csp_policies[i][1][3][1]}_${csp_policies[i][1][1][1]}_${csp_policies[i][1][2][1]}`
-        device = `${csp_policies[i][1][0][1]} height:${csp_policies[i][1][4][1]} width:${csp_policies[i][1][5][1]} operatingSystem:${csp_policies[i][1][3][1]} browser:${csp_policies[i][1][1][1]} browser_version:${csp_policies[i][1][2][1]}`
-        devices.push(device)
-        if(csp_policies[i][1][7][1] === 'true'){
-            devices_safe_csp.push(device)
-            dev_with_cspHeader.push(device)
-        }
-        if(csp_policies[i][1][7][1] === 'false'){
-            devices_notSafe_csp.push(device)
-            if(csp_policies[i][1][8][1] === 'csp dose not contain script-src-elem, script-src or default-src') {
-                dev_no_cspHeader.push(device)
-            } else {
-                dev_with_cspHeader.push(device)
-            }
-            
-        }   
-        
-        switch(csp_policies[i][1][23][1]) {
-            case '0' : {
-                dev_provide_no_protection_against_sslStripping_level_0.push(device)
-            }
-            break;
-
-            case '1': {
-                dev_provide_protection_against_sslStripping_level_1.push(device)
-            }
-            break;
-
-            case '2': {
-                dev_provide_protection_against_sslStripping_level_2.push(device)
-            }
-            break;
-
-            case '3': {
-                dev_provide_protection_against_sslStripping_level_3.push(device)
-            }
-            break;
-
-            case '4': {
-                dev_provide_protection_against_sslStripping_level_4.push(device)
-            }
-            break;
-
-            default : console.log('-_-')
-            break;
-        }
-
-        switch(csp_policies[i][1][22][1]) {   
-            case '1': {
-                arr_dev_sts_max_age_protection_classe1.push(device)
-            }
-            break;
-            case '2': {
-                arr_dev_sts_max_age_protection_classe2.push(device)                      
-            }
-            break;
-            case '3': {
-                arr_dev_sts_max_age_protection_classe3.push(device)                      
-            }
-            break;
-            default: {
-                console.log("sts_max_age")
-                console.log(csp_policies[i])
-                console.log(check)
-                console.log(i)
-            }
-            break;
-    
-        }
-
-        switch(csp_policies[i][1][26][1]) {
-            case '0' : {
-                dev_provide_no_protection_against_clickjacking_level_0.push(device)
-            }
-            break;
-            case 'false' :{
-                dev_provide_no_protection_against_clickjacking_level_0.push(device)
-            }
-            break;
-         
-            case '1': {
-                if (csp_policies[i][1][25][1] === 'x') {
-                    dev_provide_protection_against_clickjacking_xfo_level_1.push(device)
-                }
-                if (csp_policies[i][1][25][1] === 'c') {
-                    dev_provide_protection_against_clickjacking_csp_level_1.push(device)
-                }
-            
-            }
-            break;
-
-            case '2': {
-                if (csp_policies[i][1][25][1] === 'x') {
-                    dev_provide_protection_against_clickjacking_xfo_level_2.push(device)
-                }
-                if (csp_policies[i][1][25][1] === 'c') {
-                    dev_provide_protection_against_clickjacking_csp_level_2.push(device)
-                }
-            }
-            break;
-
-            case '3': {
-                if (csp_policies[i][1][25][1] === 'x') {
-                    dev_provide_protection_against_clickjacking_xfo_level_3.push(device)
-                }
-                if (csp_policies[i][1][25][1] === 'c') {
-                    dev_provide_protection_against_clickjacking_csp_level_3.push(device)
-                }
-            }
-            break;
-            default: console.log('-clickjacking-');
-            //console.log(csp_policies[i][1][26])
-
-            break;
-
-        }
-
-        switch(csp_policies[i][1][27][1]) {   
-            case 'true': {
-                dev_provide_protection_against_hijacking.push(device)
-            }
-            break;
-
-            case 'false': {
-                dev_provide_no_protection_against_hijacking.push(device)
-            }
-            break;
-
-            default: console.log('-hijacking-')
-            break;
-
-        }
-
-        switch(csp_policies[i][1][29][1]) {
-                        
-            case 'true': {
-                dev_provide_protection_against_steeling_cookies.push(device)
-            }
-            break;
-
-            case 'false': {
-                dev_provide_no_protection_against_steeling_cookies.push(device)
-            }
-            break;
-
-            default: console.log('stealing cookes')
-            break;
-
-        }
-
-        switch(csp_policies[i][1][29][1]) { 
-            case '0': {
-                dev_provide_no_protection_against_csrf_level_0.push(device)
-            }
-            break;
-
-            case '1': {
-                dev_provide_protection_against_csrf_level_1.push(device)
-            }
-            break;
-
-            case '2': {
-                dev_provide_protection_against_csrf_level_2.push(device)
-            }
-            break;
-        }
-    }
-    //console.log("LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL")
-    //console.log(devices)
-    //console.log(devices_safe_csp)
-    //console.log(devices_notSafe_csp)
-
-    json_comp["number of total devices"] = devices.length
-    json_comp["total devices"] = devices
-    json_comp["number of devices that offer safe csp"] = devices_safe_csp.length
-    json_comp["devices that offer safe csp"] = devices_safe_csp
-    json_comp["number of devices that offer unsafe csp"] = devices_notSafe_csp.length
-    json_comp["devices that offer unsafe csp"] = devices_notSafe_csp
-   
-    json_comp["number of devices that offer zero max age for hsts"] = arr_dev_sts_max_age_protection_classe1.length
-    json_comp["devices that offer zero max age for hsts"] = arr_dev_sts_max_age_protection_classe1
-    json_comp["number of devices that offer max age < 1 for hsts"] = arr_dev_sts_max_age_protection_classe2.length
-    json_comp["devices that offer max age < 1 for hsts"] = arr_dev_sts_max_age_protection_classe2
-    json_comp["number of devices that offer max age >= 1 for hsts"] = arr_dev_sts_max_age_protection_classe3.length
-    json_comp["devices that offer max age >= 1 for hsts"] = arr_dev_sts_max_age_protection_classe3
-    
-    // csp header exisit ?
-    json_comp["number of devices without csp header"] = dev_no_cspHeader.length
-    json_comp["devices without csp header"] = dev_no_cspHeader
-    json_comp["number of devices with csp header"] = dev_with_cspHeader.length
-    json_comp["devices with csp header"] = dev_with_cspHeader
-
-    // level of protection against ssl stripping
-    json_comp["number of devices that dose not offer protection against sll stripping"] = dev_provide_no_protection_against_sslStripping_level_0.length
-    json_comp["devices that dose not offer protection against sll stripping"] = dev_provide_no_protection_against_sslStripping_level_0
-    json_comp["number of devices that offer protection_level_1 against sll stripping"] = dev_provide_protection_against_sslStripping_level_1.length
-    json_comp["devices that offer protection_level_1 against sll stripping"] = dev_provide_protection_against_sslStripping_level_1
-    json_comp["number of devices that offer protection_level_2 against sll stripping"] = dev_provide_protection_against_sslStripping_level_2.length
-    json_comp["devices that offer protection_level_2 against sll stripping"] = dev_provide_protection_against_sslStripping_level_2
-    json_comp["number of devices that offer protection_level_3 against sll stripping"] = dev_provide_protection_against_sslStripping_level_3.length
-    json_comp["devices that offer protection_level_3 against sll stripping"] = dev_provide_protection_against_sslStripping_level_3
-    json_comp["number of devices that offer protection_level_4 against sll stripping"] = dev_provide_protection_against_sslStripping_level_4.length
-    json_comp["devices that offer protection_level_4 against sll stripping"] = dev_provide_protection_against_sslStripping_level_4
-    
-    // level of protection against clickjacking(x-fram-option)
-    json_comp["number of devices that dose not offer protection against clickjacking"] = dev_provide_no_protection_against_clickjacking_level_0.length
-    json_comp["devices that dose not offer protection against clickjacking"] = dev_provide_no_protection_against_clickjacking_level_0
-
-    json_comp["number of devices that offer protection_level_1 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_1.length
-    json_comp["devices that offer protection_level_1 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_1
-    json_comp["number of devices that offer protection_level_2 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_2.length
-    json_comp["devices that offer protection_level_2 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_2
-    json_comp["number of devices that offer protection_level_3 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_3.length
-    json_comp["devices that offer protection_level_3 against clickjacking (csp frame-ancestors)"] = dev_provide_protection_against_clickjacking_csp_level_3
-
-    json_comp["number of devices that offer protection_level_1 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_1.length
-    json_comp["devices that offer protection_level_1 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_1
-    json_comp["number of devices that offer protection_level_2 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_2.length
-    json_comp["devices that offer protection_level_2 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_2
-    json_comp["number of devices that offer protection_level_3 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_3.length
-    json_comp["devices that offer protection_level_3 against clickjacking (xfo)"] = dev_provide_protection_against_clickjacking_xfo_level_3
-   
-    // protection against hijacking
-    json_comp["number of devices that dose not offer protection against hijacking"] = dev_provide_no_protection_against_hijacking.length
-    json_comp["devices that dose not offer protection against hijacking"] = dev_provide_no_protection_against_hijacking
-    json_comp["number of devices that offer protection against hijacking"] = dev_provide_protection_against_hijacking.length
-    json_comp["devices that offer protection against hijacking"] = dev_provide_protection_against_hijacking
-    
-    // level of protection against csrf
-    json_comp["number of devices that dose not offer protection against csrf"] = dev_provide_no_protection_against_csrf_level_0.length
-    json_comp["devices that dose not offer protection against csrf"] = dev_provide_no_protection_against_csrf_level_0
-    json_comp["number of devices that offer protection_level_1 against csrf"] = dev_provide_protection_against_csrf_level_1.length
-    json_comp["devices that offer protection_level_1 against csrf"] = dev_provide_protection_against_csrf_level_1
-    json_comp["number of devices that offer protection_level_2 against csrf"] = dev_provide_protection_against_csrf_level_2.length
-    json_comp["devices that offer protection_level_2 against csrf"] = dev_provide_protection_against_csrf_level_2
-    
-    // protection against steeling the cookies (XXS)
-    json_comp["number of devices that dose not offer protection against steeling the cookies"] = dev_provide_no_protection_against_steeling_cookies.length
-    json_comp["devices that dose not offer protection against steeling the cookies"] = dev_provide_no_protection_against_steeling_cookies
-    json_comp["number of devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies.length
-    json_comp["devices that offer protection against steeling the cookies"] = dev_provide_protection_against_steeling_cookies
-    //console.log("FFFFFFFFFFFFFFFFFFFFFF")
-    //console.log(csp_policies)
-    json_comp["visited link"] = csp_policies[1][1][csp_policies[1][1].length-1][1]
-    //console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-    //console.log(pageName)
-    //console.log(JSON.stringify(json_comp))
-    //console.log(resultPath)
-    //console.log(osystem)
-    //console.log(websites)
-    for(var e of websites){
-        //console.log(e)
-    }
-    fs.writeFileSync(`./${resultPath}/compResult_${pageName}.json`, JSON.stringify(json_comp))
-    //console.log("dfdfdfdfdfdf")
-
-}
-
-
-
 
 
 
@@ -1474,14 +1731,16 @@ function get_ProtectionLevel_AgainstClickjacking(xfo, arr) {
     else {
      // level in case xfo value is ALLOW-FROM uri
         level = 1;
-        switch(xfo) {
-            case 'DENY' : { level = 3; }
-                break;
-            case 'SAMEORIGIN' : { level = 2; }
-                break;
-            default : console.log("xfo value is ALLOW-FROM or something that is not defined/Supported")
-                break;
+        if(xfo.includes('DENY') || xfo.includes('deny')){
+            level = 3; 
+        }else if(xfo.includes('SAMEORIGIN') || xfo.includes('sameorigin')){
+            level = 2; 
+        }else{
+            console.log("xfo value is ALLOW-FROM or something that is not defined/Supported")
+            console.log(xfo)
+
         }
+       
     }
    
 
