@@ -89,9 +89,6 @@ jsonsFiles.forEach(filename => {
 });
 
 
-//console.log(homePages)
-//console.log(subpages)
-//console.log(nonceInfo)
 
 run();
 checkNonceHomeSubPages();
