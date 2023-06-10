@@ -1,4 +1,3 @@
-//const { colorSets } = require('canvasjs/src/constants/themes');
 const { firefox, devices, chromium, webkit, expect } = require('@playwright/test');
 const playwright = require('@playwright/test');
 const parser = require('./csp_parsing')
