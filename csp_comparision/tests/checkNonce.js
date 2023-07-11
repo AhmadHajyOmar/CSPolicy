@@ -14,10 +14,10 @@ const { NOTFOUND } = require('dns');
 const { join } = require('path');
 const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
 const geo = fs.readFileSync("./tests/geo", 'utf-8').split(/\r?\n/);
-
+let choice = geo[2]
 var acceptLanguage = op[op.length-1]
 op.pop();
-const usedBrowserToTest = fs.readFileSync("./tests/browserToTest", 'utf-8').split(/\r?\n/);
+let usedBrowserToTest = fs.readFileSync("./tests/browserToTest", 'utf-8').split(/\r?\n/);
 var dir = "(";
 for(let i = 0; i < op.length; i++){
   if(i === op.length-1){
@@ -26,74 +26,79 @@ for(let i = 0; i < op.length; i++){
     dir += op[i] + " "
   }
 }
-
+if (choice === '1' && usedBrowserToTest.includes("WebKit")){
+    usedBrowserToTest = ["WebKit"]
+}
 dir += "-(" + usedBrowserToTest[0]+")"
-var folder = `./nonceValue-${acceptLanguage}-${dir}`
-var resultFolder = `./HomeSubNonce-${acceptLanguage}-${dir}`
-var resultFolder2 = `./nonceDuplicate-${acceptLanguage}-${dir}`
-const  jsonsFiles =  fs.readdirSync(folder).filter((filename) => path.extname(filename) === '.json');
-let homePages = new Array()
-let subpages = new Array()
-let nonceInfo = new Array()
-//console.log(jsonsFiles)
-let csp_policies = new Array();
-jsonsFiles.forEach(filename => {
-    if(!filename.includes("§") && !homePages.includes(filename.split("_")[0])){
-        homePages.push(filename.split("_")[0])
-    }else{
-        if(!subpages.includes(filename.split("_")[0])){
-            subpages.push(filename.split("_")[0])
-        }
-    }
-
-    let opNonce = new Array()
-    //console.log(filename)
-    const fileData = fs.readFileSync(path.join(folder, filename));                    
-    const json_arr = JSON.parse(fileData.toString());
-    let json_str = JSON.stringify(json_arr);
-    json_after_split = json_str.substring(1, json_str.length - 1);
-    json_after_split = json_after_split.split(/,"/)
-    opNonce.push(filename.split("_")[0])
-    filename_debuger = filename
-    let arr_2 = new Array();
-    //console.log(json_after_split)
-    for (var elem of json_after_split) {
-        let header;
-        let arr_;
-        let header_value;
-        if((elem.includes(":") && !elem.includes("http")) || elem.includes("visited link")){
-            arr_ = elem.split(/":/);
-            //console.log(arr_)
-            //console.log("UUUUUUUUUUUUUUUUUUUUU")
-            //console.log(arr_)
-            //console.log(arr_[1])
-            header = delete_StrSy(arr_[0], "\"");
-            header_value = delete_StrSy(arr_[1], "\"")
-            header_value = delete_StrSy(header_value, "\\")
-            arr_2.push([header, header_value])
-        }else {
-            elem = elem.replaceAll("\"", "")
-            if(elem.endsWith(" ")){
-                arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + elem
-            }else{
-                arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + " " + elem
+for(var bro of usedBrowserToTest){
+    var folder = `./nonceValue-${acceptLanguage}-${dir}-${bro}`
+    var resultFolder = `./HomeSubNonce-${acceptLanguage}-${dir}-${bro}`
+    var resultFolder2 = `./nonceDuplicate-${acceptLanguage}-${dir}-${bro}`
+    const  jsonsFiles =  fs.readdirSync(folder).filter((filename) => path.extname(filename) === '.json');
+    let homePages = new Array()
+    let subpages = new Array()
+    let nonceInfo = new Array()
+    //console.log(jsonsFiles)
+    let csp_policies = new Array();
+    jsonsFiles.forEach(filename => {
+        if(!filename.includes("§") && !homePages.includes(filename.split("_")[0])){
+            homePages.push(filename.split("_")[0])
+        }else{
+            if(!subpages.includes(filename.split("_")[0])){
+                subpages.push(filename.split("_")[0])
             }
         }
-                        
-    }
-    opNonce.push(arr_2)
     
-    nonceInfo.push(opNonce)
-    //console.log(csp)
+        let opNonce = new Array()
+        //console.log(filename)
+        const fileData = fs.readFileSync(path.join(folder, filename));                    
+        const json_arr = JSON.parse(fileData.toString());
+        let json_str = JSON.stringify(json_arr);
+        json_after_split = json_str.substring(1, json_str.length - 1);
+        json_after_split = json_after_split.split(/,"/)
+        opNonce.push(filename.split("_")[0])
+        filename_debuger = filename
+        let arr_2 = new Array();
+        //console.log(json_after_split)
+        for (var elem of json_after_split) {
+            let header;
+            let arr_;
+            let header_value;
+            if((elem.includes(":") && !elem.includes("http")) || elem.includes("visited link")){
+                arr_ = elem.split(/":/);
+                //console.log(arr_)
+                //console.log("UUUUUUUUUUUUUUUUUUUUU")
+                //console.log(arr_)
+                //console.log(arr_[1])
+                header = delete_StrSy(arr_[0], "\"");
+                header_value = delete_StrSy(arr_[1], "\"")
+                header_value = delete_StrSy(header_value, "\\")
+                arr_2.push([header, header_value])
+            }else {
+                elem = elem.replaceAll("\"", "")
+                if(elem.endsWith(" ")){
+                    arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + elem
+                }else{
+                    arr_2[arr_2.length-1][1] = arr_2[arr_2.length-1][1] + " " + elem
+                }
+            }
+                            
+        }
+        opNonce.push(arr_2)
+        
+        nonceInfo.push(opNonce)
+        //console.log(csp)
+        
+    });
     
-});
+    run(nonceInfo);
+    checkNonceHomeSubPages(homePages, nonceInfo, subpages);
+}
 
 
 
-run();
-checkNonceHomeSubPages();
 //console.log(nonceInfo)
-function checkNonceHomeSubPages(){
+function checkNonceHomeSubPages(homePages, nonceInfo, subpages){
     if(!fs.existsSync(resultFolder)){
         fs.mkdirSync(path.join("./", resultFolder));
     }
@@ -153,7 +158,7 @@ function checkNonceHomeSubPages(){
     }
 }
 
-function run() {
+function run(nonceInfo) {
     if(!fs.existsSync(resultFolder2)){
         fs.mkdirSync(path.join("./", resultFolder2));
     }
@@ -177,13 +182,17 @@ function run() {
 
             let dev = devices[devName];
             //console.log(dev)
+            //dev.pushe(2)
             //console.log(vHeight)
             //console.log(dev.viewport.height)
-            if(parseInt(dev.viewport.height)  != vHeight){
-                dev = devices[`${devName} landscape`]
-                //let devtry = devices["Galaxy S5 landscape"]
-                //console.log(devtry)
+            if(choice  === '1'){
+                if(parseInt(dev.viewport.height)  != vHeight){
+                    dev = devices[`${devName} landscape`]
+                    //let devtry = devices["Galaxy S5 landscape"]
+                    //console.log(devtry)
+                }
             }
+
             //console.log(vHeight)
             //console.log(dev.viewport.height)
         
@@ -197,17 +206,20 @@ function run() {
             }
             if(browserName === "Firefox"){
                 bro = await playwright.firefox.launch({ headless: true, timeout: 30 * 100000}); 
-                let devStr = JSON.stringify(dev);
-                devStr = devStr.replace("\"isMobile\":true,", "")
-                devStr = devStr.replace("\"isMobile\":false,", "")
-                dev = JSON.parse(devStr);
+                if(choice === '1'){
+                    let devStr = JSON.stringify(dev);
+                    devStr = devStr.replace("\"isMobile\":true,", "")
+                    devStr = devStr.replace("\"isMobile\":false,", "")
+                    dev = JSON.parse(devStr);
+                }
+     
             }
     
             let context = await bro.newContext({
                 ...dev,
                 premissions: ['geolocation'],
                 geolocation: {latitude: parseFloat(geo[0]), longitude: parseFloat(geo[1])},
-                locale: 'de-DE',
+                locale: `${acceptLanguage}`,
                 ignoreHTTPSErrors: true
             });
             let page = await context.newPage();
