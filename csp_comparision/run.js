@@ -71,7 +71,6 @@ for(var fileName of fileNames) {
     }
     if(fileName === 'c' || fileName === 'C') {
         usedBrowserToTest.push("Chrome")
-        usedBrowserToTest.push("Edge")
     }
     if(fileName === 'w' || fileName === 'W') {
         usedBrowserToTest.push("WebKit")
@@ -108,7 +107,8 @@ for(var fileName of fileNames) {
         usedBrowserToTest.push("Safari")
         usedBrowserToTest.push("Firefox")
     } 
-    if(fileName === 'hi-IN' || fileName === 'nl-BE' || fileName === 'ar-SA' || fileName === 'ar-IQ' || fileName === 'ar-EG' || fileName === 'fr-CH' || fileName === 'en-US' || fileName === 'de-DE' || fileName === 'ru-RU' || fileName === 'en-GB' || fileName === 'fr-FR'){
+    if(fileName === 'hi-IN' || fileName === 'nl-BE' || fileName === 'ar-SA' || fileName === 'ar-IQ' || fileName === 'ar-EG' || fileName === 'fr-CH' || fileName === 'en-US' || fileName === 'de-DE' || fileName === 'ru-RU' || fileName === 'en-GB' || fileName === 'fr-FR' 
+    || fileName === 'ab-YZ' || fileName === 'AR;q=10'){
         acceptLanguage = fileName
         if (acceptLanguage.length === 0){
             option.push("de-DE")
@@ -125,7 +125,18 @@ for(var fileName of fileNames) {
         geo.push(fileName.substring(3))
     } 
     
-    
+    if(fileName.includes("uaOption")){
+        let choice = fileName.split("uaOption")[1]
+        geo.push(choice)
+        if(choice != "1"){
+            usedBrowserToTest = new Array();
+            usedBrowserToTest.push("Chrome")
+            usedBrowserToTest.push("Firefox")
+            usedBrowserToTest.push("WebKit")
+        }
+     
+
+    }
    
 
     //ToDo the rest
