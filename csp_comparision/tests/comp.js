@@ -26,7 +26,7 @@ for(let i = 0; i < op.length; i++){
     dir += op[i] + " "
   }
 }
-
+//yxc
 dir += "-(" + usedBrowserToTest[0]+")"
 var folder = `./cspHeaders-${acceptLanguage}-${dir}`
 var folder2 = `./compare-${acceptLanguage}-${dir}`
