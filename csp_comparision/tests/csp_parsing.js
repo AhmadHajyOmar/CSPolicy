@@ -17,38 +17,111 @@ function cspParser(headers) {
 	}
 	//console.log("OUTPUT")
 	//console.log(csp_arr)
+	/*
 	for(var e of csp_arr){
 		if(e[0] === 'content-security-policy'){
+	
+			console.log("ZZZZZZZZZZZZZZZZZZZZ")
+			//console.log(e[1].includes("script-src"))
+			console.log(e[1])
 			if(e[1][0].includes("\\n")){
 				e[1][0] = e[1][0].replaceAll("\\n",";")
 			}
-			e[1][0] = ignoreDuplikateDirectives(e[1][0], "script-src")
-			e[1][0] = ignoreDuplikateDirectives(e[1][0], "default-src")
-			e[1][0] = ignoreDuplikateDirectives(e[1][0], "script-src-elem")
+			e[1][0] = duplikateDirectives(e[1][0], "script-src")
+			e[1][0] = duplikateDirectives(e[1][0], "default-src")
+			e[1][0] = duplikateDirectives(e[1][0], "script-src-elem")
+			console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
+			console.log(e[1])
+			//csp_arr.pushe(2)
 		}
 	}
+	*/
+	//console.log(csp_arr)
 	return csp_arr
 }
 
-function ignoreDuplikateDirectives(directives, dierctive){
+function duplikateDirectives(directives, dierctive){
 	let arr = directives.split(";")
 	//console.log(arr)
 	let i = 0;
 	let index = 0;
+	let elem = "";
 	for(let j = 0; j < arr.length; j++){
 		if(arr[j].includes(`${dierctive}`)){
 			i++
 			if(i>1){
-				let elem = "";
 				for(let n = 0; n < arr.length; n++){
 					if(n === arr.length-1 && (n != j)){
 						elem += arr[n]
 					}else{
 						if(n != j){
 							elem += arr[n]+";"
+						}else{
+							/*
+							//console.log(elem)
+							//console.log("RRRRRRRRRRRRRRRRRRRR")
+							//console.log(arr[n])
+							let dupDir = arr[n].split(/\s/g)
+							let arrdup = elem.split(";")
+							let indexFound = 0;
+							let newArr = new Array()
+							for(let p = 0; p < arrdup.length; p++){
+								let arrP = arrdup[p].split(/\s/g)
+								newArr = arrP
+								//console.log(arrP)
+								if(arrP[0] === dierctive){
+									//console.log("LLLLLLLLLLLLLLLLLLLLLLLL")
+									//console.log(dupDir)
+									//console.log(newArr)
+									for(var h of dupDir){
+										if(!newArr.includes(h)){
+											newArr.push(h)
+										}
+									}
+								}
+								if(arrP[0] === dierctive){
+								
+									elem = new String()
+								for(var a of arrdup){
+									if(a.split(/\s/g)[0] === dierctive){
+										for(var na of newArr){
+											if(na != newArr[newArr.length-1]){
+												elem += na + " "
+											}else{
+												elem += na
+
+											}
+										}
+										if(a != arrdup[arrdup.length-1]){
+											elem += ";"
+										}
+									}else{
+										if(a != arrdup[arrdup.length-1]){
+											elem += a + ";"
+
+										}else{
+											elem += a
+										}
+									}
+								}
+								//console.log(elem)
+								}
+							
+								
+
+							}
+							let directive = new Array();
+							//console.log("JJJJJJJJJJJJJJJJJ")
+							//console.log(elem)
+							//console.log(arrdup)
+							*/
 						}
+						//console.log("PPPPPPPPPPPPPPPPPPPPPP")
+						//console.log(elem)
 					}
 				}
+				//console.log("TTTTTTTTTTTTTTTTTTTTTTTTT")
+				//console.log(elem)
 				directives = elem;
 			}
 		}
@@ -253,6 +326,10 @@ function getCSP_Policy(csp, headers, headers_arr) {
 				let index = 0;
 				for(let i = 0; i < csp.length; i++) {
 					if(headers[j] == csp[i][0]) {
+						
+						if(csp[i][0] === "content-security-policy"){
+							csp.push(headers_arr[j])
+						}
 						check_flage = true;
 						index = i;
 						break;
@@ -286,6 +363,7 @@ function getCSP_Policy(csp, headers, headers_arr) {
 
 						}
 						let mulcsp = "";
+						/*
 						if(headers_arr[j][0].includes("content-security-policy") && headers_arr[j][0].includes("report-only")){
 							//console.log("LOOKKKKK")
 							//console.log(csp[index])
@@ -295,36 +373,14 @@ function getCSP_Policy(csp, headers, headers_arr) {
 							//console.log(acsp)
 							//console.log("LLLLLLLLLLLLLLLLLLLL")
 							//console.log(ncsp)
-							/*
-							for(let v of acsp){
-								let gh3 = getDirective_Sources(csp, v[0])
-								console.log("IIIIIIIIIIIIIIIIIII")
-								console.log(gh3)
-							}
 						
-							for(let b of ncsp){
-								console.log("MMMMMMMMMMMMMMMMMMMM")
-								console.log(b[0])
-								let gh4 = getDirective_Sources(headers_arr,b[0])
-								console.log(gh4)
-							}*/
 							let report_uri = false;
 							for(let z = 0; z < acsp.length; z++){
 								akcspH = acsp[z]
 								for(let ncspH of ncsp){
 									let array = new Array()
-									/*console.log(akcspH)
-									console.log(ncspH)
-									console.log(akcspH == ncspH)*/
-									/*if(akcspH[0] == 'report-uri' && !report_uri){
-										if(z == 0){
-											mulcsp += akcspH + " "
-										}else {
-											mulcsp += ";" + akcspH + " "
-
-										}
-										report_uri = true
-									}*/
+								
+								
 
 									if((akcspH[0] === ncspH[0]) && (akcspH[0] != 'report-uri')){
 										//console.log(akcspH)
@@ -352,7 +408,7 @@ function getCSP_Policy(csp, headers, headers_arr) {
 												}
 											}
 										}
-								
+										
 
 
 									}
@@ -360,7 +416,7 @@ function getCSP_Policy(csp, headers, headers_arr) {
 							}
 						
 
-						}
+						}*/
 						if(mulcsp.length > 0){
 							//console.log("output")
 							//console.log(mulcsp)
