@@ -6,6 +6,7 @@ var latitude = prompt("What is your latitude? ");
 var longitude = prompt("What is your longitude? ");
 var browser = "";
 var accLanguage = "";
+var uaOption = "";
 while(1){
     console.log("Choose one of the following browsers:")
     console.log("type c for chrom")
@@ -17,16 +18,27 @@ while(1){
     }
 }
 while(1){
-    console.log("Choose one of the following browsers:")
-    console.log("fr-CH, en-US, de-DE, ru-RU, en-GB, fr-FR, ar-EG, ar-IQ, ar-SA, nl-BE, hi-IN")
+    console.log("Choose one of the following accept languages:")
+    console.log("fr-CH, en-US, de-DE, ru-RU, en-GB, fr-FR, ar-EG, ar-IQ, ar-SA, nl-BE, hi-IN, ab-YZ(not supported accept language), AR;q=10  (mal-formed accept language)")
     accLanguage = prompt("What is your language? ")
-    if(accLanguage === 'hi-IN' || accLanguage === 'nl-BE' || accLanguage === 'ar-SA' || accLanguage === 'ar-IQ' || accLanguage === 'ar-EG' || accLanguage === 'fr-CH' || accLanguage === 'en-US' || accLanguage === 'de-DE' || accLanguage === 'ru-RU' || accLanguage === 'en-GB' || accLanguage === 'fr-FR'){
+    if(accLanguage === 'hi-IN' || accLanguage === 'nl-BE' || accLanguage === 'ar-SA' || accLanguage === 'ar-IQ' || accLanguage === 'ar-EG' || accLanguage === 'fr-CH' || accLanguage === 'en-US' || accLanguage === 'de-DE' || accLanguage === 'ru-RU' || accLanguage === 'en-GB' || accLanguage === 'fr-FR' || accLanguage === 'ab-YZ'
+    || accLanguage === 'AR;q=10' ){
+        break;
+    }
+}
+while(1){
+    console.log("Choose one of the following option:")
+    console.log("1: existed ua")
+    console.log("2: not existed ua")
+    console.log("3: mal-formed ua")
+
+    uaOption = prompt("What is your choice? ")
+    if(uaOption === '1' || uaOption === '2' || uaOption === '3'){
         break;
     }
 }
 
-
-exec(`node ./run.js website_1.txt all ${browser} ${accLanguage} lat${latitude} lon${longitude}`,{maxBuffer: undefined}, (error, stdout, stderr) => {
+exec(`node ./run.js website_1.txt all ${browser} ${accLanguage} lat${latitude} lon${longitude} uaOption${uaOption}`,{maxBuffer: undefined}, (error, stdout, stderr) => {
     if (error) {
         console.error(error)
         return;
