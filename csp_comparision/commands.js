@@ -1,7 +1,22 @@
 const { exec } = require('node:child_process')
 const { spawn } = require('node:child_process')
 const prompt = require('prompt-sync')();
+const options = process.argv.splice(2);
+console.log(options)
 
+
+
+var latitude = options[0]
+var longitude = options[1]
+var browser = options[2]
+var accLanguage = options[3]
+var uaOption = options[4]
+console.log(latitude)
+console.log(longitude)
+console.log(browser)
+console.log(accLanguage)
+console.log(uaOption)
+/*
 var latitude = prompt("What is your latitude? ");
 var longitude = prompt("What is your longitude? ");
 var browser = "";
@@ -37,6 +52,8 @@ while(1){
         break;
     }
 }
+*/
+
 
 exec(`node ./run.js website_1.txt all ${browser} ${accLanguage} lat${latitude} lon${longitude} uaOption${uaOption}`,{maxBuffer: undefined}, (error, stdout, stderr) => {
     if (error) {
