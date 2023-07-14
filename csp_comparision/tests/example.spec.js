@@ -105,6 +105,7 @@ var array = [
   ["40.4081906", "-3.6894398", "c", "ab-YZ", "2"],
  
 ]
+
 const website = process.argv.splice(2);
 let choosedBrowsers = new Array();
 let usedBrowserToTest = new Array();
@@ -629,9 +630,9 @@ for(var e of array){
           }catch (e) {
             //console.log(e);
             ``
-            if(!fs.existsSync(`./notReachableLinks-${acceptLanguage}-${dir}/${pageName}`)){
+            /*if(!fs.existsSync(`./notReachableLinks-${acceptLanguage}-${dir}/${pageName}`)){
               fs.mkdirSync(path.join(`./notReachableLinks-${acceptLanguage}-${dir}/`, `${pageName}`));
-            }
+            }*/
             const os = userAgentInfo.os.name
             const os_version = userAgentInfo.os.version;
             

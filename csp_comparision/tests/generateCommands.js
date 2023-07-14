@@ -130,9 +130,7 @@ if(choice[0] == 'h'){
     for(var c of shufflearr){
         let g = c.split("Ahmad")
         subpages_PageNames.push(g[1])
-        let subpage = g[0]
-        subpage = subpage.replaceAll("&", "")
-        commandsSubPage += `node ./commands.js s ${g[1]} ${subpage} ${op} ${waitingTime}\n`
+        commandsSubPage += `node ./commands.js s ${g[1]} '${g[0]}' ${op} ${waitingTime}\n`
     }
     fs.writeFileSync(`./tests/SubpagseCommands.txt`, commandsSubPage)
     var subpagesNames = new String();

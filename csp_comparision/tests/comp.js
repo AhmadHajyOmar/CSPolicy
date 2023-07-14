@@ -139,7 +139,6 @@ let HomeSubpagesUnSafeAgainstsllstrippingForAllUserAgent = new Array();
 let HomeSubpagesSafeAndUnSafeAgainstsllstrippingForAllUserAgent = new Array();
 let HomeSubpagesSafeAndUnSafeAgainstsllstrippingForAllUserAgentDetails = new Array();
 
-// change
 
 var array = [
     ["50.1108539", "8.63226654", "w", "en-US", "1"],

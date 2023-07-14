@@ -13,36 +13,171 @@ const { isContext, createContext } = require('vm');
 const { NOTFOUND } = require('dns');
 const { join } = require('path');
 const { kMaxLength } = require('buffer');
-const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
-var acceptLanguage = op[op.length-1]
-op.pop();
-const usedBrowserToTest = fs.readFileSync("./tests/browserToTest", 'utf-8').split(/\r?\n/);
-var dir = "(";
-for(let i = 0; i < op.length; i++){
-  if(i === op.length-1){
-    dir += op[i] + ")"
+var array = [
+  ["50.1108539", "8.63226654", "w", "en-US", "1"],
+  ["39.9950204", "127.61141", "w", "en-US", "1"],
+  ["44.4862873", "-88.029133", "w", "en-US", "1"],
+  ["-15.844159", "-47.914547", "w", "en-US", "1"],
+  ["40.4081906", "78.5004047", "w", "en-US", "1"],
+  ["30.0309385", "31.2364469", "w", "en-US", "1"],
+  ["40.4081906", "-3.6894398", "w", "en-US", "1"],
+  ["40.4081906", "-3.6894398", "w", "de-DE", "1"],
+  ["40.4081906", "-3.6894398", "w", "ar-SA", "1"],
+  ["40.4081906", "-3.6894398", "w", "ar-IQ", "1"],
+  ["40.4081906", "-3.6894398", "w", "hi-IN", "1"],
+  ["40.4081906", "-3.6894398", "w", "AR;q=10", "1"],
+  ["40.4081906", "-3.6894398", "w", "ab-YZ", "1"],
+
+  ["50.1108539", "8.63226654", "f", "en-US", "1"],
+  ["39.9950204", "127.61141", "f", "en-US", "1"],
+  ["44.4862873", "-88.029133", "f", "en-US", "1"],
+  ["-15.844159", "-47.914547", "f", "en-US", "1"],
+  ["40.4081906", "78.5004047", "f", "en-US", "1"],
+  ["30.0309385", "31.2364469", "f", "en-US", "1"],
+  ["40.4081906", "-3.6894398", "f", "en-US", "1"],
+  ["40.4081906", "-3.6894398", "f", "de-DE", "1"],
+  ["40.4081906", "-3.6894398", "f", "ar-SA", "1"],
+  ["40.4081906", "-3.6894398", "f", "ar-IQ", "1"],
+  ["40.4081906", "-3.6894398", "f", "hi-IN", "1"],
+  ["40.4081906", "-3.6894398", "f", "AR;q=10", "1"],
+  ["40.4081906", "-3.6894398", "f", "ab-YZ", "1"],
+
+  ["50.1108539", "8.63226654", "c", "en-US", "1"],
+  ["39.9950204", "127.61141", "c", "en-US", "1"],
+  ["44.4862873", "-88.029133", "c", "en-US", "1"],
+  ["-15.844159", "-47.914547", "c", "en-US", "1"],
+  ["40.4081906", "78.5004047", "c", "en-US", "1"],
+  ["30.0309385", "31.2364469", "c", "en-US", "1"],
+  ["40.4081906", "-3.6894398", "c", "en-US", "1"],
+  ["40.4081906", "-3.6894398", "c", "de-DE", "1"],
+  ["40.4081906", "-3.6894398", "c", "ar-SA", "1"],
+  ["40.4081906", "-3.6894398", "c", "ar-IQ", "1"],
+  ["40.4081906", "-3.6894398", "c", "hi-IN", "1"],
+  ["40.4081906", "-3.6894398", "c", "AR;q=10", "1"],
+  ["40.4081906", "-3.6894398", "c", "ab-YZ", "1"],
+
+  ["50.1108539", "8.63226654", "c", "en-US", "3"],
+  ["39.9950204", "127.61141", "c", "en-US", "3"],
+  ["44.4862873", "-88.029133", "c", "en-US", "3"],
+  ["-15.844159", "-47.914547", "c", "en-US", "3"],
+  ["40.4081906", "78.5004047", "c", "en-US", "3"],
+  ["30.0309385", "31.2364469", "c", "en-US", "3"],
+  ["40.4081906", "-3.6894398", "c", "en-US", "3"],
+  ["40.4081906", "-3.6894398", "c", "de-DE", "3"],
+  ["40.4081906", "-3.6894398", "c", "ar-SA", "3"],
+  ["40.4081906", "-3.6894398", "c", "ar-IQ", "3"],
+  ["40.4081906", "-3.6894398", "c", "hi-IN", "3"],
+  ["40.4081906", "-3.6894398", "c", "AR;q=10", "3"],
+  ["40.4081906", "-3.6894398", "c", "ab-YZ", "3"],
+
+  ["50.1108539", "8.63226654", "c", "en-US", "2"],
+  ["39.9950204", "127.61141", "c", "en-US", "2"],
+  ["44.4862873", "-88.029133", "c", "en-US", "2"],
+  ["-15.844159", "-47.914547", "c", "en-US", "2"],
+  ["40.4081906", "78.5004047", "c", "en-US", "2"],
+  ["30.0309385", "31.2364469", "c", "en-US", "2"],
+  ["40.4081906", "-3.6894398", "c", "en-US", "2"],
+  ["40.4081906", "-3.6894398", "c", "de-DE", "2"],
+  ["40.4081906", "-3.6894398", "c", "ar-SA", "2"],
+  ["40.4081906", "-3.6894398", "c", "ar-IQ", "2"],
+  ["40.4081906", "-3.6894398", "c", "hi-IN", "2"],
+  ["40.4081906", "-3.6894398", "c", "AR;q=10", "2"],
+  ["40.4081906", "-3.6894398", "c", "ab-YZ", "2"],
+ 
+]
+var uri = fs.readFileSync("./website_1.txt", 'utf-8').split(/\r?\n/);
+let web = new Array();
+for(var u of uri){
+  let i = u.split(".")
+  let page = ""
+  for(let j = 0; j < i.length; j++){
+      if(j!=i.length-1){
+          page += i[j]+"-"
+      }else{
+          page += i[j]
+      }
+  }
+  web.push(page)
+}
+
+var uriSub = fs.readFileSync("./tests/SubpagseNames.txt", 'utf-8').split(/\r?\n/);
+for(var e of uriSub){
+  web.push(e)
+}
+
+let choosedBrowsers = new Array();
+let usedBrowserToTest = new Array();
+var subPages = new Array();
+var lat = 0;
+var lon = 0;
+var choice = 0;
+let browserChoice = "";
+var op = ["Android", "iOS", "Windows", "Mac OS"]
+var acceptLanguage = "";
+
+var dir = "("
+
+
+for(var e of array){
+  console.log(e)
+  choosedBrowsers = new Array()
+  usedBrowserToTest = new Array();
+  subPages = new Array();
+  lat = parseFloat(e[0])
+  lon = parseFloat(e[1])
+  choice = parseInt(e[4])
+  acceptLanguage = e[3]
+  browserChoice = e[2];
+  if (browserChoice === "c" && choice === 1){
+    usedBrowserToTest = ["Chrome"]
+  }else if (browserChoice === "w" && choice === 1){
+    usedBrowserToTest = ["WebKit"]
+  }else if (browserChoice === "f" && choice === 1){
+    usedBrowserToTest = ["Firefox"]
   }else{
-    dir += op[i] + " "
+    if(choice != 1){
+      console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
+      usedBrowserToTest = ["Chrome", "Firefox", "WebKit"]
+    }
+  }
+  console.log(usedBrowserToTest)
+  
+  var dir = new String();
+  if(choice === 1){
+    dir = "("+ lat + " " + lon + ")-("+(usedBrowserToTest[0])+")-(" + choice+")";
+  }else{
+    if(choice === 2){
+      dir = "("+ lat + " " + lon + ")-(Non-Existing)-(" + choice+")";
+    }else{
+      dir = "("+ lat + " " + lon + ")-(Malformed)-(" + choice+")";
+
+    }
+  }
+  for(var f of usedBrowserToTest){
+    var folder = `./HomeSubNonce-${acceptLanguage}-${dir}-${f}`
+    console.log(folder)
+    if(fs.existsSync(folder)){
+      console.log("UUUUUUUUUUUUUUUUUUUUUU")
+      console.log(folder)
+      let numberOfHomePagesThatProvideSimilarNonceValueLikeSub = new Array();
+      let numberOfTotalHomePagesWithNoncesUsingDiffDev = 0
+      let homePagesThatProvideSimilarNonceValueLikeSub = new Array();
+      let homePagesArr = new Array()
+      getPagesSaftyResult();
+      var finalResult = `./final_Result-${acceptLanguage}-${dir}-${f}`
+      if(!fs.existsSync(finalResult)){
+        fs.mkdirSync(path.join("./", finalResult));
+      }
+      let json = {}
+      json["Number of total home pages"] = numberOfTotalHomePagesWithNoncesUsingDiffDev
+      json["home pages with nonce value"] = homePagesArr
+      json["Number of homepages that have the same nonce value as it subpages"] = numberOfHomePagesThatProvideSimilarNonceValueLikeSub
+      json["Homepages that have the same nonce value as it subpages"] = homePagesThatProvideSimilarNonceValueLikeSub
+      fs.writeFileSync(`./${finalResult}/Home-SubpagesNonceValueSimilarity.json`, JSON.stringify(json))
+    }
   }
 }
 
-dir += "-(" + usedBrowserToTest[0]+")"
-var folder = `./HomeSubNonce-${acceptLanguage}-${dir}`
-let numberOfHomePagesThatProvideSimilarNonceValueLikeSub = new Array();
-let numberOfTotalHomePagesWithNoncesUsingDiffDev = 0
-let homePagesThatProvideSimilarNonceValueLikeSub = new Array();
-let homePagesArr = new Array()
-getPagesSaftyResult();
-var finalResult = `./final_Result-${acceptLanguage}-${dir}`
-if(!fs.existsSync(finalResult)){
-  fs.mkdirSync(path.join("./", finalResult));
-}
-let json = {}
-json["Number of total home pages"] = numberOfTotalHomePagesWithNoncesUsingDiffDev
-json["home pages with nonce value"] = homePagesArr
-json["Number of homepages that have the same nonce value as it subpages"] = numberOfHomePagesThatProvideSimilarNonceValueLikeSub
-json["Homepages that have the same nonce value as it subpages"] = homePagesThatProvideSimilarNonceValueLikeSub
-fs.writeFileSync(`./${finalResult}/Home-SubpagesNonceValueSimilarity.json`, JSON.stringify(json))
 
 
 function getPagesSaftyResult(){
