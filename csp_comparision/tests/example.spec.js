@@ -640,7 +640,6 @@ for(var e of array){
             let json = {}
             json["Not Reachable webpage"] = pageName
             json["visited links"] = url
-            fs.writeFileSync(`./notReachableLinks-${acceptLanguage}-${dir}/${pageName}/${fileName}`, JSON.stringify(json))
             reachable = false
           }
           //await waitingTime(2000)
