@@ -1,17 +1,35 @@
 const { exec } = require('node:child_process')
 const { spawn } = require('node:child_process')
+const fs = require('fs')
+const path = require('path')
 const prompt = require('prompt-sync')();
 const options = process.argv.splice(2);
-
 console.log(options)
-var mode = options[0]
-var pageName = options[1]
-var url = options[2]
-var headmode = options[3]
-var waitingTime = options[4]
 
+const domains = fs.readFileSync("./website_1.txt", 'utf-8').split(/\r?\n/);
+for(var d of domains){
+    exec(`node ./commands.js 40.4081906 -3.6894398 c en-US 2 ${d}`,{maxBuffer: undefined}, (error, stdout, stderr) => {
+        if (error) {
+            console.error(error)
+            return;
+        }
+        console.log(stdout)
+    });
+}
 
-
+/*
+var latitude = options[0]
+var longitude = options[1]
+var browser = options[2]
+var accLanguage = options[3]
+var uaOption = options[4]
+var website = options[5]
+console.log(latitude)
+console.log(longitude)
+console.log(browser)
+console.log(accLanguage)
+console.log(uaOption)
+*/
 /*
 var latitude = prompt("What is your latitude? ");
 var longitude = prompt("What is your longitude? ");
@@ -50,84 +68,48 @@ while(1){
 }
 */
 
-exec(`node ./tests/example.spec.js ${mode} ${pageName} ${url} ${headmode} ${waitingTime}`,{maxBuffer: undefined}, (error, stdout, stderr) => {
+/*
+exec(`node ./run.js ${website} all ${browser} ${accLanguage} lat${latitude} lon${longitude} uaOption${uaOption}`,{maxBuffer: undefined}, (error, stdout, stderr) => {
     if (error) {
         console.error(error)
         return;
     }
     console.log(stdout)
-    exec(`node ./tests/comp.js 1 ${pageName}`,{maxBuffer: undefined}, (error, stdout, stderr) => {
+    exec('node ./tests/example.spec.js h',{maxBuffer: undefined}, (error, stdout, stderr) => {
         if (error) {
             console.error(error)
             return;
         }
         console.log(stdout)
-    });
-    /*exec('node ./tests/example.spec.js s',{maxBuffer: undefined}, (error, stdout, stderr) => {
-        if (error) {
-            console.error(error)
-            return;
-        }
-        console.log(stdout)
-        
-        exec('node ./tests/comp.js alluris',{maxBuffer: undefined}, (error, stdout, stderr) => {
+        exec('node ./tests/example.spec.js s',{maxBuffer: undefined}, (error, stdout, stderr) => {
             if (error) {
                 console.error(error)
                 return;
             }
             console.log(stdout)
-            exec('node ./tests/checkNonce.js',{maxBuffer: undefined}, (error, stdout, stderr) => {
+            exec('node ./tests/comp.js alluris',{maxBuffer: undefined}, (error, stdout, stderr) => {
                 if (error) {
                     console.error(error)
                     return;
                 }
                 console.log(stdout)
-                exec('node ./tests/HSNonceResult.js',{maxBuffer: undefined}, (error, stdout, stderr) => {
+                exec('node ./tests/checkNonce.js',{maxBuffer: undefined}, (error, stdout, stderr) => {
                     if (error) {
                         console.error(error)
                         return;
                     }
                     console.log(stdout)
+                    exec('node ./tests/HSNonceResult.js',{maxBuffer: undefined}, (error, stdout, stderr) => {
+                        if (error) {
+                            console.error(error)
+                            return;
+                        }
+                        console.log(stdout)
+                    });
                 });
             });
         });
-    });*/
+    });
 });
 
-
-
-
-
-
-
-
-/*
-exec('node ./tests/example.spec.js h', (error, output) => {
-    if (error) {
-        console.error(error)
-    }else{
-        exec('node ./tests/example.spec.js s', (error, output) => {
-            if (error) {
-                console.error(error)
-            }else{
-                exec('node ./tests/comp.js alluris', (error, output) => {
-                    if (error) {
-                        console.error(error)
-                    }else{
-                        exec('node ./tests/checkNonce.js', (error, output) => {
-                            if (error) {
-                                console.error(error)
-                            }else{
-                                
-                            }
-                            console.log(output)
-                        })
-                    }
-                    console.log(output)
-                })
-            }
-            console.log(output)
-        })
-    }
-    console.log(output)
-})*/
+*/

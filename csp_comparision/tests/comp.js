@@ -14,37 +14,7 @@ const { NOTFOUND } = require('dns');
 const { join } = require('path');
 const { url } = require('inspector');
 const { connected } = require('process');
-// change
-const op = fs.readFileSync("./tests/option", 'utf-8').split(/\r?\n/);
-var acceptLanguage = op[op.length-1]
-op.pop();
-let usedBrowserToTest = fs.readFileSync("./tests/browserToTest", 'utf-8').split(/\r?\n/);
-var dir = "(";
-for(let i = 0; i < op.length; i++){
-  if(i === op.length-1){
-    dir += op[i] + ")"
-  }else{
-    dir += op[i] + " "
-  }
-}
-var geo = fs.readFileSync("./tests/geo", 'utf-8').split(/\r?\n/);
-let choice = geo[2]
 
-if (choice === '1' && usedBrowserToTest.includes("WebKit")){
-    usedBrowserToTest = ["WebKit"]
-
-}
-
-dir += "-(" + usedBrowserToTest[0]+")"
-var folder = `./cspHeaders-${acceptLanguage}-${dir}`
-var folder2 = `./compare-${acceptLanguage}-${dir}`
-var folder3 = `./nonceValue-${acceptLanguage}-${dir}`
-var resultFolderMobile = `./comparePagesWithDevices(Mobile)-${acceptLanguage}-${dir}`
-var resultFolderDesktop = `./comparePagesWithDevice(Desktop)s-${acceptLanguage}-${dir}`
-var resultFolder2Desktop = `./compareHomeWithSubpages(Desktop)-${acceptLanguage}-${dir}`
-var resultFolder2Mobile = `./compareHomeWithSubpages(Mobile)-${acceptLanguage}-${dir}`
-var resultFolderViewPort = `./compareViewPortDevices-${acceptLanguage}-${dir}`
-var finalResult = `./final_Result-${acceptLanguage}-${dir}`
 let numberOfPagesDViewPSafeCSP = 0;
 let numberOfPagesDViewPNotSafeCSP = 0;
 let numberOfPagesDViewPSafeAndNotSafeCSP = 0;
@@ -169,38 +139,16 @@ let HomeSubpagesUnSafeAgainstsllstrippingForAllUserAgent = new Array();
 let HomeSubpagesSafeAndUnSafeAgainstsllstrippingForAllUserAgent = new Array();
 let HomeSubpagesSafeAndUnSafeAgainstsllstrippingForAllUserAgentDetails = new Array();
 
-const jsonsInDir =  fs.readdirSync(folder);
-//console.log(`./cspHeaders-${acceptLanguage}-${dir}`)
-//console.log(jsonsInDir)
+// change
+var array = [
+    ["40.4081906", "-3.6894398", "c", "en-US", "1"],
+    ["40.4081906", "-3.6894398", "w", "de-DE", "1"],
+    ["40.4081906", "-3.6894398", "f", "de-DE", "1"],
+    ["40.4081906", "-3.6894398", "w", "de-DE", "2"],
+    ["40.4081906", "-3.6894398", "w", "de-DE", "3"],
+]
 
-var uri = fs.readFileSync("./tests/urls", 'utf-8').split(/\r?\n/);
-uri.pop()
-uri.pop()
-var permission = true;
-const compare_option = process.argv.splice(2);
-// console.log(compare_option)
-let filename_debuger;
-
-let devices_offerd_safe_csp = new Array();
-let devices_offerd_unsafe_csp = new Array();
-if (compare_option.length === 0 || compare_option.length > 1 || (compare_option.length===0 && (compare_option[0] != "alluri" && (!uri.includes(compare_option[o]))))) {
-    
-    console.log("\nPlease read the following instructions:\n")
-    console.log("If you want to compare results for one uri then plesae write the following command:\n")
-    console.log("node ./tests/comp.js uri\n")
-    console.log(`valid uris => ${uri}`)
-    console.log("\n")
-    console.log("If you want to compare all results of all given uris then please write the following command:\n")
-    console.log("node ./tests/comp.js alluris\n")
-    var permission = false;
-
-} else if (compare_option.length === 1 && uri.includes(compare_option[0])) {
-    
-    let page = compare_option[0]
-    uri = new Array();
-    uri.push(page)
-    console.log(uri)
-}
+var uri = fs.readFileSync("./website_1.txt", 'utf-8').split(/\r?\n/);
 let web = new Array();
 for(var u of uri){
     let i = u.split(".")
@@ -214,29 +162,114 @@ for(var u of uri){
     }
     web.push(page)
 }
-/*jsonsInDir.forEach(filename => {
-    if(filename.includes("csp")){
-        web.push(filename)
-    }
-});*/
-let websites = new Array();
-let check;
+
+var uriSub = fs.readFileSync("./tests/SubpagseNames.txt", 'utf-8').split(/\r?\n/);
+for(var e of uriSub){
+    web.push(e)
+}
+
+console.log(web)
+console.log(uri)
+let choosedBrowsers = new Array();
+let usedBrowserToTest = new Array();
+var subPages = new Array();
+var lat = 0;
+var lon = 0;
+var choice = 0;
+let choiceRun = 0;
+let browserChoice = "";
+var op = ["Android", "iOS", "Windows", "Mac OS"]
+var acceptLanguage = "";
 let devUA = new Array()
 let devArr = new Array()
 let allDev = new Array();
-let testURL = new Array();
-let testURL2 = new Array();
-let testURL3 = new Array();
-let notReachableWebSites = new Array();
-let notReachableWebSites2 = new Array();
-let notr = 0;
-console.log(usedBrowserToTest)
-if(permission) {
-    let allDeveices = new Array();
-    let allBrowsers = new Array();
-    let SB = new Array();
-    let NSB = new Array();
-    let links = new Array();
+const inputCommand = process.argv.splice(2);
+let compareOption = parseInt(inputCommand[0])
+let pageDomainName = inputCommand[1]
+choiceRun = parseInt(inputCommand[0])
+for(var e of array){
+    console.log(e)
+    devArr = new Array();
+    allDev = new Array();
+    choosedBrowsers = new Array()
+    devNames = new Array();
+    usedBrowserToTest = new Array();
+    subPages = new Array();
+    lat = parseFloat(e[0])
+    lon = parseFloat(e[1])
+    choice = parseInt(e[4])
+    acceptLanguage = e[3]
+    browserChoice = e[2];
+    if (browserChoice === "c" && choice === 1){
+      usedBrowserToTest = ["Chrome"]
+    }else if (browserChoice === "w" && choice === 1){
+      usedBrowserToTest = ["WebKit"]
+    }else if (browserChoice === "f" && choice === 1){
+      usedBrowserToTest = ["Firefox"]
+    }else{
+      if(choice != 1){
+        console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
+        usedBrowserToTest = ["Chrome", "Firefox", "WebKit"]
+      }
+    }
+    console.log(usedBrowserToTest)
+    
+    var dir = new String();
+    if(choice === 1){
+      dir = "("+ lat + " " + lon + ")-("+(usedBrowserToTest[0])+")-(" + choice+")";
+    }else{
+      if(choice === 2){
+        dir = "("+ lat + " " + lon + ")-(Non-Existing)-(" + choice+")";
+      }else{
+        dir = "("+ lat + " " + lon + ")-(Malformed)-(" + choice+")";
+  
+      }
+    }
+  
+    console.log(dir)
+
+    if(choice === 1){
+        if(usedBrowserToTest[0] === "Chrome"){
+            devArr = ['Galaxy S9+', 'Galaxy Tab S4']
+            devUA = ['Galaxy S9+_658_320', 'Galaxy S9+_320_658', 'Galaxy Tab S4_1138_712', 'Galaxy Tab S4_712_1138']
+            allDev = ['Galaxy S9+_658_320', 'Galaxy S9+_320_658', 'Galaxy Tab S4_1138_712', 'Galaxy Tab S4_712_1138', 'Desktop Chrome_720_1280']
+        }else if(usedBrowserToTest[0] === "Firefox"){
+            devArr = ['Galaxy S9+', 'iPhone 13']
+            allDev = ['Galaxy S9+_658_320', 'Galaxy S9+_320_658', 'iPhone 13_844_390', 'iPhone 13_390_844', 'Desktop Firefox_720_1280']
+            devUA = ['Galaxy S9+_658_320', 'Galaxy S9+_320_658', 'iPhone 13_844_390', 'iPhone 13_390_844']
+        }else{
+            devArr = ['iPhone 13', 'Galaxy Note 3']
+            allDev = ['iPhone 13_844_390', 'iPhone 13_390_844', 'Galaxy Note 3_640_360', 'Galaxy Note 3_360_640', 'Desktop Safari_720_1280']
+            devUA = ['iPhone 13_844_390', 'iPhone 13_390_844', 'Galaxy Note 3_640_360', 'Galaxy Note 3_360_640']
+        }
+    }else{
+        if(choice === 2){
+            allDev = ['MobileMBA_640_360', 'MobileMBI_640_360', 'DesktopDBW_720_1280', 'DesktopDBM_720_1280']
+        }else{
+            allDev = ['Mobile-mal-formed_720_1280', 'Desktop-mal-formed_720_1280']
+        }
+    }
+    var folder = `./cspHeaders-${acceptLanguage}-${dir}`
+    var folder2 = `./compare-${acceptLanguage}-${dir}`
+    var folder3 = `./nonceValue-${acceptLanguage}-${dir}`
+    var resultFolderMobile = `./comparePagesWithDevices(Mobile)-${acceptLanguage}-${dir}`
+    var resultFolderDesktop = `./comparePagesWithDevice(Desktop)s-${acceptLanguage}-${dir}`
+    var resultFolder2Desktop = `./compareHomeWithSubpages(Desktop)-${acceptLanguage}-${dir}`
+    var resultFolder2Mobile = `./compareHomeWithSubpages(Mobile)-${acceptLanguage}-${dir}`
+    var resultFolderViewPort = `./compareViewPortDevices-${acceptLanguage}-${dir}`
+    var finalResult = `./final_Result-${acceptLanguage}-${dir}`
+
+    let testURL = new Array();
+    let testURL2 = new Array();
+    let testURL3 = new Array();
+    let notReachableWebSites = new Array();
+    let notReachableWebSites2 = new Array();
+    let notr = 0;
+    const jsonsInDir =  fs.readdirSync(folder);
+    
+    var permission = true;
+   
+
     let counterDep = 0;
     let counterDepDesktop = 0;
     let counterDepMobile = 0;
@@ -246,603 +279,482 @@ if(permission) {
     let counterDepCHECKER = 0;
     let counterDepDesktopCHECKER = 0;
     let counterDepMobileCHECKER = 0;
-
     for(var bro of usedBrowserToTest ){
+        console.log("QQQQQQQQQQQQ")
+        console.log(inputCommand)
+        console.log(usedBrowserToTest.length)
         counterDep = 0;
         counterDepDesktop = 0;
         counterDepMobile = 0;
         counterSafeCSPDesktop = 0;
         counterSafeCSPMobile = 0;
         counterSafeCSP = 0;
-        for(var u of web) {
-            if(1){
-                let page_name;
-                page_name = u.split(".json")[0].split("_")
-                page_name = page_name[page_name.length-1]
-                var csp_policies = new Array();
-                let viewport_res = new Array();
-                let filenamesdup = new Array();
+        var csp_policies = new Array();
+        let filenamesdup = new Array();
 
-                jsonsInDir.forEach(filename => {
-                    
-                    if(filename === u || filename.includes(`${u}§`) ) {
-                        const files =  fs.readdirSync(`${folder}/${filename}`);
-                        var csp = new Array();
-                        let numOfFiles = 0;
-                        files.forEach(fileN => {
-                            if(fileN.includes(bro)){
-                                numOfFiles++;
-                                
-                            }
+        if(choiceRun === 1){
+            console.log("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+            jsonsInDir.forEach(filename => {
+            
+                if(filename === pageDomainName || filename.includes(`${pageDomainName}§`) ) {
+                    const files =  fs.readdirSync(`${folder}/${filename}`);
+                    var csp = new Array();
+                    let numOfFiles = 0;
+                    files.forEach(fileN => {
+                        if(fileN.includes(bro)){
+                            numOfFiles++;
                             
-                        });
-                        let filesCounter = 0;
-                        files.forEach(fileN => {
-                            if(fileN.includes(bro)){
-                                filesCounter++;
-                                //console.log(fileN)
-                                if(!filenamesdup.includes(fileN.split(".json")[0])){
-                                    filenamesdup.push(fileN.split(".json")[0])
-                                }
-                                const fileData = fs.readFileSync(path.join(`${folder}/${filename}/`, fileN));
-                                const json_arr = JSON.parse(fileData.toString());
-                                let json_str = JSON.stringify(json_arr);
-                                json_after_split = json_str.substring(1, json_str.length - 1);
-                                json_after_split = json_after_split.split(/,"/)
-                                //csp.push()
-                                /*if(fileN.split(".json")[0].substring(4) === 'DesktopDBW_Chrome_112.0.5615.29_Windows_720_1280_NT 13.9_msn-cn§2'){
-                                    console.log(csp_policies)
-                                    console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUU")
-                                    console.log(csp)
-                                    csp.pushe(2)
-                                }*/
-                                check = fileN.split(".json")[0].substring(4)
-                                filename_debuger = filename
-                                let arr_2 = new Array();
-                                for (var elem of json_after_split) {
-                                    if(elem != ""){
-                                        let arr_ = elem.split(/:"/);
-                                        let header = delete_StrSy(arr_[0], "\"");
-                                        let header_value = delete_StrSy(arr_[1], "\"")
-                                        header_value = delete_StrSy(header_value, "\\")
-                                        arr_2.push([header, header_value])
-                                    }     
-                                }
-                              
-
-                                csp.push([fileN.split(".json")[0].substring(4),arr_2])
-                             
-                                //csp_policies.push(csp)
-                                //console.log(csp)
-                                //console.log("!!!!!!")
-                                if(filesCounter === numOfFiles){
-                                    csp_policies.push(csp)
-                                    //console.log(csp_policies)
-                                    //console.log("IIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
-                                }
-                             
-                                //console.log(numOfFiles)
-                            }
-                            
-                        });
-               
-
-                    }
-                });
-                 
-              
-                let uriPageName;
-                //console.log(csp_policies.length)
-                if(csp_policies.length > 0) {
-                    
-                    let csp_safe = new Array();
-                    /*console.log(csp_policies[0])
-                    console.log(csp_policies[1])
-                    console.log(csp_policies[2])*/
-
-                    //csp_policies.pushe(2)
-                    for(let i = 0; i < csp_policies.length; i++) {
-                        let arr = csp_policies[i];
-                        //console.log( arr)
-                        //console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOO")
-                        //console.log(arr.length)
-                        for(let i = 0; i < arr.length; i++){
-                            let targetedArr = arr[i][0];
-                            let csp_deployed = false;
-                            page_name = arr[i][0].split("_")
-                            page_name = page_name[page_name.length-1]
-                            let details = arr[i][0].split("_");
-    
-                            uriPageName = arr[i][1][arr[i][1].length-1][1]
-                            if(page_name === "google"){
-                               
-                            }
-                            if(!web.includes(page_name)){
-                                web.push(page_name)
-                            }
-                            
-                            let csp_dir = new Array();
-                            let sts;
-                            let xfo;
-                            let set_cookie;
-                            let source = new Array();
-                            let directive = "CSP header does not exist";
-                            let flage = false;
-                            let script_elem_falge = false;
-                            let script_flage = false;
-                            let default_flage = false;
-                            let nonce_flage = false;
-                            let hash_flage = false;
-                            let eval_flage = false;
-                            let inline_flage = false;
-                            let protocol_flage = false;
-                            let wildcard_flage = false;
-                            let strictD_flage = false;
-                            let data_flage = false;
-                            let safe_flage = false;
-                            let sources = new Array();
-                            let directivesArray = new Array()
-                            let safe_counter = 0;
-                            let numOfCSP = 0;
-                            //console.log(arr[i][1])
-                            //console.log(page_name)
-                            //console.log(page_name === "youtube-com")
-                            let isCSPthere = 0;
-                            let cspfound = false;
-                            for(let hdr of arr[i][1]){
-                                if(hdr[0].includes("content-security-policy") && (!hdr[0].includes("report"))){
-                                    //console.log("Deppppppppppppppp")
-                                    isCSPthere++;
-                                   /* if(page_name === "youtube-com"){
-                                        console.log(hdr)
-                                        hdr.pushe(2)
-                                    }*/
-                                    csp_dira = new Array()
-                                    source = new Array();
-                                    flage = false;
-                                    script_elem_falge = false;
-                                    script_flage = false;
-                                    default_flage = false;
-                                    nonce_flage = false;
-                                    hash_flage = false;
-                                    eval_flage = false;
-                                    inline_flage = false;
-                                    protocol_flage = false;
-                                    wildcard_flage = false;
-                                    strictD_flage = false;
-                                    data_flage = false;
-                                    safe_flage = false;
-                                    numOfCSP++;
-                                    csp_deployed = true;
-                                    if(cspfound === false){
-                                        counterDep++;
-                                        if(targetedArr.includes("Desktop")){
-                                            //console.log(targetedArr)
-                                         counterDepDesktop++;
-                                         //console.log("DESKTOPDEP")
-                                         if(!testURL.includes(page_name)){
-                                            testURL.push(page_name)
-
-                                         }
-                                        }else{
-                                         //console.log("MOBILEDEP")
-     
-                                         counterDepMobile++;
-                                        }
-                                        cspfound = true;
-                                    }
-                                   
-                                    hdr[1] = hdr[1].replace("nscript-src", ";script-src")
-                                    hdr[1] = hdr[1].replace("ndefault-src", ";default-src")
-                                    hdr[1] = hdr[1].replace("nscript-src-elem", ";script-src-elem")
-                                    csp_dir = getDirectives_content_secuirty_policy(arr[i][1], hdr[0])
-
-
-                                    if (csp_dir.includes("script-src-elem")) {
-                                        directive = "script-src-elem"
-                                        source = getDirective_Sources(arr[i][1], "script-src-elem")
-                                        flage = true;
-                                        script_elem_falge = true;
-                
-                                        if(csp_dir.includes("script-src")) {
-                                            script_flage = true;
-                                        }
-                                        if(csp_dir.includes("default-src")) {
-                                            default_flage = true;
-                                        }
-                                    }
-                                    else if (csp_dir.includes("script-src")) {
-                                        directive = "script-src"
-                                        source = getDirective_Sources([hdr], "script-src")
-                                        flage = true;
-                                        script_flage = true;
-                                        if(csp_dir.includes("default-src")) {
-                                            default_flage = true;
-                                        }
-                                    } else if (csp_dir.includes("default-src")) {
-                                        directive = "default-src"
-                                        source = getDirective_Sources([hdr], "default-src")
-                                        flage = true;
-                                        default_flage = true;
-                                    }else{
-                                        directive = "csp dose not contain script-src-elem, script-src or default-src"
-                                        source = new Array()
-                                        flage = false;
-                                        //console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSs")
-                                    }
-                                    if(flage) {
-                                        for (var v of source) { 
-                                
-                                            if(v.includes("nonce")) {
-                                                
-                                                nonce_flage = true;
-                                             
-                                                let options = arr[i][0].split("_")
-                                                let devName = options[0]
-                                                let browserName = options[1]
-                                                let browserVersion = options[2]
-                                                let operSys = options[3]
-                                                let vHeight = options[4]
-                                                let vWidth = options[5]
-                                                let operSysVersion = options[6]
-                                                let nonceValue = v.replace("\"","")
-                                                nonceValue = nonceValue.replace("\'","")
-                                                nonceValue = nonceValue.replace("nonce-", "")
-                                                nonceValue = nonceValue.substring(0, nonceValue.length-1)
-                                               
-                                            
-                                                let json_nonce = {}
-                                                json_nonce["Nonce Value"] = nonceValue
-                                                json_nonce["device Name"] = devName
-                                                json_nonce["browser Name"] = browserName
-                                                json_nonce["browser version"] = browserVersion
-                                                json_nonce["operating system"] = operSys
-                                                json_nonce["operatiny system version"] = operSysVersion
-                                                json_nonce["viewport hight"] = vHeight
-                                                json_nonce["viewport width"] = vWidth
-                                                json_nonce["visited link"] = uriPageName
-                                                json_nonce["page Name"] = page_name
-                                                let fileName = `${page_name}_Nonce_${devName}_${browserName}_${browserVersion}_${operSys}_${vHeight}_${vWidth}_${operSysVersion}`
-                                                if(!fs.existsSync(`${folder3}-${bro}`)){
-                                                    fs.mkdirSync(path.join("./", `${folder3}-${bro}`));
-                                                }
-                                                fs.writeFileSync(`${folder3}-${bro}/${fileName}.json`, JSON.stringify(json_nonce))
-                
-                                        
-                                                //check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName, page_name)
-                
-                                            }
-                                
-                                            if(v.includes("*")) {
-                                                wildcard_flage = true;
-                                            }
-                                
-                                            if(v.includes("http") || v.includes("https")) {
-                                                protocol_flage = true;
-                                            }
-                                
-                                            if (v === "'strict-dynamic'") {
-                                                strictD_flage = true;
-                                            }
-                                
-                                            if (v === "'unsafe-inline'") {
-                                                inline_flage = true;
-                                            }
-                                
-                                            if(v.includes("sha")) {
-                                                hash_flage = true;
-                                            }
-                                
-                                            if(v === "'unsafe-eval'") {
-                                                eval_flage = true;
-                                            }
-                                
-                                            if(v === "data:") {
-                                                data_flage = true;
-                                            }
-                                        }
-                                    }
-                                    if(source.length > 0){
-                                        sources.push(source)
-                                    }
-                                    directivesArray.push(csp_dir)
-                                   
-                                   
-                                    if(script_flage === true || default_flage === true || script_elem_falge === true) {
-                                        if (  ((nonce_flage === true || hash_flage === true) && (wildcard_flage === false && protocol_flage === false)) || ((nonce_flage === false || hash_flage === false) && (inline_flage === false) && (protocol_flage === false) && (wildcard_flage === false) ) ||  ( strictD_flage === true && (nonce_flage === true || hash_flage === true)) ||  (nonce_flage === true || hash_flage === true))  {
-                                            safe_flage = true;
-                                            safe_counter++;
-                                            counterSafeCSP++;
-                                            if(targetedArr.includes("Desktop")){
-                                                counterSafeCSPDesktop++;
-                                               }else{
-                                                counterSafeCSPMobile++;
-                                               }
-                                        }
-                                    }
-                                    /*console.log("SAFTY")
-                                    console.log(hdr[0])
-                                    console.log(safe_flage)*/
-        
-                                }else{
-                                    if(hdr === arr[i][1][arr[i][1].length-1]){
-                                        if(isCSPthere === 0 ){
-                                            //console.log("NOTDEPLOYING")
-                                            csp_deployed = false;
-
-                                        }else{
-                                            //console.log("DEPLOYING")
-
-                                        }
-                                    }
-                                }
-                                if(safe_counter > 0 && safe_flage === true){
-                                    break;
-                                }
-                            }
-                            /*if(counterDep === 0){
-                                console.log(page_name)
-                                console.log(directive)
-                                console.log("UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU")
-                                csp_dir.pushe(2)
-                            }*/
-                            /*console.log(page_name)
-                            console.log(targetedArr)
-                            console.log(counterDep)
-                            console.log(counterDepDesktop)
-                            console.log(counterDepMobile)
-                            console.log(safe_counter)
-                            console.log(directive)
-                            console.log(source)
-                            console.log(safe_flage)
-                            console.log("WATCH" + csp_deployed)
-                            if((source.length > 0) && (directive === 'CSP header does not exist')){
-                                console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
-                            }*/
-                            if(csp_deployed){
-                                counterDepCHECKER++;
-                                if(targetedArr.includes("Desktop")){
-                                    counterDepDesktopCHECKER++;
-                                }else{
-                                    counterDepMobileCHECKER++;
-                                }
-                            }
-                            /*let nonceSaftyFlage = false;
-                            
-                            source = sources[0]
-                            if(safe_counter > 0){
-                                nonceSaftyFlage = true;
-                                safe_flage = true;
-                                if(directivesArray.includes("script-src-elem")){
-                                    directive = "script-src-elem"
-                                }else if(directivesArray.includes("script-src")){
-                                    directive = "script-src"
-                                }else if(directivesArray.includes("default-src")){
-                                    directive = "default-src"
-                                }
-                                
-                            }else{
-                                flage = false;
-                                safe_flage = false;
-                            }
-                            if(directive != "csp dose not contain script-src-elem, script-src or default-src" && directive != 'CSP header does not exist'){
-                                for(var s of sources){
-                                    if(s.includes("nonce")){
-                                        source = s;
-                                        break;
-                                    }
-                                }
-                                for (var v of source) { 
-                                    
-                                    if(v.includes("*")) {
-                                        wildcard_flage = true;
-                                    }
-                        
-                                    if(v.includes("http") || v.includes("https")) {
-                                        protocol_flage = true;
-                                    }
-                        
-                                    if (v === "'strict-dynamic'") {
-                                        strictD_flage = true;
-                                    }
-                        
-                                    if (v === "'unsafe-inline'") {
-                                        inline_flage = true;
-                                    }
-                        
-                                    if(v.includes("sha")) {
-                                        hash_flage = true;
-                                    }
-                        
-                                    if(v === "'unsafe-eval'") {
-                                        eval_flage = true;
-                                    }
-                        
-                                    if(v === "data:") {
-                                        data_flage = true;
-                                    }
-                                }
-                            }*/
-                    
-                           
-                            sts = getDirectives_content_secuirty_policy(arr[i][1], "strict-transport-security")
-                            xfo = getDirectives_content_secuirty_policy(arr[i][1], "x-frame-options")
-                            set_cookie = getDirectives_content_secuirty_policy(arr[i][1], "set-cookie")
-
-                           
-                            //console.log(csp_dir)
-        
-        
-                            // ************************************************************************************************************************************************************
-                            // protection-level against stealing the cookies throw XXS attacks
-        
-                            let secure_flage = false;
-                            let httponly_flage = false;
-                            let samesite_flage = false; 
-                            let protection_against_csrf = 0;
-                            let protection_against_csrf_flage = false;
-                                
-                            for (var v of set_cookie) {
-                                if (v === "Secure") {
-                                    secure_flage = true;
-                                }
-                                if(v.includes("HttpOnly")) {
-                                    httponly_flage = true;
-                                }
-                                if(v.includes("SameSite")) {
-                                    samesite_flage = true;
-                                    
-                                    if(v.includes("Strict")) {
-                                        protection_against_csrf = 2;
-                                        protection_against_csrf_flage = true;
-                                    }
-                                    if(v.includes("Lax")) {
-                                        samesite_flage = true;
-                                        protection_against_csrf = 1;
-                                        protection_against_csrf_flage = true;
-                                    }
-                                }
-                            }
-                                       
-                            // ************************************************************************************************************************************************************
-                            // protection-level against hijacking.
-        
-                            let protection_against_hijacking = false;
-                            if(secure_flage && httponly_flage) {
-                                protection_against_hijacking = true;
-                            }
-                             
-                            // ************************************************************************************************************************************************************
-                            // protection-level against Clickjacking attack
-                            // CSP frame-ancestors is the most important protection mechanism against external framing, and better than X-Frame-Options in multiple ways
-        
-                            let protectionClickJacking_value_Class = new Array();
-                            let frame_ancestors = new Array();
-                            let frame_ancestors_flage = false;
-                            let xfo_flage = false;
-                          
-                            if (csp_dir.length > 0 && csp_dir.includes("frame-ancestors")) {
-                                frame_ancestors_flage = true;
-                                frame_ancestors = getDirective_Sources(arr[i][1], "frame-ancestors")
-                                protectionClickJacking_value_Class.push("csp frame-ancestors")
-                                protectionClickJacking_value_Class.push(get_ProtectionLevel_AgainstClickjacking("frame-ancestors", frame_ancestors));
-                            } else {
-                                if(xfo.length === 1) {
-                                    xfo_flage = true;
-                                    protectionClickJacking_value_Class.push(`x-farme-option ${xfo}`)
-                                    protectionClickJacking_value_Class.push(get_ProtectionLevel_AgainstClickjacking(xfo[0], []));
-                                } else {
-                                    if(xfo.length === 0) {
-                                        protectionClickJacking_value_Class = ["no protection against xlickjacking is provided", 0];
-                                    }
-                                }
-                            }
-                                               
-                            // *******************************************************************************************************************************************************
-                            // protection-level against ssl stripping attack
-        
-                            let max_age_sts = false;
-                            let insub_sts = false;
-                            let preload_sts = false;
-                            let max_age_YearValue = 0;
-                            for(var v of sts) {
-                                if (v.includes("max-age")) {
-                                    v = v.split("=")
-                                    max_age_YearValue = v[1]/31536000;                
-                                    max_age_sts = true;
-                                }
-                        
-                                if(v.includes("includeSubDomains")) {
-                                    insub_sts = true;
-                                }
-                        
-                                if(v.includes("preload")) {
-                                    preload_sts = true;
-                                }
-                            }
-                            
-                            let protection_level_againstSLLStripping = get_ProtectionLevel_AgainstSLLStripping(max_age_YearValue, max_age_sts, insub_sts, preload_sts)
-                            
-                            let hsts_classe = protection_level_againstSLLStripping[0];
-                            let level_of_protection_against_SSL_Stripping = protection_level_againstSLLStripping[1];
-                              
-                            // *******************************************************************************************************************************************************
-                            // check if the csp is safe or unsafe
-                            
-                           
-                         
-                           
-        
-                            
-
-                          
-                            if(source === undefined){
-                                source = new Array()
-                            }
-                            csp_safe.push([["device model", details[0]],["browser name", details[1]],["browser version", details[2]],["os", details[3]],["viewport-height", details[4]],["viewport-width", details[5]], ["origins", source], ["safe csp", safe_flage], ["directive to check", directive], ["script-src", script_flage], ["default-src", default_flage], ["'unsafe-inline'", inline_flage], ["'unsafe-eval'", eval_flage], ["nonce", nonce_flage], ["hash", hash_flage], ["strict-dynamic", strictD_flage], ["wildcard*", wildcard_flage], ["protocol", protocol_flage], ["dataURL", data_flage], ["sts_max_age", max_age_sts], ["sts_max_age_year_protection", max_age_YearValue] , ["sts_includeSD", insub_sts], ["sts_preload", preload_sts], ["hsts classe", hsts_classe], ["protection level against sll stripping", level_of_protection_against_SSL_Stripping], ["protection against clickjacking provided by", protectionClickJacking_value_Class[0]], ["protection-level against clickjacking", protectionClickJacking_value_Class[1]], ["protection against hijacking", protection_against_hijacking], ["protection against csrf", protection_against_csrf_flage], ["protection level against csrf", protection_against_csrf], ["protection against steeling cookies", httponly_flage], ["CSP deploying", csp_deployed], ["visited_Webpage", uriPageName]])
-                            let fileName = `csp_${details[0]}_${details[1]}_${details[2]}_${details[3]}_${details[4]}_${details[5]}_${page_name}.json`
-                           
-                            //console.log(csp_safe)
-                            //csp_safe.pushe(2)
-                            let json = {};
-                            let arr_comp = [["device model", details[0]],["browser name", details[1]],["browser version", details[2]],["os", details[3]],["viewport-height", details[4]],["viewport-width", details[5]], ["origins", source], ["safe csp", safe_flage], ["directive to check", directive], ["script-src", script_flage], ["default-src", default_flage], ["'unsafe-inline'", inline_flage], ["'unsafe-eval'", eval_flage], ["nonce", nonce_flage], ["hash", hash_flage], ["strict-dynamic", strictD_flage], ["wildcard*", wildcard_flage], ["protocol", protocol_flage], ["dataURL", data_flage], ["sts_max_age", max_age_sts], ["sts_max_age_year_protection", max_age_YearValue] , ["sts_includeSD", insub_sts], ["sts_preload", preload_sts], ["hsts classe", hsts_classe], ["protection level against sll stripping", level_of_protection_against_SSL_Stripping], ["protection against clickjacking provided by", protectionClickJacking_value_Class[0]], ["protection-level against clickjacking", protectionClickJacking_value_Class[1]], ["protection against hijacking", protection_against_hijacking], ["protection against csrf", protection_against_csrf_flage], ["protection level against csrf", protection_against_csrf], ["protection against steeling cookies", httponly_flage], ["CSP deploying", csp_deployed], ["visited_Webpage", uriPageName]]
-                         
-                            for(let j = 0; j < arr_comp.length; j++) {
-                                let key = arr_comp[j][0]
-                                let value = arr_comp[j][1];
-                                json[key] = value;
-                            } 
-                            if(!fs.existsSync(`${folder2}-${bro}`)){
-                                fs.mkdirSync(path.join("./", `${folder2}-${bro}`));
-                            }
-                            if(!devUA.includes(`${details[0]}_${details[4]}_${details[5]}`)){
-                                if(!details[0].includes("Desktop")){
-                                    devUA.push(`${details[0]}_${details[4]}_${details[5]}`)
-                                }
-                            }
-                            if(!devArr.includes(details[0])){
-                                if(!details[0].includes("Desktop")){
-                                    devArr.push(details[0])
-                                }
-                            }
-                            
-                            if(!allDev.includes(`${details[0]}_${details[4]}_${details[5]}`)){
-                                allDev.push(`${details[0]}_${details[4]}_${details[5]}`)
-                            }
-                            fs.writeFileSync(`${folder2}-${bro}/${fileName}`, JSON.stringify(json))
                         }
-                      
+                        
+                    });
+                    let filesCounter = 0;
+                    files.forEach(fileN => {
+                        if(fileN.includes(bro)){
+                            filesCounter++;
+                            //console.log(fileN)
+                            if(!filenamesdup.includes(fileN.split(".json")[0])){
+                                filenamesdup.push(fileN.split(".json")[0])
+                            }
+                            const fileData = fs.readFileSync(path.join(`${folder}/${filename}/`, fileN));
+                            const json_arr = JSON.parse(fileData.toString());
+                            let json_str = JSON.stringify(json_arr);
+                            json_after_split = json_str.substring(1, json_str.length - 1);
+                            json_after_split = json_after_split.split(/,"/)
+
+                            check = fileN.split(".json")[0].substring(4)
+                            filename_debuger = filename
+                            let arr_2 = new Array();
+                            for (var elem of json_after_split) {
+                                if(elem != ""){
+                                    let arr_ = elem.split(/:"/);
+                                    let header = delete_StrSy(arr_[0], "\"");
+                                    let header_value = delete_StrSy(arr_[1], "\"")
+                                    header_value = delete_StrSy(header_value, "\\")
+                                    arr_2.push([header, header_value])
+                                }     
+                            }
+                          
+    
+                            csp.push([fileN.split(".json")[0].substring(4),arr_2])
+
+                            if(filesCounter === numOfFiles){
+                                csp_policies.push(csp)
+
+                            }
+                         
+                        }
+                        
+                    });
+           
+    
+                }
+            });
+             
+          
+            let uriPageName;
+            if(csp_policies.length > 0) {
+                
+                let csp_safe = new Array();
+
+                for(let i = 0; i < csp_policies.length; i++) {
+                    let arr = csp_policies[i];
+
+                    for(let i = 0; i < arr.length; i++){
+                        let targetedArr = arr[i][0];
+                        let csp_deployed = false;
+                        page_name = arr[i][0].split("_")
+                        page_name = page_name[page_name.length-1]
+                        let details = arr[i][0].split("_");
+    
+                        uriPageName = arr[i][1][arr[i][1].length-1][1]
+                        if(page_name === "google"){
+                           
+                        }
+                        if(!web.includes(page_name)){
+                            web.push(page_name)
+                        }
+                        
+                        let csp_dir = new Array();
+                        let sts;
+                        let xfo;
+                        let set_cookie;
+                        let source = new Array();
+                        let directive = "CSP header does not exist";
+                        let flage = false;
+                        let script_elem_falge = false;
+                        let script_flage = false;
+                        let default_flage = false;
+                        let nonce_flage = false;
+                        let hash_flage = false;
+                        let eval_flage = false;
+                        let inline_flage = false;
+                        let protocol_flage = false;
+                        let wildcard_flage = false;
+                        let strictD_flage = false;
+                        let data_flage = false;
+                        let safe_flage = false;
+                        let sources = new Array();
+                        let directivesArray = new Array()
+                        let safe_counter = 0;
+                        let numOfCSP = 0;
+                        //console.log(arr[i][1])
+                        //console.log(page_name)
+                        //console.log(page_name === "youtube-com")
+                        let isCSPthere = 0;
+                        let cspfound = false;
+                        for(let hdr of arr[i][1]){
+                            if(hdr[0].includes("content-security-policy") && (!hdr[0].includes("report"))){
+                                //console.log("Deppppppppppppppp")
+                                isCSPthere++;
+                               /* if(page_name === "youtube-com"){
+                                    console.log(hdr)
+                                    hdr.pushe(2)
+                                }*/
+                                csp_dira = new Array()
+                                source = new Array();
+                                flage = false;
+                                script_elem_falge = false;
+                                script_flage = false;
+                                default_flage = false;
+                                nonce_flage = false;
+                                hash_flage = false;
+                                eval_flage = false;
+                                inline_flage = false;
+                                protocol_flage = false;
+                                wildcard_flage = false;
+                                strictD_flage = false;
+                                data_flage = false;
+                                safe_flage = false;
+                                numOfCSP++;
+                                csp_deployed = true;
+                                if(cspfound === false){
+                                    counterDep++;
+                                    if(targetedArr.includes("Desktop")){
+                                        //console.log(targetedArr)
+                                     counterDepDesktop++;
+                                     //console.log("DESKTOPDEP")
+                                     if(!testURL.includes(page_name)){
+                                        testURL.push(page_name)
+    
+                                     }
+                                    }else{
+                                     //console.log("MOBILEDEP")
+    
+                                     counterDepMobile++;
+                                    }
+                                    cspfound = true;
+                                }
+                               
+                                hdr[1] = hdr[1].replace("nscript-src", ";script-src")
+                                hdr[1] = hdr[1].replace("ndefault-src", ";default-src")
+                                hdr[1] = hdr[1].replace("nscript-src-elem", ";script-src-elem")
+                                csp_dir = getDirectives_content_secuirty_policy(arr[i][1], hdr[0])
+    
+    
+                                if (csp_dir.includes("script-src-elem")) {
+                                    directive = "script-src-elem"
+                                    source = getDirective_Sources(arr[i][1], "script-src-elem")
+                                    flage = true;
+                                    script_elem_falge = true;
+            
+                                    if(csp_dir.includes("script-src")) {
+                                        script_flage = true;
+                                    }
+                                    if(csp_dir.includes("default-src")) {
+                                        default_flage = true;
+                                    }
+                                }
+                                else if (csp_dir.includes("script-src")) {
+                                    directive = "script-src"
+                                    source = getDirective_Sources([hdr], "script-src")
+                                    flage = true;
+                                    script_flage = true;
+                                    if(csp_dir.includes("default-src")) {
+                                        default_flage = true;
+                                    }
+                                } else if (csp_dir.includes("default-src")) {
+                                    directive = "default-src"
+                                    source = getDirective_Sources([hdr], "default-src")
+                                    flage = true;
+                                    default_flage = true;
+                                }else{
+                                    directive = "csp dose not contain script-src-elem, script-src or default-src"
+                                    source = new Array()
+                                    flage = false;
+                                    //console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSs")
+                                }
+                                if(flage) {
+                                    for (var v of source) { 
+                            
+                                        if(v.includes("nonce")) {
+                                            
+                                            nonce_flage = true;
+                                         
+                                            let options = arr[i][0].split("_")
+                                            let devName = options[0]
+                                            let browserName = options[1]
+                                            let browserVersion = options[2]
+                                            let operSys = options[3]
+                                            let vHeight = options[4]
+                                            let vWidth = options[5]
+                                            let operSysVersion = options[6]
+                                            let nonceValue = v.replace("\"","")
+                                            nonceValue = nonceValue.replace("\'","")
+                                            nonceValue = nonceValue.replace("nonce-", "")
+                                            nonceValue = nonceValue.substring(0, nonceValue.length-1)
+                                           
+                                        
+                                            let json_nonce = {}
+                                            json_nonce["Nonce Value"] = nonceValue
+                                            json_nonce["device Name"] = devName
+                                            json_nonce["browser Name"] = browserName
+                                            json_nonce["browser version"] = browserVersion
+                                            json_nonce["operating system"] = operSys
+                                            json_nonce["operatiny system version"] = operSysVersion
+                                            json_nonce["viewport hight"] = vHeight
+                                            json_nonce["viewport width"] = vWidth
+                                            json_nonce["visited link"] = uriPageName
+                                            json_nonce["page Name"] = page_name
+                                            let fileName = `${page_name}_Nonce_${devName}_${browserName}_${browserVersion}_${operSys}_${vHeight}_${vWidth}_${operSysVersion}`
+                                            if(!fs.existsSync(`${folder3}-${bro}`)){
+                                                fs.mkdirSync(path.join("./", `${folder3}-${bro}`));
+                                            }
+                                            fs.writeFileSync(`${folder3}-${bro}/${fileName}.json`, JSON.stringify(json_nonce))
+            
+                                    
+                                            //check_DuplicateNonce(nonceValue, devName, browserName, browserVersion, operSys, vHeight, vWidth, operSysVersion, uriPageName, page_name)
+            
+                                        }
+                            
+                                        if(v.includes("*")) {
+                                            wildcard_flage = true;
+                                        }
+                            
+                                        if(v.includes("http") || v.includes("https")) {
+                                            protocol_flage = true;
+                                        }
+                            
+                                        if (v === "'strict-dynamic'") {
+                                            strictD_flage = true;
+                                        }
+                            
+                                        if (v === "'unsafe-inline'") {
+                                            inline_flage = true;
+                                        }
+                            
+                                        if(v.includes("sha")) {
+                                            hash_flage = true;
+                                        }
+                            
+                                        if(v === "'unsafe-eval'") {
+                                            eval_flage = true;
+                                        }
+                            
+                                        if(v === "data:") {
+                                            data_flage = true;
+                                        }
+                                    }
+                                }
+                                if(source.length > 0){
+                                    sources.push(source)
+                                }
+                                directivesArray.push(csp_dir)
+                               
+                               
+                                if(script_flage === true || default_flage === true || script_elem_falge === true) {
+                                    if (  ((nonce_flage === true || hash_flage === true) && (wildcard_flage === false && protocol_flage === false)) || ((nonce_flage === false || hash_flage === false) && (inline_flage === false) && (protocol_flage === false) && (wildcard_flage === false) ) ||  ( strictD_flage === true && (nonce_flage === true || hash_flage === true)) ||  (nonce_flage === true || hash_flage === true))  {
+                                        safe_flage = true;
+                                        safe_counter++;
+                                        counterSafeCSP++;
+                                        if(targetedArr.includes("Desktop")){
+                                            counterSafeCSPDesktop++;
+                                           }else{
+                                            counterSafeCSPMobile++;
+                                           }
+                                    }
+                                }
+
+    
+                            }else{
+                                if(hdr === arr[i][1][arr[i][1].length-1]){
+                                    if(isCSPthere === 0 ){
+                                        //console.log("NOTDEPLOYING")
+                                        csp_deployed = false;
+    
+                                    }else{
+                                        //console.log("DEPLOYING")
+    
+                                    }
+                                }
+                            }
+                            if(safe_counter > 0 && safe_flage === true){
+                                break;
+                            }
+                        }
+
+                        if(csp_deployed){
+                            counterDepCHECKER++;
+                            if(targetedArr.includes("Desktop")){
+                                counterDepDesktopCHECKER++;
+                            }else{
+                                counterDepMobileCHECKER++;
+                            }
+                        }          
                        
-                    }
+                        sts = getDirectives_content_secuirty_policy(arr[i][1], "strict-transport-security")
+                        xfo = getDirectives_content_secuirty_policy(arr[i][1], "x-frame-options")
+                        set_cookie = getDirectives_content_secuirty_policy(arr[i][1], "set-cookie")
+
+                        // ************************************************************************************************************************************************************
+                        // protection-level against stealing the cookies throw XXS attacks
+    
+                        let secure_flage = false;
+                        let httponly_flage = false;
+                        let samesite_flage = false; 
+                        let protection_against_csrf = 0;
+                        let protection_against_csrf_flage = false;
+                            
+                        for (var v of set_cookie) {
+                            if (v === "Secure") {
+                                secure_flage = true;
+                            }
+                            if(v.includes("HttpOnly")) {
+                                httponly_flage = true;
+                            }
+                            if(v.includes("SameSite")) {
+                                samesite_flage = true;
+                                
+                                if(v.includes("Strict")) {
+                                    protection_against_csrf = 2;
+                                    protection_against_csrf_flage = true;
+                                }
+                                if(v.includes("Lax")) {
+                                    samesite_flage = true;
+                                    protection_against_csrf = 1;
+                                    protection_against_csrf_flage = true;
+                                }
+                            }
+                        }
+                                   
+                        // ************************************************************************************************************************************************************
+                        // protection-level against hijacking.
+    
+                        let protection_against_hijacking = false;
+                        if(secure_flage && httponly_flage) {
+                            protection_against_hijacking = true;
+                        }
+                         
+                        // ************************************************************************************************************************************************************
+                        // protection-level against Clickjacking attack
+                        // CSP frame-ancestors is the most important protection mechanism against external framing, and better than X-Frame-Options in multiple ways
+    
+                        let protectionClickJacking_value_Class = new Array();
+                        let frame_ancestors = new Array();
+                        let frame_ancestors_flage = false;
+                        let xfo_flage = false;
+                      
+                        if (csp_dir.length > 0 && csp_dir.includes("frame-ancestors")) {
+                            frame_ancestors_flage = true;
+                            frame_ancestors = getDirective_Sources(arr[i][1], "frame-ancestors")
+                            protectionClickJacking_value_Class.push("csp frame-ancestors")
+                            protectionClickJacking_value_Class.push(get_ProtectionLevel_AgainstClickjacking("frame-ancestors", frame_ancestors));
+                        } else {
+                            if(xfo.length === 1) {
+                                xfo_flage = true;
+                                protectionClickJacking_value_Class.push(`x-farme-option ${xfo}`)
+                                protectionClickJacking_value_Class.push(get_ProtectionLevel_AgainstClickjacking(xfo[0], []));
+                            } else {
+                                if(xfo.length === 0) {
+                                    protectionClickJacking_value_Class = ["no protection against xlickjacking is provided", 0];
+                                }
+                            }
+                        }
+                                           
+                        // *******************************************************************************************************************************************************
+                        // protection-level against ssl stripping attack
+    
+                        let max_age_sts = false;
+                        let insub_sts = false;
+                        let preload_sts = false;
+                        let max_age_YearValue = 0;
+                        for(var v of sts) {
+                            if (v.includes("max-age")) {
+                                v = v.split("=")
+                                max_age_YearValue = v[1]/31536000;                
+                                max_age_sts = true;
+                            }
                     
-                }else{
-                    notr++;
-                    notReachableWebSites.push(u.replaceAll("-","."))
-                    notReachableWebSites2.push(u)
+                            if(v.includes("includeSubDomains")) {
+                                insub_sts = true;
+                            }
+                    
+                            if(v.includes("preload")) {
+                                preload_sts = true;
+                            }
+                        }
+                        
+                        let protection_level_againstSLLStripping = get_ProtectionLevel_AgainstSLLStripping(max_age_YearValue, max_age_sts, insub_sts, preload_sts)
+                        
+                        let hsts_classe = protection_level_againstSLLStripping[0];
+                        let level_of_protection_against_SSL_Stripping = protection_level_againstSLLStripping[1];
+                          
+                        // *******************************************************************************************************************************************************
+                        // check if the csp is safe or unsafe
+                        
+                       
+                     
+                       
+    
+                        
+    
+                      
+                        if(source === undefined){
+                            source = new Array()
+                        }
+                        csp_safe.push([["device model", details[0]],["browser name", details[1]],["browser version", details[2]],["os", details[3]],["viewport-height", details[4]],["viewport-width", details[5]], ["origins", source], ["safe csp", safe_flage], ["directive to check", directive], ["script-src", script_flage], ["default-src", default_flage], ["'unsafe-inline'", inline_flage], ["'unsafe-eval'", eval_flage], ["nonce", nonce_flage], ["hash", hash_flage], ["strict-dynamic", strictD_flage], ["wildcard*", wildcard_flage], ["protocol", protocol_flage], ["dataURL", data_flage], ["sts_max_age", max_age_sts], ["sts_max_age_year_protection", max_age_YearValue] , ["sts_includeSD", insub_sts], ["sts_preload", preload_sts], ["hsts classe", hsts_classe], ["protection level against sll stripping", level_of_protection_against_SSL_Stripping], ["protection against clickjacking provided by", protectionClickJacking_value_Class[0]], ["protection-level against clickjacking", protectionClickJacking_value_Class[1]], ["protection against hijacking", protection_against_hijacking], ["protection against csrf", protection_against_csrf_flage], ["protection level against csrf", protection_against_csrf], ["protection against steeling cookies", httponly_flage], ["CSP deploying", csp_deployed], ["visited_Webpage", uriPageName]])
+                        let fileName = `csp_${details[0]}_${details[1]}_${details[2]}_${details[3]}_${details[4]}_${details[5]}_${page_name}.json`
+
+                        let json = {};
+                        let arr_comp = [["device model", details[0]],["browser name", details[1]],["browser version", details[2]],["os", details[3]],["viewport-height", details[4]],["viewport-width", details[5]], ["origins", source], ["safe csp", safe_flage], ["directive to check", directive], ["script-src", script_flage], ["default-src", default_flage], ["'unsafe-inline'", inline_flage], ["'unsafe-eval'", eval_flage], ["nonce", nonce_flage], ["hash", hash_flage], ["strict-dynamic", strictD_flage], ["wildcard*", wildcard_flage], ["protocol", protocol_flage], ["dataURL", data_flage], ["sts_max_age", max_age_sts], ["sts_max_age_year_protection", max_age_YearValue] , ["sts_includeSD", insub_sts], ["sts_preload", preload_sts], ["hsts classe", hsts_classe], ["protection level against sll stripping", level_of_protection_against_SSL_Stripping], ["protection against clickjacking provided by", protectionClickJacking_value_Class[0]], ["protection-level against clickjacking", protectionClickJacking_value_Class[1]], ["protection against hijacking", protection_against_hijacking], ["protection against csrf", protection_against_csrf_flage], ["protection level against csrf", protection_against_csrf], ["protection against steeling cookies", httponly_flage], ["CSP deploying", csp_deployed], ["visited_Webpage", uriPageName]]
+                     
+                        for(let j = 0; j < arr_comp.length; j++) {
+                            let key = arr_comp[j][0]
+                            let value = arr_comp[j][1];
+                            json[key] = value;
+                        } 
+                        if(!fs.existsSync(`${folder2}-${bro}`)){
+                            fs.mkdirSync(path.join("./", `${folder2}-${bro}`));
+                        }
+                        if(!devUA.includes(`${details[0]}_${details[4]}_${details[5]}`)){
+                            if(!details[0].includes("Desktop")){
+                                devUA.push(`${details[0]}_${details[4]}_${details[5]}`)
+                            }
+                        }
+                        if(!devArr.includes(details[0])){
+                            if(!details[0].includes("Desktop")){
+                                devArr.push(details[0])
+                            }
+                        }
+                        
+                        if(!allDev.includes(`${details[0]}_${details[4]}_${details[5]}`)){
+                            allDev.push(`${details[0]}_${details[4]}_${details[5]}`)
+                        }
+                        fs.writeFileSync(`${folder2}-${bro}/${fileName}`, JSON.stringify(json))
+                    }
+                  
+                   
                 }
                 
+            }else{
+                notr++;
+                notReachableWebSites.push(u.replaceAll("-","."))
+                notReachableWebSites2.push(u)
             }
-           
-        }
-        /*console.log("FFFFFFFFFFFFFFFFFFFFFFFFFFF")
-        console.log(counterDep)
-        console.log(counterDepDesktop)
-        console.log(counterDepMobile)
-        console.log(counterSafeCSP)
-        console.log(counterSafeCSPDesktop)
-        console.log(counterSafeCSPMobile)
-        console.log("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-        console.log(counterDepCHECKER)
-        console.log(counterDepDesktopCHECKER)
-        console.log(counterDepMobileCHECKER)
-        console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")*/
-        //csp_policies.pushe(2)
-        if(csp_policies.length > 0){
-            /*console.log(uri)
-            console.log(web)
-            console.log(devUA)
-            console.log(devArr)
-            console.log(allDev)*/
+        }else{
+            console.log("MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM")
+            console.log(choice)
+          
+
             let mobile = new Array()
             let desktop = new Array()
         
@@ -914,57 +826,21 @@ if(permission) {
 
             //console.log(mobile)
             let lengthWeb = 0;
+            console.log(web)
+            //web.pushe(2)
             for(let u of web){
-                if(!notReachableWebSites2.includes(u)){
-                    if(!fs.existsSync(`${resultFolderDesktop}-${bro}`)){
-                        fs.mkdirSync(path.join("./", `${resultFolderDesktop}-${bro}`));
-                    }
-                    compareWebsite(u, `${folder2}-${bro}`, `${resultFolderDesktop}-${bro}`, desktop)
-    
+                lengthWeb++;
+                if(!fs.existsSync(`${resultFolderDesktop}-${bro}`)){
+                    fs.mkdirSync(path.join("./", `${resultFolderDesktop}-${bro}`));
                 }
+                compareWebsite(u, `${folder2}-${bro}`, `${resultFolderDesktop}-${bro}`, desktop)
            
           
             }
 
-            /*console.log(numberOfPagesProtectionAgainstStealingCookies)
-            console.log(pagesProtectionAgainstStealingCookies)
-            console.log(numberOfPagesNoProtectionAgainstStealingCookies)
-            console.log(pagesNoProtectionAgainstStealingCookies)
-            console.log(numberOfPagesProtectionAndNoProtectionAgainstStealingCookies)
-            console.log(pagesProtectionAndNoProtectionAgainstStealingCookies)*/
-            //pagesProtectionAndNoProtectionAgainstStealingCookies.pushe(2)
-            /*console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
-            console.log(testURL.length)
-            console.log(testURL)
-            console.log(testURL2.length)
-            console.log(testURL2)
-            console.log(testURL3.length)
-            console.log(testURL3)
-            console.log(notReachableWebSites.length)
-            console.log(notReachableWebSites)*/
-            for( var e of testURL3){
-                for(var t of testURL){
-                    if(e === t){
-                        //console.log("WHAT?")
-                        //console.log(e)
-                    }
-                }
-           
-            }
+        
+        
             console.log("Desktop")
-           let check1 = numberOfPagesWithSafeCSPWithAllUserAgent;
-           let check2 = numberOfPagesWithNotSafeCSPWithAllUserAgent;
-           let check3 = numberOfPagesWithSafeAndNotSafeCSPWithAllUserAgent;
-           let check4 = numberpagesdeployCSPWithAllUserAgentsArr;
-           let check5 = numberpagesDoesNotdeployCSPWithAllUserAgentsArr;
-           let check6 = numberpagesdeployAndNotDeployCSPWithAllUserAgentArr;
-           /*console.log(check1)
-           console.log(check2)
-           console.log(check3)
-           console.log(check4)
-           console.log(check5)
-           console.log(check6)
-            console.log(checkCounter)*/
     
             let jsonNotReachablePages= {}
             jsonNotReachablePages["number of total pages"] = web.length
@@ -1165,27 +1041,15 @@ if(permission) {
 
             let lengthWeb2 = 0;
             for(let u of web){
-                if(!notReachableWebSites2.includes(u)){
-                    lengthWeb2++;
-                    if(!fs.existsSync(`${resultFolderMobile}-${bro}`)){
-                        fs.mkdirSync(path.join("./", `${resultFolderMobile}-${bro}`));
-                    }
-                    compareWebsite(u, `${folder2}-${bro}`, `${resultFolderMobile}-${bro}`, mobile)    
+                lengthWeb2++;
+                if(!fs.existsSync(`${resultFolderMobile}-${bro}`)){
+                    fs.mkdirSync(path.join("./", `${resultFolderMobile}-${bro}`));
                 }
+                compareWebsite(u, `${folder2}-${bro}`, `${resultFolderMobile}-${bro}`, mobile)  
             }
-            let check7 = numberOfPagesWithSafeCSPWithAllUserAgent;
-            let check8 = numberOfPagesWithNotSafeCSPWithAllUserAgent;
-            let check9 = numberOfPagesWithSafeAndNotSafeCSPWithAllUserAgent;
-            let check10 = numberpagesdeployCSPWithAllUserAgentsArr;
-            let check11 = numberpagesDoesNotdeployCSPWithAllUserAgentsArr;
-            let check12 = numberpagesdeployAndNotDeployCSPWithAllUserAgentArr;
+
             console.log("Mobile")
-            /*console.log(check7)
-            console.log(check8)
-            console.log(check9)
-            console.log(check10)
-            console.log(check11)
-            console.log(check12)*/
+
             let jsonPagesMobileDeployingCSP = {}
             jsonPagesMobileDeployingCSP["number of total pages"] = lengthWeb2
             jsonPagesMobileDeployingCSP["number of total devices"] = `${mobile.length}`
@@ -1327,19 +1191,14 @@ if(permission) {
             jsonPagesMobileSLLStripping["pages (safe and not safe against sllstrpping with all user agent)"] = pagesProtectionAndNoProtectionAgainstSLLStripping
             fs.writeFileSync(`./${finalResult}-${bro}/compResultAllPagesUsingMobileBrowsers(safe and not safe against sllstrpping with all user agent).json`, JSON.stringify(jsonPagesMobileSLLStripping))
  
-            if(choice === "1"){
+            if(choice === 1){
                 let lengthVP = 0;
                 for(var u of web){
-                    //console.log(u)
-                    if(!notReachableWebSites2.includes(u)){
-                        lengthVP++;
-                        if(!fs.existsSync(`${resultFolderViewPort}-${bro}`)){
-                            fs.mkdirSync(path.join("./", `${resultFolderViewPort}-${bro}`));
-                        }
-                        //console.log("HHHHHHHHHHHHHHHHHHHHHHHHHH")
-                        compareViewport(u, `${folder2}-${bro}`, `${resultFolderViewPort}-${bro}`)
-    
-                    }  
+                    lengthVP++;
+                    if(!fs.existsSync(`${resultFolderViewPort}-${bro}`)){
+                        fs.mkdirSync(path.join("./", `${resultFolderViewPort}-${bro}`));
+                    }
+                    compareViewport(u, `${folder2}-${bro}`, `${resultFolderViewPort}-${bro}`) 
                 }
             
                 let jsonFV = {}
@@ -1431,25 +1290,20 @@ if(permission) {
 
                 let lengthnum = 0;
                 for(let u of uri){
-                    //console.log("AAAAAAAAAA")
-
-                    if(!notReachableWebSites.includes(u)){
-                        lengthnum++;
-                        let i = u.split(".")
-                        let page = ""
-                        for(let j = 0; j < i.length; j++){
-                            if(j!=i.length-1){
-                                page += i[j]+"-"
-                            }else{
-                                page += i[j]
-                            }
-                        } 
-                        if(!fs.existsSync(`${resultFolder2Desktop}-${bro}`)){
-                            fs.mkdirSync(path.join("./", `${resultFolder2Desktop}-${bro}`));
+                    lengthnum++;
+                    let i = u.split(".")
+                    let page = ""
+                    for(let j = 0; j < i.length; j++){
+                        if(j!=i.length-1){
+                            page += i[j]+"-"
+                        }else{
+                            page += i[j]
                         }
-                        compareHomeWithSubpagesForEachDevices(page, `${folder2}-${bro}`, `${resultFolder2Desktop}-${bro}`, d)
-    
+                    } 
+                    if(!fs.existsSync(`${resultFolder2Desktop}-${bro}`)){
+                        fs.mkdirSync(path.join("./", `${resultFolder2Desktop}-${bro}`));
                     }
+                    compareHomeWithSubpagesForEachDevices(page, `${folder2}-${bro}`, `${resultFolder2Desktop}-${bro}`, d)
                  
                 }
     
@@ -1655,23 +1509,20 @@ if(permission) {
                 console.log("TTTTTTTTTTTTTTTTT")*/
                 let lengthnum2 = 0;
                 for(let u of uri){
-                    if(!notReachableWebSites.includes(u)){
-                        lengthnum2++;
-                        let i = u.split(".")
-                        let page = ""
-                        for(let j = 0; j < i.length; j++){
-                            if(j!=i.length-1){
-                                page += i[j]+"-"
-                            }else{
-                                page += i[j]
-                            }
-                        } 
-                        if(!fs.existsSync(`${resultFolder2Mobile}-${bro}`)){
-                            fs.mkdirSync(path.join("./", `${resultFolder2Mobile}-${bro}`));
+                    lengthnum2++;
+                    let i = u.split(".")
+                    let page = ""
+                    for(let j = 0; j < i.length; j++){
+                        if(j!=i.length-1){
+                            page += i[j]+"-"
+                        }else{
+                            page += i[j]
                         }
-                        compareHomeWithSubpagesForEachDevices(page, `${folder2}-${bro}`, `${resultFolder2Mobile}-${bro}`, d)
-    
+                    } 
+                    if(!fs.existsSync(`${resultFolder2Mobile}-${bro}`)){
+                        fs.mkdirSync(path.join("./", `${resultFolder2Mobile}-${bro}`));
                     }
+                    compareHomeWithSubpagesForEachDevices(page, `${folder2}-${bro}`, `${resultFolder2Mobile}-${bro}`, d)
                  
                 }
     
@@ -1810,106 +1661,15 @@ if(permission) {
 
 
             }
-
-           
-        
-        
-            //web.pushe(2)
-            
-             //console.log(uri)
-             /*
-             numberOfHomeSubpagesWithSafeCSPForAllUserAgent = 0
-             numberOfHomeSubpagesWithNotSafeCSPForAllUserAgent = 0
-             numberOfHomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent = 0
-             HomeSubpagesWithSafeCSPForAllUserAgent = new Array()
-             HomeSubpagesWithNotSafeCSPForAllUserAgent = new Array()
-             HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent = new Array();
-            
-            for(let u of uri){
-                let i = u.split(".")
-                let page = ""
-                for(let j = 0; j < i.length; j++){
-                    if(j!=i.length-1){
-                        page += i[j]+"-"
-                    }else{
-                        page += i[j]
-                    }
-                } 
-                if(!fs.existsSync(`${resultFolder2Desktop}-${bro}`)){
-                    fs.mkdirSync(path.join("./", `${resultFolder2Desktop}-${bro}`));
-                }
-                
-                compareHomeWithSubpages(page, `${resultFolderDesktop}-${bro}`, `${resultFolder2Desktop}-${bro}`, desktop)
-    
-
-            }
-            
-            let jsonHomeSubpagesDesktop = {}
-            jsonHomeSubpagesDesktop["number of Home and Subpages(safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithSafeCSPForAllUserAgent}`
-            jsonHomeSubpagesDesktop["Home and Subpages(safe CSP for all user agents)"] = HomeSubpagesWithSafeCSPForAllUserAgent
-            fs.writeFileSync(`./${finalResult}-${bro}/compResultAllHome-SubpagesUsingDesktopBrowsers(safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesDesktop))
-            jsonHomeSubpagesDesktop = {}
-            jsonHomeSubpagesDesktop["number of Home and Subpages(not safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithNotSafeCSPForAllUserAgent}`
-            jsonHomeSubpagesDesktop["Home and Subpages(not safe CSP for all user agents)"] = HomeSubpagesWithNotSafeCSPForAllUserAgent
-            fs.writeFileSync(`./${finalResult}-${bro}/compResultAllHome-SubpagesUsingDesktopBrowsers(not safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesDesktop))
-            jsonHomeSubpagesDesktop = {}
-            jsonHomeSubpagesDesktop["number of Home and Subpages(safe and not safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent}`
-            jsonHomeSubpagesDesktop["Home and Subpages(safe and not safe CSP for all user agents)"] = HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent
-            fs.writeFileSync(`./${finalResult}-${bro}/compResultAllHome-SubpagesUsingDesktopBrowsers(safe and not safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesDesktop))
-        
-            //devArr.pushe(2)
-
-            
-            numberOfHomeSubpagesWithSafeCSPForAllUserAgent = 0
-            numberOfHomeSubpagesWithNotSafeCSPForAllUserAgent = 0
-            numberOfHomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent = 0
-            HomeSubpagesWithSafeCSPForAllUserAgent = new Array()
-            HomeSubpagesWithNotSafeCSPForAllUserAgent = new Array()
-            HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent = new Array();
-            //console.log(uri)
-
-            for(let u of uri){
-                //devArr.pushe(2)
-
-                let i = u.split(".")
-                let page = ""
-                for(let j = 0; j < i.length; j++){
-                    if(j!=i.length-1){
-                        page += i[j]+"-"
-                    }else{
-                        page += i[j]
-                    }
-                } 
-                if(!fs.existsSync(`${resultFolder2Mobile}-${bro}`)){
-                    fs.mkdirSync(path.join("./", `${resultFolder2Mobile}-${bro}`));
-                }
-               
-                compareHomeWithSubpages(page, `${resultFolderMobile}-${bro}`, `${resultFolder2Mobile}-${bro}`, mobile)
- 
- 
-            }
-        
-            let jsonHomeSubpagesMobile = {}
-            jsonHomeSubpagesMobile["number of Home and Subpages(safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithSafeCSPForAllUserAgent}`
-            jsonHomeSubpagesMobile["Home and Subpages(safe CSP for all user agents)"] = HomeSubpagesWithSafeCSPForAllUserAgent
-            fs.writeFileSync(`./${finalResult}-${bro}/compResultAllHome-SubpagesUsingMobileBrowsers(safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesMobile))
-            jsonHomeSubpagesMobile = {}
-            jsonHomeSubpagesMobile["number of Home and Subpages(not safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithNotSafeCSPForAllUserAgent}`
-            jsonHomeSubpagesMobile["Home and Subpages(not safe CSP for all user agents)"] = HomeSubpagesWithNotSafeCSPForAllUserAgent
-            fs.writeFileSync(`./${finalResult}-${bro}/compResultAllHome-SubpagesUsingMobileBrowsers(not safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesMobile))
-            jsonHomeSubpagesMobile = {}
-            jsonHomeSubpagesMobile["number of Home and Subpages(safe and not safe CSP for all user agents)"] = `${numberOfHomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent}`
-            jsonHomeSubpagesMobile["Home and Subpages(safe and not safe CSP for all user agents)"] = HomeSubpagesWithSafeAndNotSafeCSPForAllUserAgent
-            fs.writeFileSync(`./${finalResult}-${bro}/compResultAllHome-SubpagesUsingMobileBrowsers(safe and not safe CSP for all user agents).json`, JSON.stringify(jsonHomeSubpagesMobile))
-              web.pushe(2)*/
-
         }
-        //console.log(files)
-       
+
     }
-   
-     
-}
+  
+  }
+
+
+
+
 
 function compareHomeWithSubpagesForEachDevices(pageName, comparePath, resultPath, device){
     /*console.log("JJJJJJJJJJJJJJJJJJJJJJ")
@@ -2877,7 +2637,6 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
 
                     /*console.log(csp_policies[i][1][31])
                     console.log(pageName)*/
-                    testURL2.push(pageName)
                 }
                 break;
     
@@ -2888,7 +2647,6 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
                     pagesDeployAndNotDeploy.push([url, `${csp_policies[i][1][0][1]} hXw:${csp_policies[i][1][4][1]}x${csp_policies[i][1][5][1]}`])
                     /*console.log(csp_policies[i][1][31])
                     console.log(pageName)*/
-                    testURL3.push(pageName)
                 }
                 break;
                 default: console.log('csp deploying')
@@ -3161,6 +2919,7 @@ function compareViewport(pageName, comparePath, resultPath){
     let deviceWithDifferentViewPortSafeAndNotSafeCSP = 0;
     let pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray = new Array();
     let uri = "";
+    console.log(devArr)
     for(var d of devArr){
         let arr = new Array()
         for(var dev of devUA){

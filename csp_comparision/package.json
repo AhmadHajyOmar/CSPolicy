@@ -18,7 +18,8 @@
     "prompt-sync": "^4.2.0",
     "puppeteer": "^19.7.5",
     "save": "^2.9.0",
-    "ua-parser-js": "^1.0.35"
+    "ua-parser-js": "^1.0.35",
+    "util": "^0.12.5"
   },
   "directories": {
     "test": "tests"
