@@ -394,22 +394,19 @@ for(var e of array){
           let version;
           if(chBro === 1){
             browser = await playwright.webkit.launch({headless: headmode,
-              //slowMo:  0,
-              timeout: 30 * 100000});  
+              timeout: 30 * 1000});  
             broserName = "WebKit"
           }
           if(chBro === 2){
             browser = await playwright.chromium.launch({ headless: headmode,
-              //slowMo:  0,
-              timeout: 30 * 100000});
+              timeout: 30 * 1000});
             broserName = "Chrome"  
           }
          
           if(chBro === 3){
 
             browser = await playwright.firefox.launch({ headless: headmode,
-              //slowMo:  0,
-              timeout: 30 * 100000});  
+              timeout: 30 * 1000});  
             broserName = "Firefox"  
             
           }
