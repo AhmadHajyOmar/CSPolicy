@@ -156,7 +156,8 @@ let browserChoice = "";
 var op = ["Android", "iOS", "Windows", "Mac OS"]
 var acceptLanguage = "";
 
-
+var searchSubPages = false;
+let reachable = false;
 
 
 (async() => {
@@ -211,6 +212,7 @@ for(var e of array){
   
 
   if(choice === 1){
+    searchSubPages = true;
     if(usedBrowserToTest.includes("WebKit")){
       for(let devW of devNamesWebkit){
         devNames.push(devW)
@@ -239,6 +241,8 @@ for(var e of array){
     choosedBrowsers.push(3)
 
     if(website[0] == 'h'){
+      console.log("ZZZZZZZZZZZZZZZZZZZZZ")
+      searchSubPages = true;
       if(op.includes("Android")){
         for(let i = 0; i < 1;){
           let ua = getNoneExistedMobileDesktopUserAgent(["Android"])
@@ -319,6 +323,7 @@ for(var e of array){
   }
   let uamalFormed = new Array()
   if(choice === 3){
+    searchSubPages = true;
     choosedBrowsers.push(1)
     choosedBrowsers.push(2)
     choosedBrowsers.push(3)
@@ -357,7 +362,6 @@ for(var e of array){
       let dev = devNames[q]
       let found1 = false;
      
-      let reachable = true;
       for(let i = 0; i < choosedBrowsers.length; i++){
         dev = devNames[q]
         //console.log(dev)
@@ -666,6 +670,7 @@ for(var e of array){
             if(time > 0){
               await waitingTime(time)
             }
+            reachable = true;
           }catch (e) {
             //console.log(e);
             ``
@@ -688,9 +693,13 @@ for(var e of array){
           var index_url = 0
           var paths = new Array();
           //console.log(subPages)
-          /*
-          if(searchSubPages && reachable) {
-
+          console.log(searchSubPages)
+          console.log(reachable)
+          /*if(searchSubPages && reachable) {
+            searchSubPages = false;
+            let flage_homePage = true;
+            let flage_subpages = true;
+            let line = new String()
             for(let i = 0; i < subPages.length; i++) {
               if(subPages[i][0] === url) {
                 urlIsThere = true
@@ -704,7 +713,7 @@ for(var e of array){
             }
 
             if(urlIsThere){
-              
+              flage_subpages = false;
               if(flage_homePage){
                 flage_homePage = false;
                 line += url + " "
@@ -730,7 +739,7 @@ for(var e of array){
                 flage_subpages = false;
                 if(flage_homePage){
                   flage_homePage = false;
-                  line += `${url}Ahmad${page_name}` + " "
+                  line += `${url}Ahmad${pageName}` + " "
                 }
                 let links;
                 try{
@@ -751,7 +760,11 @@ for(var e of array){
                       //console.log(u)
                       //console.log(url.pathname)
                     }
-                    
+                    console.log(links)
+                    console.log(links.length)
+                    console.log(paths)
+                    console.log(paths.length)
+
                     if(paths.length <= 4) {
                       console.log("OR HIERRRRRRRRRRRRRRRRRRRRRRRRR")
                       let counter = 0;
@@ -803,8 +816,8 @@ for(var e of array){
                
               } 
             }	
-          }
-          */
+          }*/
+        
           await context.close();
           await browser.close();
         }

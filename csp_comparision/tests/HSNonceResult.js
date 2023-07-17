@@ -13,6 +13,7 @@ const { isContext, createContext } = require('vm');
 const { NOTFOUND } = require('dns');
 const { join } = require('path');
 const { kMaxLength } = require('buffer');
+
 var array = [
   ["-15.844159", "-47.914547", "w", "en-US", "1"],
   ["40.4081906", "78.5004047", "w", "en-US", "1"],
@@ -70,7 +71,8 @@ var uriSub = fs.readFileSync("./tests/SubpagseNames.txt", 'utf-8').split(/\r?\n/
 for(var e of uriSub){
   web.push(e)
 }
-
+let numberOfTotalHomePagesWithNoncesUsingDiffDev = 0;
+let homePagesArr = new Array();
 let choosedBrowsers = new Array();
 let usedBrowserToTest = new Array();
 var subPages = new Array();
@@ -85,6 +87,8 @@ var dir = "("
 
 
 for(var e of array){
+  numberOfTotalHomePagesWithNoncesUsingDiffDev = 0;
+  homePagesArr = new Array();
   console.log(e)
   choosedBrowsers = new Array()
   usedBrowserToTest = new Array();

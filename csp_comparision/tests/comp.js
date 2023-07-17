@@ -138,8 +138,6 @@ let HomeSubpagesSafeAgainstsllstrippingForAllUserAgent = new Array();
 let HomeSubpagesUnSafeAgainstsllstrippingForAllUserAgent = new Array();
 let HomeSubpagesSafeAndUnSafeAgainstsllstrippingForAllUserAgent = new Array();
 let HomeSubpagesSafeAndUnSafeAgainstsllstrippingForAllUserAgentDetails = new Array();
-
-
 var array = [
     ["-15.844159", "-47.914547", "w", "en-US", "1"],
     ["40.4081906", "78.5004047", "w", "en-US", "1"],
@@ -177,7 +175,7 @@ var array = [
     ["40.4081906", "-3.6894398", "c", "AR;q=10", "2"],
     ["40.4081906", "-3.6894398", "c", "ab-YZ", "2"]
    
-]
+  ]
 var uri = fs.readFileSync("./website_1.txt", 'utf-8').split(/\r?\n/);
 let web = new Array();
 for(var u of uri){
@@ -857,6 +855,7 @@ for(var e of array){
             //console.log(mobile)
             let lengthWeb = 0;
             console.log(web)
+            web = ["imdb-com"]
             //web.pushe(2)
             for(let u of web){
                 lengthWeb++;
@@ -1068,7 +1067,7 @@ for(var e of array){
             pagesProtectionAgainstSLLStripping = new Array();
             pagesNoProtectionAgainstSLLStripping = new Array();
             pagesProtectionAndNoProtectionAgainstSLLStripping = new Array();
-
+            console.log(mobile)
             let lengthWeb2 = 0;
             for(let u of web){
                 lengthWeb2++;
@@ -1077,7 +1076,7 @@ for(var e of array){
                 }
                 compareWebsite(u, `${folder2}-${bro}`, `${resultFolderMobile}-${bro}`, mobile)  
             }
-
+            //mobile.pushe(2)
             console.log("Mobile")
 
             let jsonPagesMobileDeployingCSP = {}
@@ -2179,10 +2178,13 @@ function compareHomeWithSubpagesForEachDevices(pageName, comparePath, resultPath
 function compareWebsite(pageName, comparePath, resultPath, devices){
     
     const  jsonsFiles =  fs.readdirSync(comparePath).filter((filename) => path.extname(filename) === '.json');
+    console.log(jsonsFiles)
+    console.log(pageName)
     let csp_policies = new Array();
     jsonsFiles.forEach(filename => {
         let csp = new Array()
         if(filename.includes(`${pageName}.json`)) {
+            console.log("FFFFFFFFFFFFFFFFF")
             const fileData = fs.readFileSync(path.join(comparePath, filename));                    
             const json_arr = JSON.parse(fileData.toString());
             let json_str = JSON.stringify(json_arr);
@@ -2228,6 +2230,13 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
 
     });
     //console.log(csp_policies)
+    console.log("UUUUUUUUUUUUUUUUUUUUUUUUUs")
+    console.log(csp_policies.length)
+    console.log(csp_policies[0])
+    console.log(csp_policies[1])
+    console.log(csp_policies[2])
+    console.log(csp_policies[3])
+
     if(csp_policies.length > 0){
         let pagesWithSafeCSPWithAllUserAgentsNr = 0;
         let pagesWithNotSafeCSPWithAllUserAgentsNr = 0;
@@ -2405,6 +2414,8 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
                 }else{
                     //console.log("KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK")
                     dev_no_cspHeader.push(device)
+                    dev_with_cspHeader.push(device)
+                    pagesWithNotSafeCSPWithAllUserAgentsNr++;
                 }
                 //console.log(causeOfNotSafty.length)
                 //console.log(causeOfNotSafty.le > 1)
@@ -2663,7 +2674,17 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
                     dev_deploying_csp.push(device)
                     pagesdeployCSPWithAllUserAgents++;
                     pagesdeployAndNotDeployCSPWithAllUserAgents++;
-                    pagesDeployAndNotDeploy.push([url, `${csp_policies[i][1][0][1]} hXw:${csp_policies[i][1][4][1]}x${csp_policies[i][1][5][1]}`])
+                    let insert = true;
+                    let info = `${csp_policies[i][1][0][1]} hXw:${csp_policies[i][1][4][1]}x${csp_policies[i][1][5][1]} Deploy : true`;
+                    for(var e of pagesDeployAndNotDeploy){
+                        if (e[0] === url && e[1] === info){
+                            insert = false;
+                            break;
+                        }
+                    }
+                    if(insert){
+                        pagesDeployAndNotDeploy.push([url, info])  
+                    }
 
                     /*console.log(csp_policies[i][1][31])
                     console.log(pageName)*/
@@ -2674,8 +2695,18 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
                     dev_not_deploying_csp.push(device)
                     pagesDoesNotdeployCSPWithAllUserAgents++;
                     pagesdeployAndNotDeployCSPWithAllUserAgents++;
-                    pagesDeployAndNotDeploy.push([url, `${csp_policies[i][1][0][1]} hXw:${csp_policies[i][1][4][1]}x${csp_policies[i][1][5][1]}`])
-                    /*console.log(csp_policies[i][1][31])
+
+                    let insert = true;
+                    let info = `${csp_policies[i][1][0][1]} hXw:${csp_policies[i][1][4][1]}x${csp_policies[i][1][5][1]} Deploy : false`;
+                    for(var e of pagesDeployAndNotDeploy){
+                        if (e[0] === url && e[1] === info){
+                            insert = false;
+                            break;
+                        }
+                    }
+                    if(insert){
+                        pagesDeployAndNotDeploy.push([url, info])  
+                    }                    /*console.log(csp_policies[i][1][31])
                     console.log(pageName)*/
                 }
                 break;
@@ -2774,18 +2805,22 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
   
         if(numberOfPagesProtectionAgainstStealingCookiesLocal === devices.length){
             //console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+            pagesProtectionAndNoProtectionAgainstStealingCookiesLocal = new Array();
+            numberOfPagesProtectionAndNoProtectionAgainstStealingCookiesLocal = 0;
             if(!pagesProtectionAgainstStealingCookies.includes(url)){
                 pagesProtectionAgainstStealingCookies.push(url)
                 numberOfPagesProtectionAgainstStealingCookies++;
             }
 
         }else if(numberOfPagesNoProtectionAgainstStealingCookiesLocal === devices.length){
+            pagesProtectionAndNoProtectionAgainstStealingCookiesLocal = new Array();
+            numberOfPagesProtectionAndNoProtectionAgainstStealingCookiesLocal = 0;
             if(!pagesNoProtectionAgainstStealingCookies.includes(url)){
                 pagesNoProtectionAgainstStealingCookies.push(url)
                 numberOfPagesNoProtectionAgainstStealingCookies++;
             }
         }else{
-            if(numberOfPagesProtectionAndNoProtectionAgainstStealingCookies > 0){
+            if(numberOfPagesProtectionAndNoProtectionAgainstStealingCookiesLocal > 0){
                 numberOfPagesProtectionAndNoProtectionAgainstStealingCookies++;
                 pagesProtectionAndNoProtectionAgainstStealingCookies
                 for(var v of pagesProtectionAndNoProtectionAgainstStealingCookiesLocal){
@@ -2794,9 +2829,14 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
             }
         }
 
+        console.log("JJJJJJJJJJJJJJJJJJJJ")
+        console.log(pagesdeployCSPWithAllUserAgents)
+        console.log(pagesDoesNotdeployCSPWithAllUserAgents)
+        console.log(pagesdeployAndNotDeployCSPWithAllUserAgents)
 
         if(pagesdeployCSPWithAllUserAgents === devices.length){
             pagesDeployAndNotDeploy = new Array();
+            pagesdeployAndNotDeployCSPWithAllUserAgents = 0;
             if(!pagesdeployCSPWithAllUserAgentsArr.includes(url)){
                 pagesdeployCSPWithAllUserAgentsArr.push(url)
                 numberpagesdeployCSPWithAllUserAgentsArr++;
@@ -2804,6 +2844,7 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
             }
         }else if(pagesDoesNotdeployCSPWithAllUserAgents === devices.length){
             pagesDeployAndNotDeploy = new Array()
+            pagesdeployAndNotDeployCSPWithAllUserAgents = 0;
             if(!pagesDoesNotdeployCSPWithAllUserAgentsArr.includes(url)){
                 pagesDoesNotdeployCSPWithAllUserAgentsArr.push(url)
                 numberpagesDoesNotdeployCSPWithAllUserAgentsArr++;
@@ -2817,15 +2858,22 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
                 numberpagesdeployAndNotDeployCSPWithAllUserAgentArr++;
             }
         }
-
+        console.log("dddddddddddddddddddddd")
+        console.log(pagesWithSafeCSPWithAllUserAgentsNr)
+        console.log(pagesWithNotSafeCSPWithAllUserAgentsNr)
+        console.log(pagesWithSafeAndNotSafeCSPWithAllUserAgentsNr)
+        
         if(pagesWithSafeCSPWithAllUserAgentsNr === devices.length){
+            console.log("DDDDDDDDDDDDDDDDDDDDDDDDDD")
             pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray = new Array()
+            pagesWithSafeAndNotSafeCSPWithAllUserAgentsNr = 0;
             if(!pagesWithSafeCSPWithAllUserAgent.includes(url)){
                 pagesWithSafeCSPWithAllUserAgent.push(url)
                 numberOfPagesWithSafeCSPWithAllUserAgent++;
             }
         }else if(pagesWithNotSafeCSPWithAllUserAgentsNr === devices.length){
             pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray = new Array()
+            pagesWithSafeAndNotSafeCSPWithAllUserAgentsNr = 0;
             if(!pagesWithNotSafeCSPWithAlluserAgent.includes(url)){
                 pagesWithNotSafeCSPWithAlluserAgent.push(url)
                 numberOfPagesWithNotSafeCSPWithAllUserAgent++;
@@ -2844,12 +2892,14 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
 
         if(numberOfPagesProtectionAgainstCSRFLocal === devices.length){
             pagesProtectionAndNoProtectionAgainstCSRFLocal = new Array()
+            numberOfPagesProtectionAndNoProtectionAgainstCSRFLocal = 0;
             if(!pagesProtectionAgainstCSRF.includes(url)){
                 pagesProtectionAgainstCSRF.push(url)
                 numberOfPagesProtectionAgainstCSRF++;
             }
         }else if(numberOfPagesNoProtectionAgainstCSRFLocal === devices.length){
             pagesProtectionAndNoProtectionAgainstCSRFLocal = new Array()
+            numberOfPagesProtectionAndNoProtectionAgainstCSRFLocal = 0;
             if(!pagesNoProtectionAgainstCSRF.includes(url)){
                 pagesNoProtectionAgainstCSRF.push(url)
                 numberOfPagesNoProtectionAgainstCSRF++;
@@ -2869,12 +2919,14 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
 
         if(numberOfPagesProtectionAgainsthijackingLocal === devices.length){
             pagesProtectionAndNoProtectionAgainsthijackingLocal = new Array()
+            numberOfPagesProtectionAndNoProtectionAgainsthijackingLocal = 0;
             if(!pagesProtectionAgainsthijacking.includes(url)){
                 pagesProtectionAgainsthijacking.push(url)
                 numberOfPagesProtectionAgainsthijacking++;
             }
         }else if(numberOfPagesNoProtectionAgainsthijackingLocal === devices.length){
             pagesProtectionAndNoProtectionAgainsthijackingLocal = new Array()
+            numberOfPagesProtectionAndNoProtectionAgainsthijackingLocal = 0;
             if(!pagesNoProtectionAgainsthijacking.includes(url)){
                 pagesNoProtectionAgainsthijacking.push(url)
                 numberOfPagesNoProtectionAgainsthijacking++;
@@ -2892,12 +2944,14 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
 
         if(numberOfPagesProtectionAgainstclickjackingLocal === devices.length){
             pagesProtectionAndNoProtectionAgainstclickjackingLocal = new Array()
+            numberOfPagesProtectionAndNoProtectionAgainstclickjackingLocal = 0;
             if(!pagesProtectionAgainstclickjacking.includes(url)){
                 pagesProtectionAgainstclickjacking.push(url)
                 numberOfPagesProtectionAgainstclickjacking++;
             }
         }else if(numberOfPagesNoProtectionAgainstclickjackingLocal === devices.length){
             pagesProtectionAndNoProtectionAgainstclickjackingLocal = new Array()
+            numberOfPagesProtectionAndNoProtectionAgainstclickjackingLocal = 0;
             if(!pagesNoProtectionAgainstclickjacking.includes(url)){
                 pagesNoProtectionAgainstclickjacking.push(url)
                 numberOfPagesNoProtectionAgainstclickjacking++;
@@ -2916,12 +2970,14 @@ function compareWebsite(pageName, comparePath, resultPath, devices){
 
         if(numberOfPagesProtectionAgainstSLLStrippingLocal === devices.length){
             pagesProtectionAndNoProtectionAgainstSLLStrippingLocal = new Array()
+            numberOfPagesProtectionAndNoProtectionAgainstSLLStrippingLocal = 0;
             if(!pagesProtectionAgainstSLLStripping.includes(url)){
                 pagesProtectionAgainstSLLStripping.push(url)
                 numberOfPagesProtectionAgainstSLLStripping++;
             }
         }else if(numberOfPagesNoProtectionAgainstclickjackingLocal === devices.length){
             pagesProtectionAndNoProtectionAgainstSLLStrippingLocal = new Array()
+            numberOfPagesProtectionAndNoProtectionAgainstSLLStrippingLocal = 0;
             if(!pagesNoProtectionAgainstSLLStripping.includes(url)){
                 pagesNoProtectionAgainstSLLStripping.push(url)
                 numberOfPagesNoProtectionAgainstSLLStripping++;
@@ -2949,7 +3005,7 @@ function compareViewport(pageName, comparePath, resultPath){
     let deviceWithDifferentViewPortSafeAndNotSafeCSP = 0;
     let pagesDViewPSafeAndNotSafeCSPWithDevicesInfoLocalArray = new Array();
     let uri = "";
-    console.log(devArr)
+    //console.log(devArr)
     for(var d of devArr){
         let arr = new Array()
         for(var dev of devUA){
@@ -3634,4 +3690,3 @@ function waitingTime(ms) {
     
 
 }
-
